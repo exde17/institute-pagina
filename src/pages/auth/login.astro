@@ -1,0 +1,54 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="Iniciar sesión — Instituto Fundación" description="Accede para inscribirte y ver tus programas.">
+  <section class="mx-auto max-w-md px-4 py-12">
+    <h1 class="text-3xl md:text-4xl font-bold">Iniciar sesión</h1>
+    <p class="mt-2 text-slate-700">Ingresa con tu correo y contraseña.</p>
+
+    <form id="form-login" method="post" action="#" class="mt-6 grid gap-3">
+      <label class="grid gap-1">
+        <span class="text-sm">Correo</span>
+        <input type="email" name="email" required class="border rounded px-3 py-2" placeholder="tu@email.com" />
+      </label>
+
+      <label class="grid gap-1">
+        <span class="text-sm">Contraseña</span>
+        <input type="password" name="password" required class="border rounded px-3 py-2" placeholder="Tu contraseña" />
+      </label>
+
+      <button class="mt-2 bg-slate-900 text-white rounded px-4 py-2">Entrar</button>
+      <p id="msg" class="text-sm text-slate-600 mt-2"></p>
+    </form>
+
+    <p class="mt-6 text-sm">
+      ¿No tienes cuenta? <a class="underline" href="/auth/register">Crea una cuenta</a>
+    </p>
+  </section>
+
+  <script>
+    import { loginReq, saveAuth } from '../../lib/auth.ts';
+
+    const form = document.getElementById('form-login');
+    const msg = document.getElementById('msg');
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.textContent = 'Verificando credenciales...';
+      const fd = new FormData(form);
+      try {
+        const out = await loginReq({
+          email: String(fd.get('email') || ''),
+          password: String(fd.get('password') || ''),
+        });
+        // El backend devuelve todo en un solo objeto con el token incluido
+        const { token, ...user } = out;
+        saveAuth(token, user);
+        msg.textContent = 'Acceso correcto. Redirigiendo...';
+        window.location.href = '/';
+      } catch (err) {
+        msg.textContent = err.message || 'Credenciales inválidas';
+      }
+    });
+  </script>
+</Layout>

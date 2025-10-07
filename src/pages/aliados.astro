@@ -1,0 +1,23 @@
+---
+import Layout from '../layouts/Layout.astro';
+const aliados = [
+  { nombre: 'Empresa A', logo: '/partners/empresa-a.png', url: 'https://empresa-a.com' },
+  { nombre: 'Empresa B', logo: '/partners/empresa-b.png', url: 'https://empresa-b.com' },
+  { nombre: 'Universidad C', logo: '/partners/universidad-c.png', url: 'https://universidad-c.edu' },
+  { nombre: 'ONG D', logo: '/partners/ong-d.png', url: 'https://ong-d.org' },
+];
+---
+<Layout title="Aliados — Instituto Fundación" description="Organizaciones aliadas que hacen posible nuestra labor.">
+  <section class="mx-auto max-w-6xl px-4 py-12">
+    <h1 class="text-3xl md:text-4xl font-bold">Aliados</h1>
+    <p class="mt-3 text-slate-700">Agradecemos el apoyo de nuestras organizaciones aliadas.</p>
+
+    <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-6 items-center">
+      {aliados.map(a => (
+        <a href={a.url} target="_blank" rel="noopener" class="rounded-2xl border p-6 flex items-center justify-center hover:shadow">
+          <img src={a.logo} alt={a.nombre} class="max-h-10 object-contain" />
+        </a>
+      ))}
+    </div>
+  </section>
+</Layout>

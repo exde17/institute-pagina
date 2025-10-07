@@ -1,0 +1,67 @@
+---
+// src/pages/auth/register.astro
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="Crear cuenta — Instituto Fundación" description="Regístrate para inscribirte a programas.">
+  <section class="mx-auto max-w-md px-4 py-12">
+    <h1 class="text-3xl md:text-4xl font-bold">Crear cuenta</h1>
+    <p class="mt-2 text-slate-700">Regístrate para gestionar tus inscripciones y pagos.</p>
+
+    <form id="form-register" method="post" action="#" class="mt-6 grid gap-3">
+      <label class="grid gap-1">
+        <span class="text-sm">Nombres</span>
+        <input name="firstName" required class="border rounded px-3 py-2" placeholder="Tus nombres" />
+      </label>
+
+      <label class="grid gap-1">
+        <span class="text-sm">Apellidos</span>
+        <input name="lastName" required class="border rounded px-3 py-2" placeholder="Tus apellidos" />
+      </label>
+
+      <label class="grid gap-1">
+        <span class="text-sm">Correo</span>
+        <input type="email" name="email" required class="border rounded px-3 py-2" placeholder="tu@email.com" />
+      </label>
+
+      <label class="grid gap-1">
+        <span class="text-sm">Contraseña</span>
+        <input type="password" name="password" required minlength="6" class="border rounded px-3 py-2" placeholder="Mínimo 6 caracteres" />
+      </label>
+
+      <button class="mt-2 bg-blue-800 text-white rounded px-4 py-2">Crear cuenta</button>
+      <p id="msg" class="text-sm text-slate-600 mt-2"></p>
+    </form>
+
+    <p class="mt-6 text-sm">
+      ¿Ya tienes cuenta? <a class="underline" href="/auth/login">Inicia sesión</a>
+    </p>
+  </section>
+
+  <script>
+    import { registerReq, saveAuth } from '../../lib/auth.ts';
+
+    const form = document.getElementById('form-register');
+    const msg = document.getElementById('msg');
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.textContent = 'Creando cuenta...';
+      const fd = new FormData(form);
+      try {
+        const out = await registerReq({
+          firstName: String(fd.get('firstName') || ''),
+          lastName: String(fd.get('lastName') || ''),
+          email: String(fd.get('email') || ''),
+          password: String(fd.get('password') || ''),
+        });
+        // El backend devuelve todo en un solo objeto con el token incluido
+        const { token, ...user } = out;
+        saveAuth(token, user);
+        msg.textContent = 'Cuenta creada. Redirigiendo...';
+        window.location.href = '/';
+      } catch (err) {
+        msg.textContent = err.message || 'No se pudo crear la cuenta';
+      }
+    });
+  </script>
+</Layout>

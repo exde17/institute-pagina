@@ -1,0 +1,383 @@
+---
+/* Importa Tailwind aquí (v4) */
+import '../styles/global.css';
+
+const {
+  title = 'Instituto Fundación',
+  description = 'Educación, desarrollo social y transformación',
+  image = '/hero.jpg', // ✅ default para evitar "image is not defined"
+} = Astro.props;
+
+const ogUrl = Astro.url?.href ?? ''; // opcional: URL actual para Open Graph
+---
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content={image} />
+    <meta property="og:url" content={ogUrl} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={image} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen flex flex-col bg-white text-slate-900">
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+      <nav class="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
+        <!-- Logo -->
+        <a href="/" class="flex items-center gap-2 group z-50">
+          <div class="relative">
+            <img src="/favicon.svg" alt="Logo" class="h-9 w-9 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+            <div class="absolute inset-0 bg-blue-500 rounded-full blur opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+          </div>
+          <span class="font-bold tracking-wide text-base md:text-lg bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text">
+            Instituto Fundación
+          </span>
+        </a>
+        
+        <!-- Menú Desktop -->
+        <ul class="hidden lg:flex items-center gap-1 text-sm font-medium">
+          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/programas">
+            Programas
+          </a></li>
+          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/noticias">
+            Noticias
+          </a></li>
+          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/nosotros">
+            Nosotros
+          </a></li>
+          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/aliados">
+            Aliados
+          </a></li>
+          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/transparencia">
+            Transparencia
+          </a></li>
+          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/contacto">
+            Contacto
+          </a></li>
+          <li>
+            <a class="btn-donar bg-gradient-to-r from-amber-400 to-orange-400 text-black font-bold px-6 py-2.5 rounded-lg shadow-md hover:shadow-xl transform hover:scale-105 transition-all duration-300 ml-2 relative overflow-hidden" href="/donar">
+              <span class="relative z-10">💛 Donar</span>
+            </a>
+          </li>
+        </ul>
+
+        <!-- Botón Hamburguesa -->
+        <button 
+          id="mobile-menu-button" 
+          class="lg:hidden z-50 relative w-10 h-10 flex flex-col items-center justify-center gap-1.5 group"
+          aria-label="Menú"
+        >
+          <span class="hamburger-line w-6 h-0.5 bg-slate-900 transition-all duration-300 group-hover:bg-blue-700"></span>
+          <span class="hamburger-line w-6 h-0.5 bg-slate-900 transition-all duration-300 group-hover:bg-blue-700"></span>
+          <span class="hamburger-line w-6 h-0.5 bg-slate-900 transition-all duration-300 group-hover:bg-blue-700"></span>
+        </button>
+      </nav>
+
+      <!-- Menú Mobile -->
+      <div 
+        id="mobile-menu" 
+        class="fixed inset-0 bg-slate-900/95 backdrop-blur-lg z-40 lg:hidden transform translate-x-full transition-transform duration-300"
+      >
+        <div class="flex flex-col items-center justify-center h-full gap-6 text-white">
+          <a class="mobile-nav-link text-2xl font-semibold hover:text-blue-400 transition-colors" href="/programas">
+            Programas
+          </a>
+          <a class="mobile-nav-link text-2xl font-semibold hover:text-blue-400 transition-colors" href="/noticias">
+            Noticias
+          </a>
+          <a class="mobile-nav-link text-2xl font-semibold hover:text-blue-400 transition-colors" href="/nosotros">
+            Nosotros
+          </a>
+          <a class="mobile-nav-link text-2xl font-semibold hover:text-blue-400 transition-colors" href="/aliados">
+            Aliados
+          </a>
+          <a class="mobile-nav-link text-2xl font-semibold hover:text-blue-400 transition-colors" href="/transparencia">
+            Transparencia
+          </a>
+          <a class="mobile-nav-link text-2xl font-semibold hover:text-blue-400 transition-colors" href="/contacto">
+            Contacto
+          </a>
+          <a class="bg-gradient-to-r from-amber-400 to-orange-400 text-black font-bold px-8 py-4 rounded-xl shadow-lg text-xl mt-4" href="/donar">
+            💛 Donar
+          </a>
+        </div>
+      </div>
+    </header>
+    
+    <style>
+      @keyframes slideDown {
+        from {
+          transform: translateY(-100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      header {
+        animation: slideDown 0.5s ease-out;
+      }
+
+      .nav-link::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #2563eb, #7c3aed);
+        transform: translateX(-50%);
+        transition: width 0.3s ease;
+      }
+
+      .nav-link:hover::after {
+        width: 80%;
+      }
+
+      .nav-link:active {
+        transform: scale(0.95);
+      }
+
+      .btn-donar::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.4),
+          transparent
+        );
+        transition: left 0.5s;
+      }
+
+      .btn-donar:hover::before {
+        left: 100%;
+      }
+
+      @keyframes pulse-shadow {
+        0%, 100% {
+          box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7);
+        }
+        50% {
+          box-shadow: 0 0 20px 10px rgba(251, 191, 36, 0);
+        }
+      }
+
+      .btn-donar {
+        animation: pulse-shadow 2s infinite;
+      }
+
+      /* Animación del menú hamburguesa */
+      .mobile-menu-open .hamburger-line:nth-child(1) {
+        transform: rotate(45deg) translateY(8px);
+      }
+
+      .mobile-menu-open .hamburger-line:nth-child(2) {
+        opacity: 0;
+      }
+
+      .mobile-menu-open .hamburger-line:nth-child(3) {
+        transform: rotate(-45deg) translateY(-8px);
+      }
+
+      #mobile-menu.active {
+        transform: translateX(0);
+      }
+
+      .mobile-nav-link {
+        animation: slideInRight 0.5s ease-out backwards;
+      }
+
+      .mobile-nav-link:nth-child(1) { animation-delay: 0.1s; }
+      .mobile-nav-link:nth-child(2) { animation-delay: 0.15s; }
+      .mobile-nav-link:nth-child(3) { animation-delay: 0.2s; }
+      .mobile-nav-link:nth-child(4) { animation-delay: 0.25s; }
+      .mobile-nav-link:nth-child(5) { animation-delay: 0.3s; }
+      .mobile-nav-link:nth-child(6) { animation-delay: 0.35s; }
+      .mobile-nav-link:nth-child(7) { animation-delay: 0.4s; }
+
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+    </style>
+
+    <script>
+      // Menú hamburguesa
+      const mobileMenuButton = document.getElementById('mobile-menu-button');
+      const mobileMenu = document.getElementById('mobile-menu');
+
+      mobileMenuButton?.addEventListener('click', () => {
+        mobileMenuButton.classList.toggle('mobile-menu-open');
+        mobileMenu?.classList.toggle('active');
+        document.body.classList.toggle('overflow-hidden');
+      });
+
+      // Cerrar menú al hacer clic en un link
+      const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+      mobileNavLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenuButton?.classList.remove('mobile-menu-open');
+          mobileMenu?.classList.remove('active');
+          document.body.classList.remove('overflow-hidden');
+        });
+      });
+
+      // Cerrar menú con ESC
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mobileMenu?.classList.contains('active')) {
+          mobileMenuButton?.classList.remove('mobile-menu-open');
+          mobileMenu?.classList.remove('active');
+          document.body.classList.remove('overflow-hidden');
+        }
+      });
+    </script>
+
+    <main class="flex-1">
+      <slot />
+    </main>
+
+    <footer class="mt-16 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white relative overflow-hidden">
+      <!-- Decoración de fondo -->
+      <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-0 w-96 h-96 bg-blue-500 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-purple-500 rounded-full blur-3xl"></div>
+      </div>
+
+      <div class="relative z-10 mx-auto max-w-6xl px-4 py-12">
+        <div class="grid md:grid-cols-4 gap-8 text-sm mb-8">
+          <div class="footer-section">
+            <div class="flex items-center gap-2 mb-4">
+              <img src="/favicon.svg" class="h-8 w-8 drop-shadow-lg" alt="Logo" />
+              <span class="font-bold text-lg">Instituto Fundación</span>
+            </div>
+            <p class="text-slate-300 leading-relaxed">
+              Transformamos vidas mediante educación, empleo y desarrollo comunitario.
+            </p>
+            <div class="flex gap-3 mt-4">
+              <a href="#" class="social-icon w-10 h-10 bg-white/10 hover:bg-blue-600 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110">
+                <span>📘</span>
+              </a>
+              <a href="#" class="social-icon w-10 h-10 bg-white/10 hover:bg-sky-500 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110">
+                <span>🐦</span>
+              </a>
+              <a href="#" class="social-icon w-10 h-10 bg-white/10 hover:bg-pink-600 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110">
+                <span>📷</span>
+              </a>
+            </div>
+          </div>
+          
+          <div class="footer-section">
+            <h3 class="font-bold mb-4 text-lg flex items-center gap-2">
+              <span class="text-blue-400">→</span> Enlaces
+            </h3>
+            <ul class="space-y-2">
+              <li><a href="/programas" class="footer-link text-slate-300 hover:text-white hover:translate-x-2 inline-block transition-all duration-300">Programas</a></li>
+              <li><a href="/noticias" class="footer-link text-slate-300 hover:text-white hover:translate-x-2 inline-block transition-all duration-300">Noticias</a></li>
+              <li><a href="/donar" class="footer-link text-slate-300 hover:text-white hover:translate-x-2 inline-block transition-all duration-300">Donar</a></li>
+              <li><a href="/contacto" class="footer-link text-slate-300 hover:text-white hover:translate-x-2 inline-block transition-all duration-300">Contacto</a></li>
+            </ul>
+          </div>
+          
+          <div class="footer-section">
+            <h3 class="font-bold mb-4 text-lg flex items-center gap-2">
+              <span class="text-blue-400">📍</span> Contacto
+            </h3>
+            <div class="space-y-3 text-slate-300">
+              <p class="flex items-start gap-2">
+                <span class="text-blue-400 mt-1">📌</span>
+                <span>Cra 00 # 00-00<br />Bogotá D.C.</span>
+              </p>
+              <p class="flex items-center gap-2">
+                <span class="text-blue-400">📞</span>
+                <span>+(57) 300 000 0000</span>
+              </p>
+              <p class="flex items-center gap-2">
+                <span class="text-blue-400">✉️</span>
+                <span>contacto@fundacion.org</span>
+              </p>
+            </div>
+          </div>
+          
+          <div class="footer-section">
+            <h3 class="font-bold mb-4 text-lg flex items-center gap-2">
+              <span class="text-blue-400">📬</span> Boletín
+            </h3>
+            <p class="text-slate-300 text-xs mb-3">Recibe nuestras últimas noticias</p>
+            <form class="flex flex-col gap-2">
+              <input 
+                type="email" 
+                required 
+                placeholder="Tu correo" 
+                class="bg-white/10 border border-white/20 rounded-lg px-4 py-2 w-full text-white placeholder-slate-400 focus:bg-white/20 focus:border-blue-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400/50" 
+              />
+              <button class="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white px-4 py-2 rounded-lg font-semibold transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-blue-500/50">
+                Suscribirme
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="border-t border-white/10 pt-6 text-center text-sm text-slate-400">
+          <p>© {new Date().getFullYear()} Instituto Fundación - Todos los derechos reservados</p>
+          <p class="mt-2 text-xs">Hecho con 💙 para transformar vidas</p>
+        </div>
+      </div>
+    </footer>
+
+    <style is:global>
+      .footer-section {
+        animation: fadeInUp 0.6s ease-out backwards;
+      }
+
+      .footer-section:nth-child(1) { animation-delay: 0.1s; }
+      .footer-section:nth-child(2) { animation-delay: 0.2s; }
+      .footer-section:nth-child(3) { animation-delay: 0.3s; }
+      .footer-section:nth-child(4) { animation-delay: 0.4s; }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .social-icon {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+      }
+
+      .social-icon:hover {
+        box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.5);
+      }
+    </style>
+  </body>
+</html>

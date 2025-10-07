@@ -1,0 +1,67 @@
+---
+// src/pages/mi-cuenta.astro
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Mi cuenta — Instituto Fundación" description="Gestiona tu perfil y tus inscripciones.">
+  <section class="mx-auto max-w-4xl px-4 py-12">
+    <div class="flex items-center justify-between mb-8">
+      <h1 class="text-3xl md:text-4xl font-bold">Mi cuenta</h1>
+      <button id="btn-logout" class="text-sm text-red-600 hover:underline">
+        Cerrar sesión
+      </button>
+    </div>
+
+    <div id="user-info" class="bg-white border rounded-lg p-6 shadow-sm">
+      <h2 class="text-xl font-semibold mb-4">Información personal</h2>
+      <div class="grid gap-3 text-slate-700">
+        <p><strong>Nombre:</strong> <span id="user-name">Cargando...</span></p>
+        <p><strong>Correo:</strong> <span id="user-email">Cargando...</span></p>
+      </div>
+    </div>
+
+    <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+      <h2 class="text-xl font-semibold mb-4">Mis inscripciones</h2>
+      <p class="text-slate-600">Aún no tienes inscripciones a programas.</p>
+      <a href="/programas" class="mt-4 inline-block bg-blue-800 text-white rounded px-6 py-2 hover:bg-blue-700">
+        Ver programas disponibles
+      </a>
+    </div>
+  </section>
+
+  <script>
+    import { getUser, getToken, logout } from '../lib/auth.ts';
+
+    // Verificar si el usuario está autenticado
+    const token = getToken();
+    const user = getUser();
+
+    if (!token || !user) {
+      // Si no está autenticado, redirigir al login
+      window.location.href = '/auth/login';
+    } else {
+      // Mostrar información del usuario
+      const nameEl = document.getElementById('user-name');
+      const emailEl = document.getElementById('user-email');
+      
+      if (nameEl) {
+        const fullName = user.firstName && user.lastName 
+          ? `${user.firstName} ${user.lastName}` 
+          : user.name || 'Usuario';
+        nameEl.textContent = fullName;
+      }
+      
+      if (emailEl) {
+        emailEl.textContent = user.email;
+      }
+    }
+
+    // Cerrar sesión
+    const btnLogout = document.getElementById('btn-logout');
+    btnLogout?.addEventListener('click', () => {
+      if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+        logout();
+        window.location.href = '/';
+      }
+    });
+  </script>
+</Layout>

@@ -1,0 +1,250 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Programas — Instituto Fundación">
+  <section class="mx-auto max-w-6xl px-4 py-12">
+    <header class="mb-12 animate-fade-in">
+      <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">
+        Programas Disponibles
+      </h1>
+      <p class="mt-2 text-slate-600">Explora nuestros programas de formación y desarrollo.</p>
+    </header>
+
+    <div id="loading" class="text-center py-12">
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-800"></div>
+      <p class="mt-4 text-slate-600">Cargando programas...</p>
+    </div>
+
+    <div id="error" class="hidden bg-red-50 border border-red-200 rounded-lg p-6 mb-6 animate-shake">
+      <p class="text-red-800"></p>
+    </div>
+
+    <div id="programas-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </section>
+
+  <style>
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slide-up {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: -1000px 0;
+      }
+      100% {
+        background-position: 1000px 0;
+      }
+    }
+
+    .animate-fade-in {
+      animation: fade-in 0.6s ease-out;
+    }
+
+    .animate-shake {
+      animation: shake 0.5s ease-in-out;
+    }
+
+    .programa-card {
+      animation: slide-up 0.6s ease-out backwards;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .programa-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 25px 50px -12px rgba(37, 99, 235, 0.25);
+    }
+
+    .programa-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+      );
+      transition: left 0.5s;
+    }
+
+    .programa-card:hover::before {
+      left: 100%;
+    }
+
+    .btn-inscribir {
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-inscribir::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn-inscribir:hover::after {
+      width: 300px;
+      height: 300px;
+    }
+
+    .badge-precio {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .badge-duracion {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+  </style>
+
+  <script>
+    import { getProgramas, getToken } from '../lib/auth.ts';
+    import type { Programa } from '../lib/auth.ts';
+
+    const loadingEl = document.getElementById('loading');
+    const errorEl = document.getElementById('error');
+    const containerEl = document.getElementById('programas-container');
+
+    // Función para formatear el precio en COP
+    function formatCurrency(amount: number): string {
+      return new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        minimumFractionDigits: 0,
+      }).format(amount);
+    }
+
+    // Cargar programas
+    async function loadProgramas() {
+      try {
+        const programas = await getProgramas();
+        
+        if (loadingEl) loadingEl.classList.add('hidden');
+        
+        if (!programas || programas.length === 0) {
+          if (containerEl) {
+            containerEl.innerHTML = '<p class="text-slate-600 col-span-full text-center py-12">No hay programas disponibles en este momento.</p>';
+          }
+          return;
+        }
+
+        // Renderizar programas
+        if (containerEl) {
+          containerEl.innerHTML = programas.map((programa: Programa, index: number) => `
+            <article 
+              class="programa-card bg-white border border-slate-200 rounded-2xl overflow-hidden group"
+              style="animation-delay: ${index * 0.1}s"
+            >
+              <div class="h-2 bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500"></div>
+              
+              <div class="p-6 relative z-10">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="text-xl font-bold capitalize group-hover:text-blue-700 transition-colors duration-300">
+                    ${programa.nombre}
+                  </h2>
+                  <svg class="w-6 h-6 text-blue-600 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                  </svg>
+                </div>
+                
+                <p class="text-slate-600 mb-6 text-sm leading-relaxed min-h-[60px]">
+                  ${programa.descripcion}
+                </p>
+                
+                <div class="flex gap-3 mb-6">
+                  <div class="badge-duracion flex-1 text-white text-center py-2 px-3 rounded-lg shadow-md">
+                    <div class="text-xs opacity-90">Duración</div>
+                    <div class="text-lg font-bold">${programa.duracion} meses</div>
+                  </div>
+                  <div class="badge-precio flex-1 text-white text-center py-2 px-3 rounded-lg shadow-md">
+                    <div class="text-xs opacity-90">Inversión</div>
+                    <div class="text-base font-bold">${formatCurrency(programa.costo)}</div>
+                  </div>
+                </div>
+
+                <button 
+                  class="btn-inscribir w-full bg-gradient-to-r from-blue-800 to-blue-600 text-white rounded-lg px-4 py-3 font-semibold hover:from-blue-700 hover:to-blue-500 transform hover:scale-105 shadow-md hover:shadow-xl"
+                  data-programa-id="${programa.id}"
+                  onclick="handleInscribir('${programa.id}', '${programa.nombre}')"
+                >
+                  <span class="relative z-10 flex items-center justify-center gap-2">
+                    Inscribirme ahora
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                  </span>
+                </button>
+              </div>
+              
+              <div class="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-full opacity-10 -mr-16 -mt-16 group-hover:opacity-20 transition-opacity duration-300"></div>
+            </article>
+          `).join('');
+        }
+
+      } catch (err: any) {
+        if (loadingEl) loadingEl.classList.add('hidden');
+        if (errorEl) {
+          errorEl.classList.remove('hidden');
+          const errorText = errorEl.querySelector('p');
+          if (errorText) {
+            errorText.textContent = err.message || 'Error al cargar los programas. Por favor, intenta más tarde.';
+          }
+        }
+      }
+    }
+
+    // Función para manejar inscripción
+    (window as any).handleInscribir = (programaId: string, programaNombre: string) => {
+      const token = getToken();
+      
+      if (!token) {
+        if (confirm(`Para inscribirte en "${programaNombre}" debes iniciar sesión. ¿Deseas ir al login?`)) {
+          window.location.href = '/auth/login';
+        }
+        return;
+      }
+
+      // Aquí puedes implementar la lógica de inscripción
+      alert(`Funcionalidad de inscripción próximamente. Programa: ${programaNombre}`);
+    };
+
+    // Cargar programas al cargar la página
+    loadProgramas();
+  </script>
+</Layout>

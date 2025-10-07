@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Contacto — Instituto Fundación">
+  <section class="mx-auto max-w-3xl px-4 py-12">
+    <h1 class="text-3xl md:text-4xl font-bold">Contacto</h1>
+    <form method="POST" action="#" class="mt-6 grid gap-4">
+      <input name="nombre" required placeholder="Nombre" class="border rounded px-3 py-2" />
+      <input type="email" name="email" required placeholder="Correo" class="border rounded px-3 py-2" />
+      <input name="telefono" placeholder="Teléfono" class="border rounded px-3 py-2" />
+      <textarea name="mensaje" rows="5" required placeholder="¿Cómo podemos ayudarte?" class="border rounded px-3 py-2"></textarea>
+      <button class="bg-blue-800 text-white px-5 py-3 rounded font-semibold">Enviar</button>
+    </form>
+    <p class="mt-3 text-sm text-slate-600">*Luego conectamos este formulario con Formspree/Netlify o tu backend.</p>
+  </section>
+</Layout>

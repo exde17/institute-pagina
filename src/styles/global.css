@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* utilidades rápidas */
+.prosa { /* buen look para artículos/texto largo */
+  max-width: 65ch;
+}
