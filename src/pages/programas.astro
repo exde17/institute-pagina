@@ -1,25 +1,248 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+// Programas con sus imágenes y detalles
+const programasData = [
+  {
+    id: 'fotovoltaicos',
+    nombre: 'Instalación de Paneles Solares',
+    imagen: '/img/flyers/FOTOVOLTAICOS.png',
+    descripcion: 'Conviértete en un experto en energías renovables. Aprende a diseñar, instalar y mantener sistemas fotovoltaicos residenciales y comerciales.',
+    duracion: '6 meses',
+    modalidad: 'Presencial',
+    categoria: 'Técnico',
+    badge: 'Popular',
+    badgeColor: 'green',
+    detalles: [
+      'Fundamentos de energía solar',
+      'Diseño de sistemas fotovoltaicos',
+      'Instalación y mantenimiento',
+      'Normatividad y certificaciones',
+      'Prácticas en proyectos reales'
+    ]
+  },
+  {
+    id: 'marketing',
+    nombre: 'Marketing y Redes Sociales',
+    imagen: '/img/flyers/MARKETING Y REDES SOCIALES.png',
+    descripcion: 'Domina las estrategias digitales más efectivas. Crea contenido que impacta y gestiona comunidades en línea para impulsar marcas en el mundo digital.',
+    duracion: '4 meses',
+    modalidad: 'Virtual',
+    categoria: 'Marketing Digital',
+    badge: 'Trending',
+    badgeColor: 'purple',
+    detalles: [
+      'Community Management profesional',
+      'Estrategias de contenido viral',
+      'Publicidad en redes sociales',
+      'Analítica y métricas digitales',
+      'Gestión de crisis online'
+    ]
+  },
+  {
+    id: 'innovacion',
+    nombre: 'Gestión de la Innovación',
+    imagen: '/img/flyers/GESTIÓN DE LA INNOVACIÓN.png',
+    descripcion: 'Lidera proyectos innovadores y transforma ideas en realidad. Desarrolla habilidades de emprendimiento y gestión de proyectos disruptivos.',
+    duracion: '5 meses',
+    modalidad: 'Híbrido',
+    categoria: 'Emprendimiento',
+    badge: 'Nuevo',
+    badgeColor: 'blue',
+    detalles: [
+      'Metodologías ágiles y Design Thinking',
+      'Gestión de proyectos innovadores',
+      'Creatividad y pensamiento lateral',
+      'Pitch y presentación de proyectos',
+      'Financiamiento y escalamiento'
+    ]
+  },
+  {
+    id: 'agroindustria',
+    nombre: 'Agroindustria Sostenible',
+    imagen: '/img/flyers/AGROINDUSTRIA.png',
+    descripcion: 'Aprende técnicas modernas de producción agroindustrial. Desarrolla proyectos sostenibles que generen impacto social y ambiental positivo.',
+    duracion: '6 meses',
+    modalidad: 'Presencial',
+    categoria: 'Agricultura',
+    badge: 'Certificado',
+    badgeColor: 'emerald',
+    detalles: [
+      'Técnicas de cultivo sostenible',
+      'Procesamiento y valor agregado',
+      'Gestión de proyectos agrícolas',
+      'Comercialización y mercados',
+      'Certificaciones orgánicas'
+    ]
+  },
+  {
+    id: 'culturales',
+    nombre: 'Programas Culturales y Artísticos',
+    imagen: '/img/flyers/CULTURALES Y ARTISTICOS.png',
+    descripcion: 'Descubre y potencia tu talento artístico. Participa en talleres de música, danza, teatro y artes plásticas con instructores profesionales.',
+    duracion: '3 meses',
+    modalidad: 'Presencial',
+    categoria: 'Arte y Cultura',
+    badge: 'Creativo',
+    badgeColor: 'pink',
+    detalles: [
+      'Talleres de música y canto',
+      'Danza folclórica y moderna',
+      'Teatro y expresión corporal',
+      'Artes plásticas y pintura',
+      'Presentaciones y recitales'
+    ]
+  },
+  {
+    id: 'deportes',
+    nombre: 'Deportes y Recreación',
+    imagen: '/img/flyers/DEPORTES Y RECREACIÓN.png',
+    descripcion: 'Promueve hábitos de vida saludable a través del deporte. Participa en programas de fútbol, voleibol, atletismo y actividades recreativas.',
+    duracion: '3 meses',
+    modalidad: 'Presencial',
+    categoria: 'Deporte y Salud',
+    badge: 'Activo',
+    badgeColor: 'orange',
+    detalles: [
+      'Entrenamiento deportivo básico',
+      'Disciplinas: fútbol, voleibol, atletismo',
+      'Actividades recreativas grupales',
+      'Nutrición deportiva básica',
+      'Torneos y competencias'
+    ]
+  }
+];
 ---
 <Layout title="Programas — Instituto Fundación">
-  <section class="mx-auto max-w-6xl px-4 py-12">
-    <header class="mb-12 animate-fade-in">
-      <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">
-        Programas Disponibles
+  <section class="mx-auto max-w-7xl px-4 py-12">
+    <header class="mb-12 text-center animate-fade-in">
+      <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-800 via-purple-700 to-blue-600 bg-clip-text text-transparent mb-4">
+        Nuestros Programas de Formación
       </h1>
-      <p class="mt-2 text-slate-600">Explora nuestros programas de formación y desarrollo.</p>
+      <div class="w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto rounded-full mb-6"></div>
+      <p class="text-lg text-slate-600 max-w-3xl mx-auto">
+        Explora nuestra oferta completa de programas diseñados para transformar tu futuro profesional y personal.
+      </p>
+      <div class="mt-6 flex flex-wrap justify-center gap-3">
+        <span class="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">📚 6 Programas</span>
+        <span class="px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-semibold">👥 +500 Estudiantes</span>
+        <span class="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-semibold">✓ Certificados</span>
+      </div>
     </header>
 
-    <div id="loading" class="text-center py-12">
-      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-800"></div>
-      <p class="mt-4 text-slate-600">Cargando programas...</p>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {programasData.map((programa, index) => (
+        <article 
+          class="programa-card bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 group"
+          style={`animation-delay: ${index * 0.1}s`}
+        >
+          <!-- Imagen del programa -->
+          <div class="relative h-64 overflow-hidden">
+            <img 
+              src={programa.imagen} 
+              alt={programa.nombre}
+              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent opacity-70"></div>
+            
+            <!-- Badge -->
+            <div class={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold text-white ${
+              programa.badgeColor === 'green' ? 'bg-green-500' :
+              programa.badgeColor === 'purple' ? 'bg-purple-500' :
+              programa.badgeColor === 'blue' ? 'bg-blue-500' :
+              programa.badgeColor === 'emerald' ? 'bg-emerald-500' :
+              programa.badgeColor === 'pink' ? 'bg-pink-500' :
+              'bg-orange-500'
+            }`}>
+              {programa.badge}
+            </div>
+
+            <!-- Título sobre la imagen -->
+            <div class="absolute bottom-0 left-0 right-0 p-4 text-white z-10">
+              <h2 class="text-2xl font-bold mb-1 group-hover:text-yellow-400 transition-colors">
+                {programa.nombre}
+              </h2>
+              <span class="inline-block px-2 py-1 bg-white/20 backdrop-blur-sm rounded text-xs font-semibold">
+                {programa.categoria}
+              </span>
+            </div>
+          </div>
+
+          <!-- Contenido -->
+          <div class="p-6">
+            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+              {programa.descripcion}
+            </p>
+
+            <!-- Detalles del programa -->
+            <div class="mb-4 space-y-2">
+              <h3 class="text-sm font-bold text-slate-700 mb-2">📋 Contenido del programa:</h3>
+              <ul class="space-y-1">
+                {programa.detalles.slice(0, 3).map(detalle => (
+                  <li class="text-xs text-slate-600 flex items-start gap-2">
+                    <svg class="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    {detalle}
+                  </li>
+                ))}
+              </ul>
+              <button 
+                class="show-more-btn text-xs text-blue-600 hover:text-blue-800 font-semibold mt-2 flex items-center gap-1"
+                data-programa-id={programa.id}
+              >
+                Ver más detalles
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Info adicional -->
+            <div class="flex gap-2 mb-4">
+              <div class="flex-1 bg-gradient-to-br from-purple-500 to-pink-500 text-white text-center py-2 px-3 rounded-lg">
+                <div class="text-xs opacity-90">Duración</div>
+                <div class="text-sm font-bold">{programa.duracion}</div>
+              </div>
+              <div class="flex-1 bg-gradient-to-br from-blue-500 to-cyan-500 text-white text-center py-2 px-3 rounded-lg">
+                <div class="text-xs opacity-90">Modalidad</div>
+                <div class="text-sm font-bold">{programa.modalidad}</div>
+              </div>
+            </div>
+
+            <!-- Botón de acción -->
+            <button 
+              class="btn-inscribir w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl px-4 py-3 font-bold transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+              data-programa-nombre={programa.nombre}
+            >
+              <span class="flex items-center justify-center gap-2">
+                Inscribirme ahora
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                </svg>
+              </span>
+            </button>
+          </div>
+        </article>
+      ))}
     </div>
 
-    <div id="error" class="hidden bg-red-50 border border-red-200 rounded-lg p-6 mb-6 animate-shake">
-      <p class="text-red-800"></p>
+    <!-- CTA Final -->
+    <div class="mt-16 text-center bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
+      <h2 class="text-3xl font-bold mb-4">¿Listo para transformar tu futuro?</h2>
+      <p class="text-lg mb-6 opacity-90">
+        Únete a nuestra comunidad de más de 500 estudiantes que ya están construyendo su camino al éxito.
+      </p>
+      <a 
+        href="/contacto" 
+        class="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-slate-100 transform hover:scale-105 transition-all duration-300 shadow-xl"
+      >
+        Contáctanos ahora
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+      </a>
     </div>
-
-    <div id="programas-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
   </section>
 
   <style>
@@ -45,63 +268,20 @@ import Layout from '../layouts/Layout.astro';
       }
     }
 
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-10px); }
-      75% { transform: translateX(10px); }
-    }
-
-    @keyframes shimmer {
-      0% {
-        background-position: -1000px 0;
-      }
-      100% {
-        background-position: 1000px 0;
-      }
-    }
-
     .animate-fade-in {
       animation: fade-in 0.6s ease-out;
     }
 
-    .animate-shake {
-      animation: shake 0.5s ease-in-out;
-    }
-
     .programa-card {
       animation: slide-up 0.6s ease-out backwards;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .programa-card:hover {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 25px 50px -12px rgba(37, 99, 235, 0.25);
-    }
-
-    .programa-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.3),
-        transparent
-      );
-      transition: left 0.5s;
-    }
-
-    .programa-card:hover::before {
-      left: 100%;
+      transform: translateY(-12px);
     }
 
     .btn-inscribir {
-      transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
     }
@@ -109,10 +289,10 @@ import Layout from '../layouts/Layout.astro';
     .btn-inscribir::after {
       content: '';
       position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
+      inset-block-start: 50%;
+      inset-inline-start: 50%;
+      inline-size: 0;
+      block-size: 0;
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.3);
       transform: translate(-50%, -50%);
@@ -120,131 +300,76 @@ import Layout from '../layouts/Layout.astro';
     }
 
     .btn-inscribir:hover::after {
-      width: 300px;
-      height: 300px;
+      inline-size: 300px;
+      block-size: 300px;
     }
 
-    .badge-precio {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .badge-duracion {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    .details-expanded {
+      max-height: 500px;
+      transition: max-height 0.5s ease-in-out;
     }
   </style>
 
   <script>
-    import { getProgramas, getToken } from '../lib/auth.ts';
-    import type { Programa } from '../lib/auth.ts';
-
-    const loadingEl = document.getElementById('loading');
-    const errorEl = document.getElementById('error');
-    const containerEl = document.getElementById('programas-container');
-
-    // Función para formatear el precio en COP
-    function formatCurrency(amount: number): string {
-      return new Intl.NumberFormat('es-CO', {
-        style: 'currency',
-        currency: 'COP',
-        minimumFractionDigits: 0,
-      }).format(amount);
-    }
-
-    // Cargar programas
-    async function loadProgramas() {
-      try {
-        const programas = await getProgramas();
-        
-        if (loadingEl) loadingEl.classList.add('hidden');
-        
-        if (!programas || programas.length === 0) {
-          if (containerEl) {
-            containerEl.innerHTML = '<p class="text-slate-600 col-span-full text-center py-12">No hay programas disponibles en este momento.</p>';
-          }
-          return;
-        }
-
-        // Renderizar programas
-        if (containerEl) {
-          containerEl.innerHTML = programas.map((programa: Programa, index: number) => `
-            <article 
-              class="programa-card bg-white border border-slate-200 rounded-2xl overflow-hidden group"
-              style="animation-delay: ${index * 0.1}s"
-            >
-              <div class="h-2 bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500"></div>
-              
-              <div class="p-6 relative z-10">
-                <div class="flex items-center justify-between mb-4">
-                  <h2 class="text-xl font-bold capitalize group-hover:text-blue-700 transition-colors duration-300">
-                    ${programa.nombre}
-                  </h2>
-                  <svg class="w-6 h-6 text-blue-600 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                  </svg>
-                </div>
-                
-                <p class="text-slate-600 mb-6 text-sm leading-relaxed min-h-[60px]">
-                  ${programa.descripcion}
-                </p>
-                
-                <div class="flex gap-3 mb-6">
-                  <div class="badge-duracion flex-1 text-white text-center py-2 px-3 rounded-lg shadow-md">
-                    <div class="text-xs opacity-90">Duración</div>
-                    <div class="text-lg font-bold">${programa.duracion} meses</div>
-                  </div>
-                  <div class="badge-precio flex-1 text-white text-center py-2 px-3 rounded-lg shadow-md">
-                    <div class="text-xs opacity-90">Inversión</div>
-                    <div class="text-base font-bold">${formatCurrency(programa.costo)}</div>
-                  </div>
-                </div>
-
-                <button 
-                  class="btn-inscribir w-full bg-gradient-to-r from-blue-800 to-blue-600 text-white rounded-lg px-4 py-3 font-semibold hover:from-blue-700 hover:to-blue-500 transform hover:scale-105 shadow-md hover:shadow-xl"
-                  data-programa-id="${programa.id}"
-                  onclick="handleInscribir('${programa.id}', '${programa.nombre}')"
-                >
-                  <span class="relative z-10 flex items-center justify-center gap-2">
-                    Inscribirme ahora
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                    </svg>
-                  </span>
-                </button>
-              </div>
-              
-              <div class="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-full opacity-10 -mr-16 -mt-16 group-hover:opacity-20 transition-opacity duration-300"></div>
-            </article>
-          `).join('');
-        }
-
-      } catch (err: any) {
-        if (loadingEl) loadingEl.classList.add('hidden');
-        if (errorEl) {
-          errorEl.classList.remove('hidden');
-          const errorText = errorEl.querySelector('p');
-          if (errorText) {
-            errorText.textContent = err.message || 'Error al cargar los programas. Por favor, intenta más tarde.';
-          }
-        }
-      }
-    }
-
-    // Función para manejar inscripción
-    (window as any).handleInscribir = (programaId: string, programaNombre: string) => {
-      const token = getToken();
+    // Función para manejar "Ver más detalles"
+    document.addEventListener('DOMContentLoaded', () => {
+      const showMoreButtons = document.querySelectorAll('.show-more-btn');
       
-      if (!token) {
-        if (confirm(`Para inscribirte en "${programaNombre}" debes iniciar sesión. ¿Deseas ir al login?`)) {
-          window.location.href = '/auth/login';
-        }
-        return;
-      }
+      showMoreButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const programaId = (e.currentTarget as HTMLElement).dataset.programaId;
+          const card = (e.currentTarget as HTMLElement).closest('.programa-card');
+          const detallesList = card?.querySelector('ul');
+          
+          if (detallesList) {
+            const isExpanded = detallesList.classList.contains('details-expanded');
+            
+            if (!isExpanded) {
+              // Mostrar todos los detalles
+              detallesList.classList.add('details-expanded');
+              (e.currentTarget as HTMLElement).innerHTML = `
+                Ver menos detalles
+                <svg class="w-3 h-3 transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              `;
+            } else {
+              // Ocultar detalles extras
+              detallesList.classList.remove('details-expanded');
+              (e.currentTarget as HTMLElement).innerHTML = `
+                Ver más detalles
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              `;
+            }
+          }
+        });
+      });
 
-      // Aquí puedes implementar la lógica de inscripción
-      alert(`Funcionalidad de inscripción próximamente. Programa: ${programaNombre}`);
-    };
+      // Función para manejar inscripción
+      const inscribirButtons = document.querySelectorAll('.btn-inscribir');
+      
+      inscribirButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const programaNombre = (e.currentTarget as HTMLElement).dataset.programaNombre;
+          
+          // Verificar si hay token (usuario logueado)
+          const token = localStorage.getItem('token');
+          
+          if (!token) {
+            if (confirm(`Para inscribirte en "${programaNombre}" debes iniciar sesión. ¿Deseas ir al login?`)) {
+              window.location.href = '/auth/login';
+            }
+            return;
+          }
 
-    // Cargar programas al cargar la página
-    loadProgramas();
+          // Redirigir a página de contacto o inscripción
+          if (confirm(`¿Deseas inscribirte en "${programaNombre}"? Te redirigiremos a la página de contacto.`)) {
+            window.location.href = `/contacto?programa=${encodeURIComponent(programaNombre || '')}`;
+          }
+        });
+      });
+    });
   </script>
 </Layout>

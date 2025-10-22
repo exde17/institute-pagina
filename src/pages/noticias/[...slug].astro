@@ -9,14 +9,19 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const entry = await getEntry('noticias', slug);
+
+if (!entry) {
+  return Astro.redirect('/404');
+}
+
 const { Content, data } = await entry.render();
 ---
-<Layout title={`${data.titulo} — Noticias`}>
+<Layout title={`${data?.titulo || 'Noticia'} — Noticias`}>
   <article class="mx-auto max-w-3xl px-4 py-12">
-    {data.cover && <img src={data.cover} alt="" class="w-full rounded-2xl border mb-6" />}
-    <h1 class="text-3xl md:text-4xl font-bold">{data.titulo}</h1>
-    <div class="text-sm text-slate-500 mt-1">{new Date(data.fecha).toLocaleDateString('es-CO')}</div>
-    <p class="mt-2 text-slate-700">{data.resumen}</p>
+    {data?.cover && <img src={data.cover} alt="" class="w-full rounded-2xl border mb-6" />}
+    <h1 class="text-3xl md:text-4xl font-bold">{data?.titulo || 'Sin título'}</h1>
+    <div class="text-sm text-slate-500 mt-1">{data?.fecha ? new Date(data.fecha).toLocaleDateString('es-CO') : ''}</div>
+    <p class="mt-2 text-slate-700">{data?.resumen || ''}</p>
     <div class="prose mt-6">
       <Content />
     </div>
