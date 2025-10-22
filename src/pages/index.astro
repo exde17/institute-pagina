@@ -200,49 +200,55 @@ import Layout from '../layouts/Layout.astro';
   </section>
 
   <!-- Sección de impacto institucional -->
-  <section class="bg-gradient-to-br from-blue-900 via-blue-800 to-slate-900 text-white py-20">
+  <section class="bg-slate-50 py-20">
     <div class="mx-auto max-w-7xl px-6 md:px-8">
       <div class="grid md:grid-cols-2 gap-12 items-center">
         <div>
-          <div class="inline-block px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-full text-sm font-semibold mb-6">
+          <div class="inline-block px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold mb-6">
             Nuestro Impacto
           </div>
-          <h2 class="text-3xl md:text-5xl font-bold mb-6">
+          <h2 class="text-3xl md:text-5xl font-bold mb-6 text-slate-900">
             Transformando Vidas y Comunidades
           </h2>
-          <p class="text-lg text-white/90 leading-relaxed mb-8">
+          <p class="text-lg text-slate-600 leading-relaxed mb-8">
             Trabajamos cada día para crear oportunidades reales de crecimiento y desarrollo. Nuestros programas han transformado la vida de cientos de familias en Colombia.
           </p>
           <div class="space-y-6">
             <div class="flex items-start gap-4">
-              <div class="flex-shrink-0 w-14 h-14 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center text-2xl">
-                ✓
+              <div class="flex-shrink-0 w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-md">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                </svg>
               </div>
               <div>
-                <h3 class="font-bold text-xl mb-2">Educación de Excelencia</h3>
-                <p class="text-white/80">Formación académica de alto nivel con acompañamiento personalizado</p>
+                <h3 class="font-bold text-xl mb-2 text-slate-900">Educación de Excelencia</h3>
+                <p class="text-slate-600">Formación académica de alto nivel con acompañamiento personalizado</p>
               </div>
             </div>
             <div class="flex items-start gap-4">
-              <div class="flex-shrink-0 w-14 h-14 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center text-2xl">
-                ✓
+              <div class="flex-shrink-0 w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-md">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                </svg>
               </div>
               <div>
-                <h3 class="font-bold text-xl mb-2">Oportunidades Laborales</h3>
-                <p class="text-white/80">Conexión directa con empresas líderes del sector</p>
+                <h3 class="font-bold text-xl mb-2 text-slate-900">Oportunidades Laborales</h3>
+                <p class="text-slate-600">Conexión directa con empresas líderes del sector</p>
               </div>
             </div>
             <div class="flex items-start gap-4">
-              <div class="flex-shrink-0 w-14 h-14 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center text-2xl">
-                ✓
+              <div class="flex-shrink-0 w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-md">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                </svg>
               </div>
               <div>
-                <h3 class="font-bold text-xl mb-2">Compromiso Social</h3>
-                <p class="text-white/80">Apoyo integral y desarrollo comunitario sostenible</p>
+                <h3 class="font-bold text-xl mb-2 text-slate-900">Compromiso Social</h3>
+                <p class="text-slate-600">Apoyo integral y desarrollo comunitario sostenible</p>
               </div>
             </div>
           </div>
-          <a href="/nosotros" class="mt-10 inline-flex items-center gap-2 bg-white text-blue-900 px-8 py-4 rounded-lg font-bold hover:bg-blue-50 transition-all shadow-xl">
+          <a href="/nosotros" class="mt-10 inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
             Conócenos Mejor
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
@@ -250,7 +256,7 @@ import Layout from '../layouts/Layout.astro';
           </a>
         </div>
         <div class="relative">
-          <div class="aspect-video rounded-2xl shadow-2xl overflow-hidden">
+          <div class="aspect-video rounded-2xl shadow-2xl overflow-hidden border-4 border-white">
             <video 
               class="w-full h-full object-cover" 
               autoplay 
@@ -262,7 +268,7 @@ import Layout from '../layouts/Layout.astro';
               Tu navegador no soporta el elemento de video.
             </video>
           </div>
-          <div class="absolute -bottom-6 -right-6 bg-amber-400 text-black px-8 py-4 rounded-xl shadow-xl">
+          <div class="absolute -bottom-6 -right-6 bg-gradient-to-br from-amber-400 to-orange-500 text-white px-8 py-4 rounded-xl shadow-2xl border-4 border-white">
             <div class="font-bold text-2xl">+500</div>
             <div class="text-sm font-semibold">Vidas Transformadas</div>
           </div>
@@ -298,30 +304,92 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </section>
 
-  <!-- Call to action final con ancho consistente -->
-  <section class="mx-auto max-w-7xl px-6 md:px-8 py-20">
-    <div class="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-900 rounded-3xl p-12 md:p-16 text-center text-white relative overflow-hidden shadow-2xl">
-      <div class="absolute inset-0 opacity-10">
-        <div class="absolute top-0 left-1/4 w-96 h-96 bg-white rounded-full blur-3xl"></div>
-        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-white rounded-full blur-3xl"></div>
-      </div>
-      <div class="relative z-10">
-        <div class="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-semibold mb-6">
+  <!-- Call to action final - Opción 4: Diseño con cards flotantes -->
+  <section class="bg-gradient-to-b from-slate-50 to-white py-20">
+    <div class="mx-auto max-w-7xl px-6 md:px-8">
+      <!-- Header centrado -->
+      <div class="text-center mb-12">
+        <div class="inline-block px-5 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold mb-4">
           Únete a Nosotros
         </div>
-        <h2 class="text-3xl md:text-5xl font-bold mb-6">
+        <h2 class="text-3xl md:text-5xl font-bold mb-4 text-slate-900">
           ¿Listo para Ser Parte del Cambio?
         </h2>
-        <p class="text-lg md:text-xl mb-10 max-w-2xl mx-auto text-white/90">
+        <p class="text-lg text-slate-600 max-w-2xl mx-auto">
           Tu apoyo puede transformar vidas. Únete a nuestra misión de crear oportunidades reales de progreso.
         </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href="/donar" class="bg-white text-blue-900 px-10 py-4 rounded-lg font-bold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all inline-flex items-center justify-center gap-2">
-            💛 Hacer una Donación
+      </div>
+      
+      <!-- Cards flotantes -->
+      <div class="grid md:grid-cols-3 gap-6">
+        <!-- Card 1: Donación -->
+        <div class="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-blue-100 hover:border-blue-300 transform hover:-translate-y-2">
+          <div class="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
+            <svg class="w-9 h-9 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold text-slate-900 mb-3">Hacer una Donación</h3>
+          <p class="text-slate-600 mb-6 leading-relaxed">
+            Contribuye directamente al futuro de jóvenes y familias. Cada aporte hace la diferencia.
+          </p>
+          <a href="/donar" class="inline-flex items-center gap-2 text-blue-700 font-bold group-hover:gap-3 transition-all">
+            Donar Ahora
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
           </a>
-          <a href="/contacto" class="bg-white/10 backdrop-blur-sm text-white px-10 py-4 rounded-lg font-bold border-2 border-white/30 hover:bg-white/20 transition-all">
-            Contáctanos
+        </div>
+        
+        <!-- Card 2: Contacto -->
+        <div class="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-slate-100 hover:border-blue-300 transform hover:-translate-y-2">
+          <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
+            <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold text-slate-900 mb-3">Contáctanos</h3>
+          <p class="text-slate-600 mb-6 leading-relaxed">
+            ¿Tienes preguntas? Estamos aquí para ayudarte. Conversemos sobre cómo puedes apoyar.
+          </p>
+          <a href="/contacto" class="inline-flex items-center gap-2 text-blue-700 font-bold group-hover:gap-3 transition-all">
+            Escribir Mensaje
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
           </a>
+        </div>
+        
+        <!-- Card 3: Conocer más -->
+        <div class="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-slate-100 hover:border-blue-300 transform hover:-translate-y-2">
+          <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
+            <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold text-slate-900 mb-3">Conoce Más</h3>
+          <p class="text-slate-600 mb-6 leading-relaxed">
+            Descubre nuestra historia, misión y el impacto que generamos en la comunidad.
+          </p>
+          <a href="/nosotros" class="inline-flex items-center gap-2 text-blue-700 font-bold group-hover:gap-3 transition-all">
+            Sobre Nosotros
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+      
+      <!-- Estadística destacada -->
+      <div class="mt-12 text-center">
+        <div class="inline-flex items-center gap-3 bg-blue-600 text-white px-8 py-4 rounded-2xl shadow-xl">
+          <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+          </svg>
+          <div>
+            <div class="text-3xl font-bold">+500</div>
+            <div class="text-sm font-semibold text-blue-100">Vidas Transformadas</div>
+          </div>
         </div>
       </div>
     </div>
