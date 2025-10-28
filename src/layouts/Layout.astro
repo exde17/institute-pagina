@@ -48,29 +48,26 @@ const ogUrl = Astro.url?.href ?? ''; // opcional: URL actual para Open Graph
         </a>
         
         <!-- Menú Desktop -->
-        <ul class="hidden lg:flex items-center gap-1 text-sm font-medium">
-          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/programas">
+        <ul class="hidden lg:flex items-center gap-1 text-base font-semibold">
+          <li><a class="nav-link px-5 py-2.5 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/programas">
             Programas
           </a></li>
-          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/noticias">
+          <li><a class="nav-link px-5 py-2.5 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/noticias">
             Noticias
           </a></li>
-          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/nosotros">
+          <li><a class="nav-link px-5 py-2.5 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/nosotros">
             Nosotros
           </a></li>
-          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/aliados">
+          <li><a class="nav-link px-5 py-2.5 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/aliados">
             Aliados
           </a></li>
-          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/pqr">
+          <li><a class="nav-link px-5 py-2.5 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/pqr">
             PQR
           </a></li>
-          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/contacto">
+          <li><a class="nav-link px-5 py-2.5 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/contacto">
             Contacto
           </a></li>
           <li>
-            <a class="btn-donar bg-gradient-to-r from-amber-400 to-orange-400 text-black font-bold px-6 py-2.5 rounded-lg shadow-md hover:shadow-xl transform hover:scale-105 transition-all duration-300 ml-2 relative overflow-hidden" href="/donar">
-              <span class="relative z-10">💛 Donar</span>
-            </a>
           </li>
         </ul>
 
@@ -109,9 +106,6 @@ const ogUrl = Astro.url?.href ?? ''; // opcional: URL actual para Open Graph
           </a>
           <a class="mobile-nav-link text-2xl font-semibold hover:text-blue-400 transition-colors" href="/contacto">
             Contacto
-          </a>
-          <a class="bg-gradient-to-r from-amber-400 to-orange-400 text-black font-bold px-8 py-4 rounded-xl shadow-lg text-xl mt-4" href="/donar">
-            💛 Donar
           </a>
         </div>
       </div>
@@ -153,25 +147,6 @@ const ogUrl = Astro.url?.href ?? ''; // opcional: URL actual para Open Graph
         transform: scale(0.95);
       }
 
-      .btn-donar::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          rgba(255, 255, 255, 0.4),
-          transparent
-        );
-        transition: left 0.5s;
-      }
-
-      .btn-donar:hover::before {
-        left: 100%;
-      }
 
       @keyframes pulse-shadow {
         0%, 100% {
@@ -299,7 +274,6 @@ const ogUrl = Astro.url?.href ?? ''; // opcional: URL actual para Open Graph
             <ul class="space-y-2">
               <li><a href="/programas" class="footer-link text-slate-300 hover:text-white hover:translate-x-2 inline-block transition-all duration-300">Programas</a></li>
               <li><a href="/noticias" class="footer-link text-slate-300 hover:text-white hover:translate-x-2 inline-block transition-all duration-300">Noticias</a></li>
-              <li><a href="/donar" class="footer-link text-slate-300 hover:text-white hover:translate-x-2 inline-block transition-all duration-300">Donar</a></li>
               <li><a href="/contacto" class="footer-link text-slate-300 hover:text-white hover:translate-x-2 inline-block transition-all duration-300">Contacto</a></li>
             </ul>
           </div>
