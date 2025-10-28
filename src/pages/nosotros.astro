@@ -1,24 +1,310 @@
 ---
 import Layout from '../layouts/Layout.astro';
 ---
-<Layout title="Nosotros — FCM INSTITUTE">
-  <section class="mx-auto max-w-3xl px-4 py-12">
-    <h1 class="text-3xl md:text-4xl font-bold">Quiénes Somos</h1>
-    <p class="mt-3 text-slate-700">
-      Somos una institución orientada a la transformación social mediante educación, empleabilidad y acción comunitaria.
+<Layout title="Nosotros — Instituto Fundación" description="Conoce nuestra historia, misión, visión y valores que nos impulsan a transformar vidas.">
+  <!-- Hero Section -->
+  <section class="relative bg-gradient-to-br from-blue-900 via-slate-800 to-blue-800 text-white py-20 overflow-hidden">
+    <div class="absolute inset-0 bg-[url('/hero.png')] opacity-10 bg-cover bg-center"></div>
+    <div class="absolute top-0 right-0 w-96 h-96 bg-blue-500 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+    <div class="absolute bottom-0 left-0 w-72 h-72 bg-purple-500 rounded-full blur-3xl opacity-20 animate-pulse" style="animation-delay: 1s"></div>
+    
+    <div class="relative mx-auto max-w-5xl px-4 text-center">
+      <div class="inline-block mb-4 px-4 py-2 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-full text-sm font-semibold">
+        🏫 Instituto para la Formación y el Desarrollo Comunitario
+      </div>
+      <h1 class="text-4xl md:text-6xl font-extrabold mb-6 bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
+        Transformando Vidas a Través de la Educación
+      </h1>
+      <p class="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+        Más de 500 personas han transformado sus vidas gracias a nuestra labor comprometida con la educación de calidad, 
+        la empleabilidad y el desarrollo comunitario en Colombia.
+      </p>
+    </div>
+  </section>
+
+  <!-- Quiénes Somos -->
+  <section class="mx-auto max-w-6xl px-4 py-16">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      <div>
+        <div class="inline-block mb-4 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+          📖 Nuestra Historia
+        </div>
+        <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">¿Quiénes Somos?</h2>
+        <div class="space-y-4 text-slate-700 leading-relaxed">
+          <p>
+            Somos el <strong>Instituto para la Formación y el Desarrollo Comunitario de Colombia Mía</strong>, 
+            una institución educativa sin ánimo de lucro dedicada a la transformación social mediante programas 
+            técnicos laborales de alta calidad, orientados a la empleabilidad y el emprendimiento.
+          </p>
+          <p>
+            Fundados con la convicción de que la educación es el motor del cambio social, trabajamos día a día 
+            para ofrecer oportunidades reales de formación a comunidades vulnerables, jóvenes en riesgo y personas 
+            que buscan mejorar sus condiciones de vida a través del conocimiento y las competencias laborales.
+          </p>
+          <p>
+            Nuestro compromiso va más allá de la formación académica: <strong>acompañamos a nuestros estudiantes</strong> 
+            en todo su proceso de desarrollo personal, profesional y laboral, construyendo alianzas estratégicas con 
+            empresas e instituciones que garantizan prácticas profesionales y oportunidades de empleo.
+          </p>
+          <p class="text-blue-700 font-semibold">
+            ✨ Más de 500 vidas transformadas y cientos de historias de éxito respaldan nuestra labor.
+          </p>
+        </div>
+      </div>
+      
+      <div class="space-y-6">
+        <div class="bg-gradient-to-br from-blue-50 to-slate-50 rounded-2xl p-8 border-l-4 border-blue-600 shadow-lg">
+          <div class="text-5xl mb-4">🎓</div>
+          <h3 class="text-xl font-bold text-slate-900 mb-2">Programas Técnicos de Calidad</h3>
+          <p class="text-slate-600">
+            Ofrecemos 6 programas técnicos laborales diseñados con estándares de excelencia y certificados 
+            por entidades reconocidas nacionalmente.
+          </p>
+        </div>
+        
+        <div class="bg-gradient-to-br from-purple-50 to-slate-50 rounded-2xl p-8 border-l-4 border-purple-600 shadow-lg">
+          <div class="text-5xl mb-4">🤝</div>
+          <h3 class="text-xl font-bold text-slate-900 mb-2">Alianzas Estratégicas</h3>
+          <p class="text-slate-600">
+            Trabajamos con más de 17 organizaciones aliadas que garantizan prácticas profesionales y 
+            oportunidades laborales reales para nuestros egresados.
+          </p>
+        </div>
+        
+        <div class="bg-gradient-to-br from-green-50 to-slate-50 rounded-2xl p-8 border-l-4 border-green-600 shadow-lg">
+          <div class="text-5xl mb-4">💼</div>
+          <h3 class="text-xl font-bold text-slate-900 mb-2">Empleabilidad Garantizada</h3>
+          <p class="text-slate-600">
+            El 62% de nuestros egresados son contratados durante o inmediatamente después de sus prácticas 
+            profesionales, gracias a nuestra formación integral.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Misión y Visión -->
+  <section class="bg-slate-50 py-16">
+    <div class="mx-auto max-w-6xl px-4">
+      <div class="grid md:grid-cols-2 gap-12">
+        <!-- Misión -->
+        <div class="bg-white rounded-2xl p-8 shadow-xl border-t-4 border-blue-600 transform hover:scale-105 transition-transform duration-300">
+          <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+            <span class="text-3xl">🎯</span>
+          </div>
+          <h2 class="text-3xl font-bold text-slate-900 mb-4">Nuestra Misión</h2>
+          <p class="text-slate-700 leading-relaxed mb-4">
+            Promover el <strong>desarrollo humano integral</strong> mediante programas de formación técnica laboral 
+            de alto impacto, orientados a la empleabilidad, el emprendimiento y la innovación social.
+          </p>
+          <p class="text-slate-700 leading-relaxed mb-4">
+            Nos comprometemos a ofrecer educación de <strong>calidad accesible</strong> a comunidades vulnerables, 
+            jóvenes y adultos que buscan transformar sus vidas, generando oportunidades reales de inserción laboral 
+            y movilidad social.
+          </p>
+          <div class="mt-6 space-y-2">
+            <div class="flex items-start gap-3">
+              <span class="text-blue-600 text-xl">✓</span>
+              <span class="text-slate-600">Formación técnica con enfoque práctico y laboral</span>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="text-blue-600 text-xl">✓</span>
+              <span class="text-slate-600">Desarrollo de competencias para el siglo XXI</span>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="text-blue-600 text-xl">✓</span>
+              <span class="text-slate-600">Acompañamiento integral durante todo el proceso</span>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="text-blue-600 text-xl">✓</span>
+              <span class="text-slate-600">Generación de oportunidades de empleo y emprendimiento</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visión -->
+        <div class="bg-white rounded-2xl p-8 shadow-xl border-t-4 border-purple-600 transform hover:scale-105 transition-transform duration-300">
+          <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+            <span class="text-3xl">🚀</span>
+          </div>
+          <h2 class="text-3xl font-bold text-slate-900 mb-4">Nuestra Visión</h2>
+          <p class="text-slate-700 leading-relaxed mb-4">
+            Ser reconocidos en 2030 como el <strong>instituto líder en Colombia</strong> en formación técnica laboral, 
+            innovación social y movilidad educativa, transformando la vida de miles de personas y contribuyendo 
+            al desarrollo sostenible del país.
+          </p>
+          <p class="text-slate-700 leading-relaxed mb-4">
+            Aspiramos a consolidarnos como un <strong>referente nacional e internacional</strong> en la creación de 
+            programas educativos innovadores, alianzas estratégicas de alto impacto y modelos de empleabilidad que 
+            garanticen la inserción laboral exitosa de nuestros egresados.
+          </p>
+          <div class="mt-6 space-y-2">
+            <div class="flex items-start gap-3">
+              <span class="text-purple-600 text-xl">★</span>
+              <span class="text-slate-600">Líder nacional en formación técnica de calidad</span>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="text-purple-600 text-xl">★</span>
+              <span class="text-slate-600">Referente en innovación social y educativa</span>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="text-purple-600 text-xl">★</span>
+              <span class="text-slate-600">Modelo de empleabilidad y emprendimiento</span>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="text-purple-600 text-xl">★</span>
+              <span class="text-slate-600">Impacto social medible y sostenible en comunidades</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Valores -->
+  <section class="mx-auto max-w-6xl px-4 py-16">
+    <div class="text-center mb-12">
+      <div class="inline-block mb-4 px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+        💎 Nuestros Pilares
+      </div>
+      <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Valores Institucionales</h2>
+      <p class="text-slate-600 max-w-2xl mx-auto">
+        Nuestros valores guían cada decisión y acción, definiendo quiénes somos y cómo trabajamos 
+        para transformar vidas a través de la educación.
+      </p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="bg-gradient-to-br from-blue-50 to-white rounded-2xl p-8 shadow-lg border border-blue-100 hover:shadow-2xl transition-shadow">
+        <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-4 shadow-md">
+          <span class="text-2xl">🤝</span>
+        </div>
+        <h3 class="text-xl font-bold text-slate-900 mb-3">Solidaridad</h3>
+        <p class="text-slate-600 leading-relaxed">
+          Trabajamos unidos por el bienestar colectivo, apoyando a quienes más lo necesitan y 
+          construyendo una comunidad de apoyo mutuo.
+        </p>
+      </div>
+
+      <div class="bg-gradient-to-br from-purple-50 to-white rounded-2xl p-8 shadow-lg border border-purple-100 hover:shadow-2xl transition-shadow">
+        <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-4 shadow-md">
+          <span class="text-2xl">🔍</span>
+        </div>
+        <h3 class="text-xl font-bold text-slate-900 mb-3">Transparencia</h3>
+        <p class="text-slate-600 leading-relaxed">
+          Actuamos con honestidad, claridad y rendición de cuentas en todos nuestros procesos, 
+          generando confianza en nuestra comunidad.
+        </p>
+      </div>
+
+      <div class="bg-gradient-to-br from-green-50 to-white rounded-2xl p-8 shadow-lg border border-green-100 hover:shadow-2xl transition-shadow">
+        <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-4 shadow-md">
+          <span class="text-2xl">⭐</span>
+        </div>
+        <h3 class="text-xl font-bold text-slate-900 mb-3">Excelencia</h3>
+        <p class="text-slate-600 leading-relaxed">
+          Nos comprometemos con la calidad en cada aspecto de nuestra labor educativa, buscando 
+          la mejora continua y los más altos estándares.
+        </p>
+      </div>
+
+      <div class="bg-gradient-to-br from-orange-50 to-white rounded-2xl p-8 shadow-lg border border-orange-100 hover:shadow-2xl transition-shadow">
+        <div class="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center mb-4 shadow-md">
+          <span class="text-2xl">🌱</span>
+        </div>
+        <h3 class="text-xl font-bold text-slate-900 mb-3">Innovación</h3>
+        <p class="text-slate-600 leading-relaxed">
+          Buscamos constantemente nuevas formas de enseñar, aprender y generar impacto social, 
+          adaptándonos a las necesidades del mundo actual.
+        </p>
+      </div>
+
+      <div class="bg-gradient-to-br from-red-50 to-white rounded-2xl p-8 shadow-lg border border-red-100 hover:shadow-2xl transition-shadow">
+        <div class="w-14 h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center mb-4 shadow-md">
+          <span class="text-2xl">❤️</span>
+        </div>
+        <h3 class="text-xl font-bold text-slate-900 mb-3">Compromiso Social</h3>
+        <p class="text-slate-600 leading-relaxed">
+          Trabajamos incansablemente por la transformación de comunidades vulnerables, generando 
+          oportunidades reales y sostenibles de desarrollo.
+        </p>
+      </div>
+
+      <div class="bg-gradient-to-br from-indigo-50 to-white rounded-2xl p-8 shadow-lg border border-indigo-100 hover:shadow-2xl transition-shadow">
+        <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4 shadow-md">
+          <span class="text-2xl">🌍</span>
+        </div>
+        <h3 class="text-xl font-bold text-slate-900 mb-3">Inclusión</h3>
+        <p class="text-slate-600 leading-relaxed">
+          Valoramos la diversidad y garantizamos acceso equitativo a la educación, sin importar 
+          origen, género, edad o condición socioeconómica.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Impacto y Estadísticas -->
+  <section class="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 text-white py-16">
+    <div class="mx-auto max-w-6xl px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">Nuestro Impacto en Cifras</h2>
+        <p class="text-blue-100 max-w-2xl mx-auto">
+          Los números que respaldan nuestra labor y demuestran el compromiso con la transformación social.
+        </p>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 text-center">
+          <div class="text-5xl font-bold text-blue-300 mb-2">500+</div>
+          <div class="text-sm text-blue-100">Vidas Transformadas</div>
+        </div>
+        
+        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 text-center">
+          <div class="text-5xl font-bold text-green-300 mb-2">17+</div>
+          <div class="text-sm text-blue-100">Aliados Estratégicos</div>
+        </div>
+        
+        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 text-center">
+          <div class="text-5xl font-bold text-purple-300 mb-2">62%</div>
+          <div class="text-sm text-blue-100">Tasa de Empleabilidad</div>
+        </div>
+        
+        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 text-center">
+          <div class="text-5xl font-bold text-orange-300 mb-2">6</div>
+          <div class="text-sm text-blue-100">Programas Técnicos</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="mx-auto max-w-4xl px-4 py-16 text-center">
+    <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+      ¿Listo para Transformar Tu Futuro?
+    </h2>
+    <p class="text-slate-600 text-lg mb-8 max-w-2xl mx-auto">
+      Únete a cientos de personas que ya han cambiado sus vidas a través de nuestra formación de calidad.
     </p>
-
-    <h2 class="mt-8 text-2xl font-semibold">Misión</h2>
-    <p class="mt-2 text-slate-700">Promover el desarrollo humano integral con programas de alto impacto.</p>
-
-    <h2 class="mt-6 text-2xl font-semibold">Visión</h2>
-    <p class="mt-2 text-slate-700">Ser referente en innovación social y movilidad educativa y laboral.</p>
-
-    <h2 class="mt-6 text-2xl font-semibold">Valores</h2>
-    <ul class="mt-2 list-disc pl-6 text-slate-700">
-      <li>Solidaridad</li>
-      <li>Transparencia</li>
-      <li>Excelencia</li>
-    </ul>
+    <div class="flex flex-wrap gap-4 justify-center">
+      <a 
+        href="/programas" 
+        class="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
+      >
+        Ver Programas →
+      </a>
+      <a 
+        href="/contacto" 
+        class="px-8 py-4 bg-white border-2 border-blue-600 text-blue-600 font-bold rounded-full shadow-lg hover:bg-blue-50 hover:scale-105 transition-all duration-300"
+      >
+        Contáctanos
+      </a>
+    </div>
   </section>
 </Layout>
+
+<style>
+  @keyframes pulse {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.3; }
+  }
+</style>
