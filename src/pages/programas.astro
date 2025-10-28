@@ -13,13 +13,40 @@ const programasData = [
     categoria: 'Técnico',
     badge: 'Popular',
     badgeColor: 'green',
-    detalles: [
-      'Fundamentos de energía solar',
-      'Diseño de sistemas fotovoltaicos',
-      'Instalación y mantenimiento',
-      'Normatividad y certificaciones',
-      'Prácticas en proyectos reales'
-    ]
+      semestres: [
+        {
+          numero: 'I',
+          nombre: 'Instalaciones Fotovoltaicas y Electricidad',
+          materias: [
+            'Instalación de acometidas eléctricas de acuerdo con reglamento técnico',
+            'Operaciones básicas en el montaje y mantenimiento de instalaciones solares fotovoltaicas',
+            'Lengua extranjera - Inglés'
+          ]
+        },
+        {
+          numero: 'II',
+          nombre: 'Sistemas Solares Térmicos y Mecánica',
+          materias: [
+            'Operaciones básicas en el montaje y mantenimiento de instalaciones solares térmicas',
+            'Mecanizado básico',
+            'Desarrollo humano - Prepráctica'
+          ]
+        },
+        {
+          numero: 'III',
+          nombre: 'Práctica Empresarial',
+          materias: [
+            'Práctica Empresarial'
+          ]
+        }
+      ],
+      detalles: [
+        'Fundamentos de energía solar',
+        'Diseño de sistemas fotovoltaicos',
+        'Instalación y mantenimiento',
+        'Normatividad y certificaciones',
+        'Prácticas en proyectos reales'
+      ]
   },
   {
     id: 'marketing',
@@ -120,24 +147,24 @@ const programasData = [
         'Financiamiento y escalamiento'
       ]
   },
-  {
-    id: 'agroindustria',
-    nombre: 'Agroindustria Sostenible',
-    imagen: '/img/flyers/AGROINDUSTRIA.png',
-    descripcion: 'Aprende técnicas modernas de producción agroindustrial. Desarrolla proyectos sostenibles que generen impacto social y ambiental positivo.',
-    duracion: '6 meses',
-    modalidad: 'Presencial',
-    categoria: 'Agricultura',
-    badge: 'Certificado',
-    badgeColor: 'emerald',
-    detalles: [
-      'Técnicas de cultivo sostenible',
-      'Procesamiento y valor agregado',
-      'Gestión de proyectos agrícolas',
-      'Comercialización y mercados',
-      'Certificaciones orgánicas'
-    ]
-  },
+  // {
+  //   id: 'agroindustria',
+  //   nombre: 'Agroindustria Sostenible',
+  //   imagen: '/img/flyers/AGROINDUSTRIA.png',
+  //   descripcion: 'Aprende técnicas modernas de producción agroindustrial. Desarrolla proyectos sostenibles que generen impacto social y ambiental positivo.',
+  //   duracion: '6 meses',
+  //   modalidad: 'Presencial',
+  //   categoria: 'Agricultura',
+  //   badge: 'Certificado',
+  //   badgeColor: 'emerald',
+  //   detalles: [
+  //     'Técnicas de cultivo sostenible',
+  //     'Procesamiento y valor agregado',
+  //     'Gestión de proyectos agrícolas',
+  //     'Comercialización y mercados',
+  //     'Certificaciones orgánicas'
+  //   ]
+  // },
   {
     id: 'culturales',
     nombre: 'Programas Culturales y Artísticos',
