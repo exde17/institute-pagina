@@ -3,7 +3,7 @@
 import '../styles/global.css';
 
 const {
-  title = 'Instituto Fundación',
+  title = 'FCM INSTITUTE',
   description = 'Educación, desarrollo social y transformación',
   image = '/hero.jpg', // ✅ default para evitar "image is not defined"
 } = Astro.props;
@@ -39,11 +39,11 @@ const ogUrl = Astro.url?.href ?? ''; // opcional: URL actual para Open Graph
         <!-- Logo -->
         <a href="/" class="flex items-center gap-3 group z-50">
           <div class="relative">
-            <img src="/img/logo_institute.png" alt="Logo Instituto Fundación" class="h-12 w-12 rounded-full object-cover transition-transform duration-300 group-hover:scale-105 shadow-md" />
+            <img src="/img/logo_institute.png" alt="Logo FCM INSTITUTE" class="h-12 w-12 rounded-full object-cover transition-transform duration-300 group-hover:scale-105 shadow-md" />
             <div class="absolute inset-0 bg-blue-500 rounded-full blur opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
           </div>
           <span class="font-bold tracking-wide text-base md:text-lg bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text">
-            Instituto Fundación
+            FCM INSTITUTE
           </span>
         </a>
         
@@ -274,7 +274,7 @@ const ogUrl = Astro.url?.href ?? ''; // opcional: URL actual para Open Graph
           <div class="footer-section">
             <div class="flex items-center gap-2 mb-4">
               <img src="/favicon.svg" class="h-8 w-8 drop-shadow-lg" alt="Logo" />
-              <span class="font-bold text-lg">Instituto Fundación</span>
+              <span class="font-bold text-lg">FCM INSTITUTE</span>
             </div>
             <p class="text-slate-300 leading-relaxed">
               Transformamos talentos en soluciones técnicas de alto impacto.
@@ -344,7 +344,7 @@ const ogUrl = Astro.url?.href ?? ''; // opcional: URL actual para Open Graph
         </div>
 
         <div class="border-t border-white/10 pt-6 text-center text-sm text-slate-400">
-          <p>© {new Date().getFullYear()} Instituto Fundación - Todos los derechos reservados</p>
+          <p>© {new Date().getFullYear()} FCM INSTITUTE - Todos los derechos reservados</p>
           <p class="mt-2 text-xs">Hecho con 💙 para transformar vidas</p>
         </div>
       </div>
