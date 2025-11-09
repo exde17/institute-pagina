@@ -67,7 +67,8 @@ const ogUrl = Astro.url?.href ?? ''; // opcional: URL actual para Open Graph
           <li><a class="nav-link px-5 py-2.5 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/contacto">
             Contacto
           </a></li>
-          <li>
+          <li id="auth-section">
+            <!-- Se actualizará dinámicamente con JavaScript -->
           </li>
         </ul>
 
@@ -107,6 +108,9 @@ const ogUrl = Astro.url?.href ?? ''; // opcional: URL actual para Open Graph
           <a class="mobile-nav-link text-2xl font-semibold hover:text-blue-400 transition-colors" href="/contacto">
             Contacto
           </a>
+          <div id="mobile-auth-section" class="mt-4">
+            <!-- Se actualizará dinámicamente con JavaScript -->
+          </div>
         </div>
       </div>
     </header>
@@ -231,6 +235,72 @@ const ogUrl = Astro.url?.href ?? ''; // opcional: URL actual para Open Graph
           document.body.classList.remove('overflow-hidden');
         }
       });
+
+      // Función de autenticación
+      function updateAuthUI() {
+        const authSection = document.getElementById('auth-section');
+        const mobileAuthSection = document.getElementById('mobile-auth-section');
+        
+        if (!authSection || !mobileAuthSection) return;
+
+        // Obtener datos del usuario desde localStorage
+        const token = localStorage.getItem('auth_token');
+        const userData = localStorage.getItem('auth_user');
+        const user = userData ? JSON.parse(userData) : null;
+        
+        if (user && token) {
+          // Usuario logueado - mostrar nombre y botón de logout
+          const userName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.name || user.email;
+          
+          authSection.innerHTML = `
+            <div class="flex items-center gap-3">
+              <span class="text-sm font-medium text-slate-700">Hola, ${userName}</span>
+              <button id="logout-btn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
+                Salir
+              </button>
+            </div>
+          `;
+          
+          mobileAuthSection.innerHTML = `
+            <div class="flex flex-col items-center gap-2">
+              <span class="text-lg font-medium text-white">Hola, ${userName}</span>
+              <button id="mobile-logout-btn" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-lg font-medium">
+                Salir
+              </button>
+            </div>
+          `;
+          
+          // Event listeners para logout
+          document.getElementById('logout-btn')?.addEventListener('click', () => {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('auth_user');
+            window.location.reload();
+          });
+          
+          document.getElementById('mobile-logout-btn')?.addEventListener('click', () => {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('auth_user');
+            window.location.reload();
+          });
+          
+        } else {
+          // Usuario no logueado - mostrar botón de acceder
+          authSection.innerHTML = `
+            <a href="/auth/login" class="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+              Acceder
+            </a>
+          `;
+          
+          mobileAuthSection.innerHTML = `
+            <a href="/auth/login" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xl font-medium">
+              Acceder
+            </a>
+          `;
+        }
+      }
+
+      // Actualizar UI de autenticación al cargar la página
+      updateAuthUI();
     </script>
 
     <main class="flex-1">

@@ -41,12 +41,16 @@ import Layout from '../../layouts/Layout.astro';
           email: String(fd.get('email') || ''),
           password: String(fd.get('password') || ''),
         });
+        console.log('Respuesta del login:', out); // Mostrar en consola lo que devuelve el backend
         // El backend devuelve todo en un solo objeto con el token incluido
         const { token, ...user } = out;
+        console.log('Token:', token); // Mostrar el token
+        console.log('Datos del usuario:', user); // Mostrar los datos del usuario
         saveAuth(token, user);
         if (msg) msg.textContent = 'Acceso correcto. Redirigiendo...';
         window.location.href = '/';
       } catch (err: any) {
+        console.error('Error en login:', err); // Mostrar errores en consola
         if (msg) msg.textContent = err?.message || 'Credenciales inválidas';
       }
     });
