@@ -25,7 +25,17 @@ import Layout from '../../layouts/Layout.astro';
 
       <label class="grid gap-1">
         <span class="text-sm">Contraseña</span>
-        <input type="password" name="password" required minlength="6" class="border rounded px-3 py-2" placeholder="Mínimo 6 caracteres" />
+        <input type="password" name="password" required minlength="6" maxlength="50" class="border rounded px-3 py-2" placeholder="Mínimo 6 caracteres (mayúscula, minúscula, número)" />
+      </label>
+
+      <label class="grid gap-1">
+        <span class="text-sm">Teléfono</span>
+        <input name="telephone" required class="border rounded px-3 py-2" placeholder="Tu número de teléfono" />
+      </label>
+
+      <label class="grid gap-1">
+        <span class="text-sm">Dirección</span>
+        <input name="address" required class="border rounded px-3 py-2" placeholder="Tu dirección" />
       </label>
 
       <button class="mt-2 bg-blue-800 text-white rounded px-4 py-2">Crear cuenta</button>
@@ -40,19 +50,40 @@ import Layout from '../../layouts/Layout.astro';
   <script>
     import { registerReq, saveAuth } from '../../lib/auth.ts';
 
-    const form = document.getElementById('form-register');
-    const msg = document.getElementById('msg');
+    const form = document.getElementById('form-register') as HTMLFormElement;
+    const msg = document.getElementById('msg') as HTMLParagraphElement;
+
+    // Función para validar contraseña
+    function validatePassword(password: string): boolean {
+      // Debe tener al menos una mayúscula, una minúscula y un número
+      const hasUpperCase = /[A-Z]/.test(password);
+      const hasLowerCase = /[a-z]/.test(password);
+      const hasNumber = /\d/.test(password);
+      return hasUpperCase && hasLowerCase && hasNumber;
+    }
 
     form?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      msg.textContent = 'Creando cuenta...';
+      if (!msg) return;
+
       const fd = new FormData(form);
+      const password = String(fd.get('password') || '');
+
+      // Validar contraseña antes de enviar
+      if (!validatePassword(password)) {
+        msg.textContent = 'La contraseña debe contener al menos una mayúscula, una minúscula y un número';
+        return;
+      }
+
+      msg.textContent = 'Creando cuenta...';
       try {
         const out = await registerReq({
           firstName: String(fd.get('firstName') || ''),
           lastName: String(fd.get('lastName') || ''),
           email: String(fd.get('email') || ''),
-          password: String(fd.get('password') || ''),
+          password: password,
+          telephone: String(fd.get('telephone') || ''),
+          address: String(fd.get('address') || ''),
         });
         // El backend devuelve todo en un solo objeto con el token incluido
         const { token, ...user } = out;
@@ -60,7 +91,8 @@ import Layout from '../../layouts/Layout.astro';
         msg.textContent = 'Cuenta creada. Redirigiendo...';
         window.location.href = '/';
       } catch (err) {
-        msg.textContent = err.message || 'No se pudo crear la cuenta';
+        const error = err as Error;
+        msg.textContent = error.message || 'No se pudo crear la cuenta';
       }
     });
   </script>

@@ -29,13 +29,13 @@ import Layout from '../../layouts/Layout.astro';
   <script>
     import { loginReq, saveAuth } from '../../lib/auth.ts';
 
-    const form = document.getElementById('form-login');
+    const form = document.getElementById('form-login') as HTMLFormElement | null;
     const msg = document.getElementById('msg');
 
     form?.addEventListener('submit', async (e) => {
       e.preventDefault();
-      msg.textContent = 'Verificando credenciales...';
-      const fd = new FormData(form);
+      if (msg) msg.textContent = 'Verificando credenciales...';
+      const fd = new FormData(form as HTMLFormElement);
       try {
         const out = await loginReq({
           email: String(fd.get('email') || ''),
@@ -44,10 +44,10 @@ import Layout from '../../layouts/Layout.astro';
         // El backend devuelve todo en un solo objeto con el token incluido
         const { token, ...user } = out;
         saveAuth(token, user);
-        msg.textContent = 'Acceso correcto. Redirigiendo...';
+        if (msg) msg.textContent = 'Acceso correcto. Redirigiendo...';
         window.location.href = '/';
-      } catch (err) {
-        msg.textContent = err.message || 'Credenciales inválidas';
+      } catch (err: any) {
+        if (msg) msg.textContent = err?.message || 'Credenciales inválidas';
       }
     });
   </script>
