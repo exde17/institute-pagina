@@ -147,24 +147,7 @@ const programasData = [
         'Financiamiento y escalamiento'
       ]
   },
-  // {
-  //   id: 'agroindustria',
-  //   nombre: 'Agroindustria Sostenible',
-  //   imagen: '/img/flyers/AGROINDUSTRIA.png',
-  //   descripcion: 'Aprende técnicas modernas de producción agroindustrial. Desarrolla proyectos sostenibles que generen impacto social y ambiental positivo.',
-  //   duracion: '6 meses',
-  //   modalidad: 'Presencial',
-  //   categoria: 'Agricultura',
-  //   badge: 'Certificado',
-  //   badgeColor: 'emerald',
-  //   detalles: [
-  //     'Técnicas de cultivo sostenible',
-  //     'Procesamiento y valor agregado',
-  //     'Gestión de proyectos agrícolas',
-  //     'Comercialización y mercados',
-  //     'Certificaciones orgánicas'
-  //   ]
-  // },
+  
   {
     id: 'culturales',
     nombre: 'Programas Culturales y Artísticos',
@@ -604,7 +587,7 @@ const programasData = [
           const programaNombre = (e.currentTarget as HTMLElement).dataset.programaNombre;
           
           // Verificar si hay token (usuario logueado)
-          const token = localStorage.getItem('token');
+          const token = localStorage.getItem('auth_token');
           
           if (!token) {
             if (confirm(`Para inscribirte en "${programaNombre}" debes iniciar sesión. ¿Deseas ir al login?`)) {
