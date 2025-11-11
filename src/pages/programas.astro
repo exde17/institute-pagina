@@ -416,6 +416,7 @@ const programasDataFallback = [
             <!-- Botón de acción -->
             <button 
               class="btn-inscribir w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl px-4 py-3 font-bold transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+              data-programa-id={programa.id}
               data-programa-nombre={programa.nombre}
             >
               <span class="flex items-center justify-center gap-2">
@@ -517,8 +518,14 @@ const programasDataFallback = [
     // Importar la función de la API
     import { getProgramas } from '../lib/auth.ts';
 
+    // Variable global para almacenar los programas cargados
+    let programasCargados = [];
+
     // Función para renderizar los programas
     function renderProgramas(programas) {
+      // Guardar los programas para usarlos en la inscripción
+      programasCargados = programas;
+      
       const grid = document.getElementById('programas-grid');
       const countSpan = document.getElementById('programas-count');
       
@@ -688,6 +695,7 @@ const programasDataFallback = [
             <!-- Botón de acción -->
             <button
               class="btn-inscribir w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl px-4 py-3 font-bold transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+              data-programa-id="${programa.id}"
               data-programa-nombre="${programa.nombre}"
             >
               <span class="flex items-center justify-center gap-2">
@@ -778,44 +786,185 @@ const programasDataFallback = [
       const inscribirButtons = document.querySelectorAll('.btn-inscribir');
       
       inscribirButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const programaNombre = (e.currentTarget as HTMLElement).dataset.programaNombre;
+        btn.addEventListener('click', async (e) => {
+          const button = e.currentTarget as HTMLButtonElement;
+          const programaId = button.dataset.programaId;
+          const programaNombre = button.dataset.programaNombre;
+          
+          console.log('=== INICIO DE INSCRIPCIÓN ===');
+          console.log('Programa ID:', programaId);
+          console.log('Programa Nombre:', programaNombre);
           
           // Verificar si hay token (usuario logueado)
           const token = localStorage.getItem('auth_token');
           
           if (!token) {
+            console.log('No hay token, redirigiendo al login');
             if (confirm(`Para inscribirte en "${programaNombre}" debes iniciar sesión. ¿Deseas ir al login?`)) {
               window.location.href = '/auth/login';
             }
             return;
           }
 
-          // Redirigir a página de contacto o inscripción
-          if (confirm(`¿Deseas inscribirte en "${programaNombre}"? Te redirigiremos a la página de contacto.`)) {
-            window.location.href = `/contacto?programa=${encodeURIComponent(programaNombre || '')}`;
+          // Verificar que tenemos el ID del programa
+          if (!programaId) {
+            console.error('Error: No se pudo obtener el ID del programa');
+            alert('Error: No se pudo obtener la información del programa. Por favor, recarga la página e intenta nuevamente.');
+            return;
           }
+
+          // Pedir observación al usuario
+          const observacion = prompt(`¿Tienes alguna observación o comentario sobre tu inscripción a "${programaNombre}"?`, '');
+          
+          // Si el usuario cancela el prompt, salir
+          if (observacion === null) {
+            console.log('Usuario canceló el prompt de observación');
+            return;
+          }
+          
+          console.log('Observación del usuario:', observacion);
+
+          // Confirmar la inscripción
+          if (!confirm(`¿Confirmas tu inscripción en "${programaNombre}"?`)) {
+            console.log('Usuario canceló la inscripción');
+            return;
+          }
+
+          // Preparar el body de la petición
+          const bodyData = {
+            observacion: observacion || '',
+            programa: programaId // Solo el UUID del programa
+          };
+          console.log('Body de la petición:', bodyData);
+
+          // Deshabilitar el botón mientras se procesa
+          button.disabled = true;
+          button.innerHTML = `
+            <span class="flex items-center justify-center gap-2">
+              Procesando...
+              <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </span>
+          `;
+
+          try {
+            const API_BASE = import.meta.env.PUBLIC_API_BASE;
+            console.log('Enviando petición a:', `${API_BASE}/inscripcion`);
+            
+            const response = await fetch(`${API_BASE}/inscripcion`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(bodyData)
+            });
+
+            console.log('Respuesta recibida - Status:', response.status);
+
+            if (response.ok) {
+              // Intentar parsear como JSON, si falla obtener como texto
+              let data;
+              let mensaje = '';
+              
+              try {
+                const responseText = await response.text();
+                console.log('Respuesta como texto:', responseText);
+                
+                // Intentar parsear como JSON
+                try {
+                  data = JSON.parse(responseText);
+                  console.log('Respuesta parseada como JSON:', data);
+                  mensaje = data.message || `¡Inscripción exitosa! Te has inscrito en "${programaNombre}".`;
+                } catch {
+                  // Si no es JSON, usar el texto directamente
+                  console.log('La respuesta no es JSON, usando texto plano');
+                  mensaje = responseText || `¡Inscripción exitosa! Te has inscrito en "${programaNombre}".`;
+                }
+              } catch (error) {
+                console.error('Error al leer la respuesta:', error);
+                mensaje = `¡Inscripción exitosa! Te has inscrito en "${programaNombre}".`;
+              }
+              
+              alert(`${mensaje} Pronto nos pondremos en contacto contigo.`);
+              
+              // Cambiar el botón para indicar que ya está inscrito
+              button.innerHTML = `
+                <span class="flex items-center justify-center gap-2">
+                  ✓ Ya inscrito
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </span>
+              `;
+              button.disabled = true;
+              button.classList.remove('hover:from-blue-700', 'hover:to-purple-700', 'hover:scale-105');
+              button.classList.add('opacity-60', 'cursor-not-allowed');
+            } else {
+              const errorData = await response.json().catch(() => ({}));
+              console.error('Error en la respuesta:', errorData);
+              const errorMsg = errorData.message || errorData.error || 'Error al procesar la inscripción';
+              alert(`Error: ${errorMsg}`);
+              
+              // Restaurar el botón
+              button.disabled = false;
+              button.innerHTML = `
+                <span class="flex items-center justify-center gap-2">
+                  Inscribirme ahora
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                  </svg>
+                </span>
+              `;
+            }
+          } catch (error) {
+            console.error('=== ERROR AL PROCESAR INSCRIPCIÓN ===');
+            console.error('Detalles del error:', error);
+            alert('Error de conexión. Por favor, intenta nuevamente.');
+            
+            // Restaurar el botón
+            button.disabled = false;
+            button.innerHTML = `
+              <span class="flex items-center justify-center gap-2">
+                Inscribirme ahora
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                </svg>
+              </span>
+            `;
+          }
+          console.log('=== FIN DE INSCRIPCIÓN ===\n');
         });
       });
     }
 
     // Cargar programas al cargar la página
     document.addEventListener('DOMContentLoaded', async () => {
+      console.log('=== CARGANDO PÁGINA DE PROGRAMAS ===');
       try {
+        console.log('Intentando obtener programas desde la API...');
         // Intentar obtener programas desde la API
         const programas = await getProgramas();
+        console.log('Programas obtenidos:', programas);
         if (programas && programas.length > 0) {
+          console.log(`Renderizando ${programas.length} programas desde la API`);
           renderProgramas(programas);
         } else {
+          console.log('No se obtuvieron programas desde la API, usando fallback');
           // Si no hay programas, los event listeners ya están en el HTML renderizado por Astro
           attachEventListeners();
         }
       } catch (error) {
-        console.error('Error al cargar programas desde la API:', error);
+        console.error('=== ERROR AL CARGAR PROGRAMAS ===');
+        console.error('Detalles del error:', error);
+        console.log('Usando programas de fallback');
         // En caso de error, los programas de fallback ya están renderizados
         // Solo necesitamos agregar los event listeners
         attachEventListeners();
       }
+      console.log('=== PÁGINA DE PROGRAMAS CARGADA ===\n');
     });
   </script>
 </Layout>
