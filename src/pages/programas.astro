@@ -447,6 +447,89 @@ const programasDataFallback = [
         </svg>
       </a>
     </div>
+
+    <!-- Modal de Éxito -->
+    <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl p-8 max-w-md w-full transform scale-95 opacity-0 transition-all duration-300" id="success-modal-content">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mb-2" id="success-title">¡Inscripción Exitosa!</h3>
+          <p class="text-slate-600 mb-6" id="success-message">Pronto nos pondremos en contacto contigo.</p>
+          <button id="success-close" class="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-3 rounded-xl font-bold transform hover:scale-105 transition-all duration-300">
+            ¡Perfecto!
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Error -->
+    <div id="error-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl p-8 max-w-md w-full transform scale-95 opacity-0 transition-all duration-300" id="error-modal-content">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mb-2" id="error-title">Error</h3>
+          <p class="text-slate-600 mb-6" id="error-message">Ha ocurrido un error inesperado.</p>
+          <button id="error-close" class="w-full bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-6 py-3 rounded-xl font-bold transform hover:scale-105 transition-all duration-300">
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl p-8 max-w-md w-full transform scale-95 opacity-0 transition-all duration-300" id="confirm-modal-content">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mb-2" id="confirm-title">Confirmar Inscripción</h3>
+          <p class="text-slate-600 mb-6" id="confirm-message">¿Confirmas tu inscripción?</p>
+          <div class="flex gap-3">
+            <button id="confirm-cancel" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-3 rounded-xl font-bold transform hover:scale-105 transition-all duration-300">
+              Cancelar
+            </button>
+            <button id="confirm-accept" class="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-6 py-3 rounded-xl font-bold transform hover:scale-105 transition-all duration-300">
+              Confirmar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Prompt -->
+    <div id="prompt-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl p-8 max-w-md w-full transform scale-95 opacity-0 transition-all duration-300" id="prompt-modal-content">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900 mb-2" id="prompt-title">Observaciones</h3>
+          <p class="text-slate-600 mb-4" id="prompt-message">¿Tienes alguna observación o comentario?</p>
+          <textarea id="prompt-input" class="w-full p-3 border border-slate-300 rounded-lg mb-4 resize-none" rows="3" placeholder="Escribe tus observaciones aquí..."></textarea>
+          <div class="flex gap-3">
+            <button id="prompt-cancel" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-3 rounded-xl font-bold transform hover:scale-105 transition-all duration-300">
+              Omitir
+            </button>
+            <button id="prompt-accept" class="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-3 rounded-xl font-bold transform hover:scale-105 transition-all duration-300">
+              Continuar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <style>
@@ -520,6 +603,150 @@ const programasDataFallback = [
 
     // Variable global para almacenar los programas cargados
     let programasCargados = [];
+
+    // Función para mostrar modal de éxito
+    function showSuccessModal(title, message) {
+      const modal = document.getElementById('success-modal');
+      const modalContent = document.getElementById('success-modal-content');
+      const titleEl = document.getElementById('success-title');
+      const messageEl = document.getElementById('success-message');
+      const closeBtn = document.getElementById('success-close');
+
+      if (titleEl) titleEl.textContent = title;
+      if (messageEl) messageEl.textContent = message;
+
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modalContent.classList.remove('scale-95', 'opacity-0');
+        modalContent.classList.add('scale-100', 'opacity-100');
+      }, 10);
+
+      const closeModal = () => {
+        modalContent.classList.remove('scale-100', 'opacity-100');
+        modalContent.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+          modal.classList.add('hidden');
+        }, 300);
+      };
+
+      closeBtn.addEventListener('click', closeModal, { once: true });
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+    }
+
+    // Función para mostrar modal de error
+    function showErrorModal(title, message) {
+      const modal = document.getElementById('error-modal');
+      const modalContent = document.getElementById('error-modal-content');
+      const titleEl = document.getElementById('error-title');
+      const messageEl = document.getElementById('error-message');
+      const closeBtn = document.getElementById('error-close');
+
+      if (titleEl) titleEl.textContent = title;
+      if (messageEl) messageEl.textContent = message;
+
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modalContent.classList.remove('scale-95', 'opacity-0');
+        modalContent.classList.add('scale-100', 'opacity-100');
+      }, 10);
+
+      const closeModal = () => {
+        modalContent.classList.remove('scale-100', 'opacity-100');
+        modalContent.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+          modal.classList.add('hidden');
+        }, 300);
+      };
+
+      closeBtn.addEventListener('click', closeModal, { once: true });
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+    }
+
+    // Función para mostrar modal de confirmación
+    function showConfirmModal(title, message) {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('confirm-modal');
+        const modalContent = document.getElementById('confirm-modal-content');
+        const titleEl = document.getElementById('confirm-title');
+        const messageEl = document.getElementById('confirm-message');
+        const cancelBtn = document.getElementById('confirm-cancel');
+        const acceptBtn = document.getElementById('confirm-accept');
+
+        if (titleEl) titleEl.textContent = title;
+        if (messageEl) messageEl.textContent = message;
+
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+          modalContent.classList.remove('scale-95', 'opacity-0');
+          modalContent.classList.add('scale-100', 'opacity-100');
+        }, 10);
+
+        const closeModal = (result) => {
+          modalContent.classList.remove('scale-100', 'opacity-100');
+          modalContent.classList.add('scale-95', 'opacity-0');
+          setTimeout(() => {
+            modal.classList.add('hidden');
+            resolve(result);
+          }, 300);
+        };
+
+        cancelBtn.addEventListener('click', () => closeModal(false), { once: true });
+        acceptBtn.addEventListener('click', () => closeModal(true), { once: true });
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) closeModal(false);
+        });
+      });
+    }
+
+    // Función para mostrar modal de prompt
+    function showPromptModal(title, message, defaultValue = '') {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('prompt-modal');
+        const modalContent = document.getElementById('prompt-modal-content');
+        const titleEl = document.getElementById('prompt-title');
+        const messageEl = document.getElementById('prompt-message');
+        const inputEl = document.getElementById('prompt-input');
+        const cancelBtn = document.getElementById('prompt-cancel');
+        const acceptBtn = document.getElementById('prompt-accept');
+
+        if (titleEl) titleEl.textContent = title;
+        if (messageEl) messageEl.textContent = message;
+        if (inputEl) inputEl.value = defaultValue;
+
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+          modalContent.classList.remove('scale-95', 'opacity-0');
+          modalContent.classList.add('scale-100', 'opacity-100');
+        }, 10);
+
+        const closeModal = (result) => {
+          modalContent.classList.remove('scale-100', 'opacity-100');
+          modalContent.classList.add('scale-95', 'opacity-0');
+          setTimeout(() => {
+            modal.classList.add('hidden');
+            resolve(result);
+          }, 300);
+        };
+
+        cancelBtn.addEventListener('click', () => closeModal(null), { once: true });
+        acceptBtn.addEventListener('click', () => {
+          const value = inputEl ? inputEl.value : '';
+          closeModal(value);
+        }, { once: true });
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) closeModal(null);
+        });
+
+        // Focus en el input
+        setTimeout(() => {
+          if (inputEl) inputEl.focus();
+        }, 100);
+      });
+    }
 
     // Función para renderizar los programas
     function renderProgramas(programas) {
@@ -800,7 +1027,11 @@ const programasDataFallback = [
           
           if (!token) {
             console.log('No hay token, redirigiendo al login');
-            if (confirm(`Para inscribirte en "${programaNombre}" debes iniciar sesión. ¿Deseas ir al login?`)) {
+            const shouldLogin = await showConfirmModal(
+              'Inicio de Sesión Requerido',
+              `Para inscribirte en "${programaNombre}" debes iniciar sesión. ¿Deseas ir al login?`
+            );
+            if (shouldLogin) {
               window.location.href = '/auth/login';
             }
             return;
@@ -809,12 +1040,19 @@ const programasDataFallback = [
           // Verificar que tenemos el ID del programa
           if (!programaId) {
             console.error('Error: No se pudo obtener el ID del programa');
-            alert('Error: No se pudo obtener la información del programa. Por favor, recarga la página e intenta nuevamente.');
+            await showErrorModal(
+              'Error',
+              'No se pudo obtener la información del programa. Por favor, recarga la página e intenta nuevamente.'
+            );
             return;
           }
 
           // Pedir observación al usuario
-          const observacion = prompt(`¿Tienes alguna observación o comentario sobre tu inscripción a "${programaNombre}"?`, '');
+          const observacion = await showPromptModal(
+            'Observaciones',
+            `¿Tienes alguna observación o comentario sobre tu inscripción a "${programaNombre}"?`,
+            ''
+          );
           
           // Si el usuario cancela el prompt, salir
           if (observacion === null) {
@@ -825,7 +1063,12 @@ const programasDataFallback = [
           console.log('Observación del usuario:', observacion);
 
           // Confirmar la inscripción
-          if (!confirm(`¿Confirmas tu inscripción en "${programaNombre}"?`)) {
+          const confirmarInscripcion = await showConfirmModal(
+            'Confirmar Inscripción',
+            `¿Confirmas tu inscripción en "${programaNombre}"?`
+          );
+          
+          if (!confirmarInscripcion) {
             console.log('Usuario canceló la inscripción');
             return;
           }
@@ -877,7 +1120,13 @@ const programasDataFallback = [
                 try {
                   data = JSON.parse(responseText);
                   console.log('Respuesta parseada como JSON:', data);
-                  mensaje = data.message || `¡Inscripción exitosa! Te has inscrito en "${programaNombre}".`;
+                  
+                  // Verificar si es una respuesta exitosa con inscripción
+                  if (data.message && data.inscripcion) {
+                    mensaje = `${data.message} Te has inscrito en "${programaNombre}".`;
+                  } else {
+                    mensaje = data.message || `¡Inscripción exitosa! Te has inscrito en "${programaNombre}".`;
+                  }
                 } catch {
                   // Si no es JSON, usar el texto directamente
                   console.log('La respuesta no es JSON, usando texto plano');
@@ -888,7 +1137,7 @@ const programasDataFallback = [
                 mensaje = `¡Inscripción exitosa! Te has inscrito en "${programaNombre}".`;
               }
               
-              alert(`${mensaje} Pronto nos pondremos en contacto contigo.`);
+              await showSuccessModal('¡Inscripción Exitosa!', `${mensaje} Pronto nos pondremos en contacto contigo.`);
               
               // Cambiar el botón para indicar que ya está inscrito
               button.innerHTML = `
@@ -903,10 +1152,27 @@ const programasDataFallback = [
               button.classList.remove('hover:from-blue-700', 'hover:to-purple-700', 'hover:scale-105');
               button.classList.add('opacity-60', 'cursor-not-allowed');
             } else {
-              const errorData = await response.json().catch(() => ({}));
-              console.error('Error en la respuesta:', errorData);
-              const errorMsg = errorData.message || errorData.error || 'Error al procesar la inscripción';
-              alert(`Error: ${errorMsg}`);
+              // Manejar errores específicos
+              let errorTitle = 'Error en la Inscripción';
+              let errorMessage = 'Error al procesar la inscripción';
+              
+              try {
+                const errorData = await response.json();
+                console.error('Error en la respuesta:', errorData);
+                
+                // Manejar caso específico de inscripción duplicada (409)
+                if (response.status === 409) {
+                  errorTitle = 'Inscripción Ya Existente';
+                  errorMessage = errorData.message || 'Ya existe una inscripción para este usuario en este programa';
+                } else {
+                  errorMessage = errorData.message || errorData.error || 'Error al procesar la inscripción';
+                }
+              } catch (parseError) {
+                console.error('Error al parsear respuesta de error:', parseError);
+                errorMessage = `Error ${response.status}: ${response.statusText}`;
+              }
+              
+              await showErrorModal(errorTitle, errorMessage);
               
               // Restaurar el botón
               button.disabled = false;
@@ -922,7 +1188,7 @@ const programasDataFallback = [
           } catch (error) {
             console.error('=== ERROR AL PROCESAR INSCRIPCIÓN ===');
             console.error('Detalles del error:', error);
-            alert('Error de conexión. Por favor, intenta nuevamente.');
+            await showErrorModal('Error de Conexión', 'Error de conexión. Por favor, intenta nuevamente.');
             
             // Restaurar el botón
             button.disabled = false;
