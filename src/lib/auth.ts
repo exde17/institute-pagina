@@ -39,9 +39,21 @@ async function apiPost<T>(path: string, body: unknown): Promise<T> {
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    // Tu API puede responder { message: [...] } o { message: '...' } o { error: '...' }
+    // Manejar diferentes tipos de errores
     const arr = Array.isArray(data?.message) ? data.message : null;
-    const msg = arr ? arr.join(' • ') : (data?.message || data?.error || 'Error de red');
+    let msg = arr ? arr.join(' • ') : (data?.message || data?.error || 'Error de red');
+    
+    // Mensajes específicos según el código de estado
+    if (res.status === 401) {
+      msg = 'Correo o contraseña incorrectos';
+    } else if (res.status === 404) {
+      msg = 'Usuario no encontrado';
+    } else if (res.status === 403) {
+      msg = 'Acceso denegado';
+    } else if (res.status >= 500) {
+      msg = 'Error del servidor. Intenta más tarde';
+    }
+    
     throw new Error(msg);
   }
   return data as T;
@@ -98,6 +110,61 @@ export type Noticia = {
   contenido: string;
   fecha: string;
 };
+
+// 👇 Tipos y funciones para inscripciones y pagos
+export type Pago = {
+  id: string;
+  monto: string;
+  metodo: string | null;
+  createdAt: string;
+  updatedAt: string;
+  referenciaPago: string;
+  wompi_transaccion: string | null;
+  fechaPago: string | null;
+  raw_response: any | null;
+  estado: 'Pendiente' | 'Completado' | 'Fallido';
+};
+
+export type Inscripcion = {
+  id: string;
+  observacion: string;
+  estado: boolean;
+  fechaInscripcion: string;
+  user: User;
+  programa: Programa & {
+    imagen: string;
+    modalidad: string;
+    categoria: string;
+    badge: string;
+    badgeColor: string;
+    semestres: any[];
+    detalles: string[];
+  };
+  pagos: Pago[];
+};
+
+export function getInscripciones() {
+  return apiGet<Inscripcion[]>('/inscripcion');
+}
+
+// Función para generar link de pago con Wompi
+export async function generarLinkPago(pagoId: string): Promise<{ url: string }> {
+  const token = getToken();
+  const res = await fetch(`${API_BASE}/pagos/${pagoId}/link-pago`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const msg = data?.message || data?.error || 'Error al generar link de pago';
+    throw new Error(msg);
+  }
+  return data;
+}
 
 export function getNoticias() {
   return apiGet<Noticia[]>('/noticias');

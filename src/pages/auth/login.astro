@@ -7,17 +7,23 @@ import Layout from '../../layouts/Layout.astro';
     <p class="mt-2 text-slate-700">Ingresa con tu correo y contraseña.</p>
 
     <form id="form-login" method="post" action="#" class="mt-6 grid gap-3">
+      <div id="error-message" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg">
+        <p class="text-sm text-red-700 font-medium"></p>
+      </div>
+
       <label class="grid gap-1">
         <span class="text-sm">Correo</span>
-        <input type="email" name="email" required class="border rounded px-3 py-2" placeholder="tu@email.com" />
+        <input type="email" name="email" required class="border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="tu@email.com" />
       </label>
 
       <label class="grid gap-1">
         <span class="text-sm">Contraseña</span>
-        <input type="password" name="password" required class="border rounded px-3 py-2" placeholder="Tu contraseña" />
+        <input type="password" name="password" required class="border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Tu contraseña" />
       </label>
 
-      <button class="mt-2 bg-slate-900 text-white rounded px-4 py-2">Entrar</button>
+      <button id="submit-btn" class="mt-2 bg-slate-900 text-white rounded px-4 py-2 hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        Entrar
+      </button>
       <p id="msg" class="text-sm text-slate-600 mt-2"></p>
     </form>
 
@@ -31,27 +37,79 @@ import Layout from '../../layouts/Layout.astro';
 
     const form = document.getElementById('form-login') as HTMLFormElement | null;
     const msg = document.getElementById('msg');
+    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement | null;
+    const errorMessage = document.getElementById('error-message');
+    const errorText = errorMessage?.querySelector('p');
+
+    function showError(message: string) {
+      if (errorMessage && errorText) {
+        errorText.textContent = message;
+        errorMessage.classList.remove('hidden');
+      }
+      if (msg) msg.textContent = '';
+    }
+
+    function hideError() {
+      errorMessage?.classList.add('hidden');
+    }
 
     form?.addEventListener('submit', async (e) => {
       e.preventDefault();
+      hideError();
+      
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Verificando...';
+      }
       if (msg) msg.textContent = 'Verificando credenciales...';
+      
       const fd = new FormData(form as HTMLFormElement);
+      const email = String(fd.get('email') || '').trim();
+      const password = String(fd.get('password') || '');
+
+      // Validación básica del cliente
+      if (!email || !password) {
+        showError('Por favor completa todos los campos');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Entrar';
+        }
+        return;
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showError('El formato del correo no es válido');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Entrar';
+        }
+        return;
+      }
+
       try {
-        const out = await loginReq({
-          email: String(fd.get('email') || ''),
-          password: String(fd.get('password') || ''),
-        });
-        console.log('Respuesta del login:', out); // Mostrar en consola lo que devuelve el backend
-        // El backend devuelve todo en un solo objeto con el token incluido
+        const out = await loginReq({ email, password });
+        console.log('Respuesta del login:', out);
+        
         const { token, ...user } = out;
-        console.log('Token:', token); // Mostrar el token
-        console.log('Datos del usuario:', user); // Mostrar los datos del usuario
+        
+        if (!token) {
+          throw new Error('No se recibió token de autenticación');
+        }
+        
         saveAuth(token, user);
-        if (msg) msg.textContent = 'Acceso correcto. Redirigiendo...';
-        window.location.href = '/';
+        if (msg) msg.textContent = '✓ Acceso correcto. Redirigiendo...';
+        msg?.classList.add('text-green-600');
+        
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 500);
       } catch (err: any) {
-        console.error('Error en login:', err); // Mostrar errores en consola
-        if (msg) msg.textContent = err?.message || 'Credenciales inválidas';
+        console.error('Error en login:', err);
+        showError(err?.message || 'Error al iniciar sesión. Verifica tus credenciales');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Entrar';
+        }
       }
     });
   </script>

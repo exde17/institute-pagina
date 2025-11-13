@@ -1,0 +1,160 @@
+---
+// Componente independiente del menú móvil
+---
+
+<div id="mobile-menu" class="hidden fixed inset-0 z-40 lg:hidden" aria-hidden="true">
+  <!-- Backdrop -->
+  <div id="menu-backdrop" class="absolute inset-0 bg-black/80 opacity-0 transition-opacity duration-300"></div>
+  
+  <!-- Panel -->
+  <div id="menu-panel" class="absolute inset-y-0 right-0 w-full max-w-sm bg-slate-900 shadow-xl transform translate-x-full transition-transform duration-300 overflow-y-auto">
+    <!-- Botón cerrar -->
+    <button id="menu-close-btn" class="absolute top-6 right-6 p-2 text-white hover:bg-white/10 rounded-lg transition-colors">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+
+    <!-- Menú links -->
+    <nav class="flex flex-col gap-0 pt-20 px-6">
+      <a href="/programas" class="menu-link py-4 px-4 text-lg font-semibold text-white hover:text-blue-300 border-b border-slate-700 transition-colors">
+        Programas
+      </a>
+      <a href="/noticias" class="menu-link py-4 px-4 text-lg font-semibold text-white hover:text-blue-300 border-b border-slate-700 transition-colors">
+        Noticias
+      </a>
+      <a href="/nosotros" class="menu-link py-4 px-4 text-lg font-semibold text-white hover:text-blue-300 border-b border-slate-700 transition-colors">
+        Nosotros
+      </a>
+      <a href="/aliados" class="menu-link py-4 px-4 text-lg font-semibold text-white hover:text-blue-300 border-b border-slate-700 transition-colors">
+        Aliados
+      </a>
+      <a href="https://fcminstitute.co/mod/page/view.php?id=325" class="menu-link py-4 px-4 text-lg font-semibold text-white hover:text-blue-300 border-b border-slate-700 transition-colors">
+        PQRS
+      </a>
+      <a href="/contacto" class="menu-link py-4 px-4 text-lg font-semibold text-white hover:text-blue-300 border-b border-slate-700 transition-colors">
+        Contacto
+      </a>
+      <a id="admin-menu-link" href="/mis-inscripciones" class="menu-link py-4 px-4 text-lg font-semibold text-white hover:text-amber-300 border-b border-slate-700 transition-colors hidden">
+        <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+        </svg>
+        Inscripciones
+      </a>
+      <div id="mobile-auth-section" class="py-4 px-4 border-t border-slate-700 mt-4">
+        <!-- Se llenará con JavaScript -->
+      </div>
+    </nav>
+  </div>
+</div>
+
+<script>
+  const mobileMenu = document.getElementById('mobile-menu');
+  const menuBackdrop = document.getElementById('menu-backdrop');
+  const menuPanel = document.getElementById('menu-panel');
+  const menuCloseBtn = document.getElementById('menu-close-btn');
+  const menuLinks = document.querySelectorAll('.menu-link');
+  const mobileMenuBtn = document.getElementById('mobile-menu-button');
+  const adminMenuLink = document.getElementById('admin-menu-link');
+
+  function openMenu() {
+    mobileMenu?.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      menuBackdrop?.classList.add('opacity-100');
+      menuBackdrop?.classList.remove('opacity-0');
+      menuPanel?.classList.add('translate-x-0');
+      menuPanel?.classList.remove('translate-x-full');
+    });
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    menuBackdrop?.classList.add('opacity-0');
+    menuBackdrop?.classList.remove('opacity-100');
+    menuPanel?.classList.add('translate-x-full');
+    menuPanel?.classList.remove('translate-x-0');
+    
+    setTimeout(() => {
+      mobileMenu?.classList.add('hidden');
+      document.body.style.overflow = '';
+    }, 300);
+  }
+
+  // Abrir menú
+  mobileMenuBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openMenu();
+  });
+
+  // Cerrar menú
+  menuCloseBtn?.addEventListener('click', closeMenu);
+  menuBackdrop?.addEventListener('click', closeMenu);
+
+  // Cerrar al hacer clic en un link
+  menuLinks.forEach(link => {
+    link.addEventListener('click', closeMenu);
+  });
+
+  // Cerrar con ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !mobileMenu?.classList.contains('hidden')) {
+      closeMenu();
+    }
+  });
+
+  // Mostrar/ocultar link de admin y manejar auth
+  function updateMobileMenu() {
+    const userData = localStorage.getItem('auth_user');
+    const token = localStorage.getItem('auth_token');
+    const user = userData ? JSON.parse(userData) : null;
+    const isAdmin = user && Array.isArray(user.role) && user.role.includes('admin');
+    const mobileAuthSection = document.getElementById('mobile-auth-section');
+    
+    // Actualizar link de admin
+    if (adminMenuLink) {
+      if (isAdmin) {
+        adminMenuLink.classList.remove('hidden');
+      } else {
+        adminMenuLink.classList.add('hidden');
+      }
+    }
+
+    // Actualizar sección de autenticación
+    if (mobileAuthSection) {
+      if (user && token) {
+        const userName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.name || user.email;
+        mobileAuthSection.innerHTML = `
+          <span class="block text-sm font-medium text-white mb-2">Hola, ${userName}</span>
+          <button id="mobile-logout-btn" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
+            Salir
+          </button>
+        `;
+        document.getElementById('mobile-logout-btn')?.addEventListener('click', () => {
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('auth_user');
+          window.location.reload();
+        });
+      } else {
+        mobileAuthSection.innerHTML = `
+          <a href="/auth/login" class="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+            Acceder
+          </a>
+        `;
+      }
+    }
+  }
+
+  // Ejecutar al cargar
+  updateMobileMenu();
+
+  // Escuchar cambios en localStorage
+  window.addEventListener('storage', updateMobileMenu);
+  
+  // Reejecutar cuando se abre el menú en caso de que haya cambios
+  const originalOpenMenu = openMenu;
+  window.openMenuWrapper = function() {
+    updateMobileMenu();
+    originalOpenMenu();
+  };
+</script>

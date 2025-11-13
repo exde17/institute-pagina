@@ -1,14 +1,15 @@
 ---
 /* Importa Tailwind aquí (v4) */
 import '../styles/global.css';
+import MobileMenu from '../components/MobileMenu.astro';
 
 const {
   title = 'FCM INSTITUTE',
   description = 'Educación, desarrollo social y transformación',
-  image = '/hero.jpg', // ✅ default para evitar "image is not defined"
+  image = '/hero.jpg',
 } = Astro.props;
 
-const ogUrl = Astro.url?.href ?? ''; // opcional: URL actual para Open Graph
+const ogUrl = Astro.url?.href ?? '';
 ---
 <html lang="es">
   <head>
@@ -67,6 +68,14 @@ const ogUrl = Astro.url?.href ?? ''; // opcional: URL actual para Open Graph
           <li><a class="nav-link px-5 py-2.5 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/contacto">
             Contacto
           </a></li>
+          <li id="admin-link" class="hidden">
+            <a class="nav-link px-5 py-2.5 rounded-lg transition-all duration-300 hover:bg-amber-50 hover:text-amber-700 relative flex items-center gap-2" href="/mis-inscripciones">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+              </svg>
+              Inscripciones
+            </a>
+          </li>
           <li id="auth-section">
             <!-- Se actualizará dinámicamente con JavaScript -->
           </li>
@@ -84,38 +93,19 @@ const ogUrl = Astro.url?.href ?? ''; // opcional: URL actual para Open Graph
         </button>
       </nav>
 
-      <!-- Menú Mobile -->
-      <div 
-        id="mobile-menu" 
-        class="fixed inset-0 bg-slate-900/95 backdrop-blur-lg z-40 lg:hidden transform translate-x-full transition-transform duration-300"
-      >
-        <div class="flex flex-col items-center justify-center h-full gap-6 text-white">
-          <a class="mobile-nav-link text-2xl font-semibold hover:text-blue-400 transition-colors" href="/programas">
-            Programas
-          </a>
-          <a class="mobile-nav-link text-2xl font-semibold hover:text-blue-400 transition-colors" href="/noticias">
-            Noticias
-          </a>
-          <a class="mobile-nav-link text-2xl font-semibold hover:text-blue-400 transition-colors" href="/nosotros">
-            Nosotros
-          </a>
-          <a class="mobile-nav-link text-2xl font-semibold hover:text-blue-400 transition-colors" href="/aliados">
-            Aliados
-          </a>
-          <a class="mobile-nav-link text-2xl font-semibold hover:text-blue-400 transition-colors" href="/pqr">
-            PQR
-          </a>
-          <a class="mobile-nav-link text-2xl font-semibold hover:text-blue-400 transition-colors" href="/contacto">
-            Contacto
-          </a>
-          <div id="mobile-auth-section" class="mt-4">
-            <!-- Se actualizará dinámicamente con JavaScript -->
-          </div>
-        </div>
-      </div>
-    </header>
+      <!-- Componente del menú móvil -->
+      <MobileMenu />
     
     <style>
+      #mobile-menu.show {
+        display: flex !important;
+        animation: fadeIn 0.3s ease-in-out;
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
       @keyframes slideDown {
         from {
           transform: translateY(-100%);
@@ -151,6 +141,26 @@ const ogUrl = Astro.url?.href ?? ''; // opcional: URL actual para Open Graph
         transform: scale(0.95);
       }
 
+      #mobile-menu-backdrop {
+        opacity: 0;
+        transition: opacity 0.3s ease-out;
+      }
+
+      #mobile-menu-backdrop.menu-open {
+        opacity: 1;
+      }
+
+      #mobile-menu-panel {
+        opacity: 0;
+        transform: scale(0.95);
+        transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+      }
+
+      #mobile-menu-panel.menu-open {
+        opacity: 1;
+        transform: scale(1);
+      }
+
 
       @keyframes pulse-shadow {
         0%, 100% {
@@ -166,20 +176,16 @@ const ogUrl = Astro.url?.href ?? ''; // opcional: URL actual para Open Graph
       }
 
       /* Animación del menú hamburguesa */
-      .mobile-menu-open .hamburger-line:nth-child(1) {
+      #mobile-menu-button.mobile-menu-open .hamburger-line:nth-child(1) {
         transform: rotate(45deg) translateY(8px);
       }
 
-      .mobile-menu-open .hamburger-line:nth-child(2) {
+      #mobile-menu-button.mobile-menu-open .hamburger-line:nth-child(2) {
         opacity: 0;
       }
 
-      .mobile-menu-open .hamburger-line:nth-child(3) {
+      #mobile-menu-button.mobile-menu-open .hamburger-line:nth-child(3) {
         transform: rotate(-45deg) translateY(-8px);
-      }
-
-      #mobile-menu.active {
-        transform: translateX(0);
       }
 
       .mobile-nav-link {
@@ -207,39 +213,11 @@ const ogUrl = Astro.url?.href ?? ''; // opcional: URL actual para Open Graph
     </style>
 
     <script>
-      // Menú hamburguesa
-      const mobileMenuButton = document.getElementById('mobile-menu-button');
-      const mobileMenu = document.getElementById('mobile-menu');
-
-      mobileMenuButton?.addEventListener('click', () => {
-        mobileMenuButton.classList.toggle('mobile-menu-open');
-        mobileMenu?.classList.toggle('active');
-        document.body.classList.toggle('overflow-hidden');
-      });
-
-      // Cerrar menú al hacer clic en un link
-      const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
-      mobileNavLinks.forEach(link => {
-        link.addEventListener('click', () => {
-          mobileMenuButton?.classList.remove('mobile-menu-open');
-          mobileMenu?.classList.remove('active');
-          document.body.classList.remove('overflow-hidden');
-        });
-      });
-
-      // Cerrar menú con ESC
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && mobileMenu?.classList.contains('active')) {
-          mobileMenuButton?.classList.remove('mobile-menu-open');
-          mobileMenu?.classList.remove('active');
-          document.body.classList.remove('overflow-hidden');
-        }
-      });
-
       // Función de autenticación
       function updateAuthUI() {
         const authSection = document.getElementById('auth-section');
         const mobileAuthSection = document.getElementById('mobile-auth-section');
+        const adminLink = document.getElementById('admin-link');
         
         if (!authSection || !mobileAuthSection) return;
 
@@ -247,6 +225,18 @@ const ogUrl = Astro.url?.href ?? ''; // opcional: URL actual para Open Graph
         const token = localStorage.getItem('auth_token');
         const userData = localStorage.getItem('auth_user');
         const user = userData ? JSON.parse(userData) : null;
+        
+        // Verificar si el usuario es admin
+        const isAdmin = user && Array.isArray(user.role) && user.role.includes('admin');
+        
+        // Mostrar u ocultar el enlace de inscripciones según el rol
+        if (adminLink) {
+          if (isAdmin) {
+            adminLink.classList.remove('hidden');
+          } else {
+            adminLink.classList.add('hidden');
+          }
+        }
         
         if (user && token) {
           // Usuario logueado - mostrar nombre y botón de logout
