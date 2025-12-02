@@ -29,7 +29,6 @@ import Layout from '../layouts/Layout.astro';
         <thead class="bg-gradient-to-r from-slate-800 to-slate-900 text-white">
           <tr>
             <th class="px-6 py-4 text-left text-sm font-semibold">Nombre</th>
-            <th class="px-6 py-4 text-left text-sm font-semibold">Correo</th>
             <th class="px-6 py-4 text-left text-sm font-semibold">Programa</th>
             <th class="px-6 py-4 text-left text-sm font-semibold">Costo</th>
             <th class="px-6 py-4 text-left text-sm font-semibold">Estado Pago</th>
@@ -151,7 +150,6 @@ import Layout from '../layouts/Layout.astro';
           return `
             <tr class="hover:bg-slate-50 transition-colors">
               <td class="px-6 py-4 text-sm font-medium text-slate-900">${nombreCompleto}</td>
-              <td class="px-6 py-4 text-sm text-slate-600">${user.email}</td>
               <td class="px-6 py-4 text-sm text-slate-600">${programa.nombre}</td>
               <td class="px-6 py-4 text-sm font-semibold text-slate-900">${formatCurrency(programa.costo)}</td>
               <td class="px-6 py-4 text-sm">${getStatusBadge(pago?.estado || 'Pendiente')}</td>
