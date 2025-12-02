@@ -49,31 +49,31 @@ const ogUrl = Astro.url?.href ?? '';
         </a>
         
         <!-- Menú Desktop -->
-        <ul class="hidden lg:flex items-center gap-1 text-base font-semibold">
-          <li><a class="nav-link px-5 py-2.5 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/programas">
+        <ul class="hidden lg:flex items-center gap-2 text-base font-semibold">
+          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-slate-100 text-slate-700 hover:text-blue-700 relative" href="/programas">
             Programas
           </a></li>
-          <li><a class="nav-link px-5 py-2.5 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/noticias">
+          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-slate-100 text-slate-700 hover:text-blue-700 relative" href="/noticias">
             Noticias
           </a></li>
-          <li><a class="nav-link px-5 py-2.5 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/nosotros">
+          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-slate-100 text-slate-700 hover:text-blue-700 relative" href="/nosotros">
             Nosotros
           </a></li>
-          <li><a class="nav-link px-5 py-2.5 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/aliados">
+          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-slate-100 text-slate-700 hover:text-blue-700 relative" href="/aliados">
             Aliados
           </a></li>
-          <li><a class="nav-link px-5 py-2.5 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="https://fcminstitute.co/mod/page/view.php?id=325">
+          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-slate-100 text-slate-700 hover:text-blue-700 relative" href="https://fcminstitute.co/mod/page/view.php?id=325">
             PQRS
           </a></li>
-          <li><a class="nav-link px-5 py-2.5 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/contacto">
+          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-slate-100 text-slate-700 hover:text-blue-700 relative" href="/contacto">
             Contacto
           </a></li>
           <li id="admin-link" class="hidden">
-            <a class="nav-link px-5 py-2.5 rounded-lg transition-all duration-300 hover:bg-blue-50 hover:text-blue-700 relative" href="/mis-inscripciones">
+            <a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-blue-100 text-slate-700 hover:text-blue-700 relative" href="/mis-inscripciones">
               Inscripciones
             </a>
           </li>
-          <li id="auth-section">
+          <li id="auth-section" class="ml-4">
             <!-- Se actualizará dinámicamente con JavaScript -->
           </li>
         </ul>
@@ -131,7 +131,7 @@ const ogUrl = Astro.url?.href ?? '';
       }
 
       .nav-link:hover::after {
-        width: 80%;
+        width: 70%;
       }
 
       .nav-link:active {
@@ -240,18 +240,24 @@ const ogUrl = Astro.url?.href ?? '';
           const userName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.name || user.email;
           
           authSection.innerHTML = `
-            <div class="flex items-center gap-3">
-              <span class="text-sm font-medium text-slate-700">Hola, ${userName}</span>
-              <button id="logout-btn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
+            <div class="flex items-center gap-3 pl-4 border-l border-slate-200">
+              <div class="flex flex-col items-end">
+                <span class="text-xs font-medium text-slate-500 uppercase tracking-wide">Bienvenido</span>
+                <span class="text-sm font-semibold text-slate-900">${userName}</span>
+              </div>
+              <button id="logout-btn" class="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-300 text-sm font-semibold shadow-md hover:shadow-lg transform hover:scale-105">
                 Salir
               </button>
             </div>
           `;
           
           mobileAuthSection.innerHTML = `
-            <div class="flex flex-col items-center gap-2">
-              <span class="text-lg font-medium text-white">Hola, ${userName}</span>
-              <button id="mobile-logout-btn" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-lg font-medium">
+            <div class="flex flex-col items-center gap-3 py-4">
+              <div class="text-center">
+                <span class="text-xs font-medium text-slate-400 uppercase tracking-wide">Bienvenido</span>
+                <p class="text-lg font-semibold text-white">${userName}</p>
+              </div>
+              <button id="mobile-logout-btn" class="px-6 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-300 text-lg font-medium shadow-lg">
                 Salir
               </button>
             </div>
@@ -273,13 +279,13 @@ const ogUrl = Astro.url?.href ?? '';
         } else {
           // Usuario no logueado - mostrar botón de acceder
           authSection.innerHTML = `
-            <a href="/auth/login" class="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+            <a href="/auth/login" class="px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 text-sm font-semibold shadow-md hover:shadow-lg transform hover:scale-105">
               Acceder
             </a>
           `;
           
           mobileAuthSection.innerHTML = `
-            <a href="/auth/login" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xl font-medium">
+            <a href="/auth/login" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 text-xl font-medium shadow-lg">
               Acceder
             </a>
           `;
