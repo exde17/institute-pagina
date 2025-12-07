@@ -148,22 +148,81 @@ export function getInscripciones() {
 }
 
 // Función para generar link de pago con Wompi
-export async function generarLinkPago(pagoId: string): Promise<{ url: string }> {
+export async function generarLinkPago(
+  pagoId: string, 
+  monto: number, 
+  nombreCompleto: string, 
+  nombrePrograma: string
+): Promise<{ url: string }> {
   const token = getToken();
-  const res = await fetch(`${API_BASE}/pagos/${pagoId}/link-pago`, {
+  
+  // Convertir el monto a centavos (Wompi requiere amount_in_cents)
+  const amountInCents = Math.round(monto * 100);
+  
+  // Construir el nombre y descripción del link de pago
+  const paymentLinkName = `Inscripción de ${nombreCompleto} al programa ${nombrePrograma}`;
+  const paymentLinkDescription = "Pago de inscripción";
+  
+  // Obtener la clave privada de Wompi desde variables de entorno
+  const wompiPrivateKey = import.meta.env.WOMPI_PRIVATE_KEY || 'prv_test_xX2lSTCi4QdKr6BGFmht6Xzu2yhqcJf9';
+  const appEnv = import.meta.env.APP_ENV || 'dev';
+  const wompiUrl = appEnv === 'prod' 
+    ? (import.meta.env.PUBLIC_WOMPI_URL || 'https://api.wompi.co/v1')
+    : (import.meta.env.SANDBOX_WOMPI_URL || 'https://sandbox.wompi.co/v1');
+  
+  // Crear el link de pago en Wompi
+  const wompiResponse = await fetch(`${wompiUrl}/payment_links`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
+      'Authorization': `Bearer ${wompiPrivateKey}`,
     },
+    body: JSON.stringify({
+      name: paymentLinkName,
+      description: paymentLinkDescription,
+      single_use: true, // El link solo puede usarse una vez
+      collect_shipping: false,
+      currency: "COP",
+      amount_in_cents: amountInCents,
+    }),
   });
   
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const msg = data?.message || data?.error || 'Error al generar link de pago';
-    throw new Error(msg);
+  const wompiData = await wompiResponse.json().catch(() => ({}));
+  
+  if (!wompiResponse.ok) {
+    const errorMsg = wompiData?.error?.message || wompiData?.message || 'Error al crear link de pago en Wompi';
+    throw new Error(errorMsg);
   }
-  return data;
+  
+  // Obtener el ID del link de pago creado
+  const paymentLinkId = wompiData?.data?.id;
+  
+  if (!paymentLinkId) {
+    throw new Error('No se recibió el ID del link de pago de Wompi');
+  }
+  
+  // Construir la URL del checkout de Wompi
+  const checkoutUrl = `https://checkout.wompi.co/l/${paymentLinkId}`;
+  
+  // Opcionalmente, actualizar el backend con el link generado
+  try {
+    await fetch(`${API_BASE}/pagos/${pagoId}/link-pago`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        wompi_link_id: paymentLinkId,
+        url: checkoutUrl,
+      }),
+    });
+  } catch (error) {
+    console.warn('No se pudo actualizar el backend con el link de pago:', error);
+    // No lanzamos error aquí porque el link ya fue creado exitosamente
+  }
+  
+  return { url: checkoutUrl };
 }
 
 export function getNoticias() {
