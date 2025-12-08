@@ -36,7 +36,7 @@ export const Step4Education: React.FC<StepProps> = ({ formData, updateFormData, 
           <option value="">Selecciona...</option>
           {nivelesEducativos.map((nivel: any) => (
             <option key={nivel.id} value={nivel.id}>
-              {nivel.name}
+              {nivel.nombre}
             </option>
           ))}
         </select>
@@ -45,7 +45,7 @@ export const Step4Education: React.FC<StepProps> = ({ formData, updateFormData, 
       <label className="grid gap-1">
         <span className="text-sm font-medium">Año de Certificación</span>
         <input
-          type="text"
+          type="number"
           value={formData.anioCertificacion}
           onChange={(e) => updateFormData({ anioCertificacion: e.target.value })}
           className="border rounded px-3 py-2"
@@ -80,7 +80,7 @@ export const Step4Education: React.FC<StepProps> = ({ formData, updateFormData, 
           <option value="">Selecciona...</option>
           {departamentos.map((depto: any) => (
             <option key={depto.id} value={depto.id}>
-              {depto.name}
+              {depto.nombre}
             </option>
           ))}
         </select>
@@ -97,7 +97,7 @@ export const Step4Education: React.FC<StepProps> = ({ formData, updateFormData, 
           <option value="">Selecciona...</option>
           {municipios.map((mun: any) => (
             <option key={mun.id} value={mun.id}>
-              {mun.name}
+              {mun.nombre}
             </option>
           ))}
         </select>

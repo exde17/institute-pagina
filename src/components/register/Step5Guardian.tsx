@@ -60,7 +60,7 @@ export const Step5Guardian: React.FC<StepProps> = ({ formData, updateFormData, o
           <option value="">Selecciona...</option>
           {parentescos.map((parentesco: any) => (
             <option key={parentesco.id} value={parentesco.id}>
-              {parentesco.name}
+              {parentesco.nombre}
             </option>
           ))}
         </select>

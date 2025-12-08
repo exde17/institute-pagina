@@ -74,7 +74,7 @@ export const Step2Document: React.FC<StepProps> = ({ formData, updateFormData, o
           <option value="">Selecciona...</option>
           {departamentos.map((depto) => (
             <option key={depto.id} value={depto.id}>
-              {depto.name}
+              {depto.nombre}
             </option>
           ))}
         </select>
@@ -91,7 +91,7 @@ export const Step2Document: React.FC<StepProps> = ({ formData, updateFormData, o
           <option value="">Selecciona...</option>
           {municipiosNacimiento.map((mun) => (
             <option key={mun.id} value={mun.id}>
-              {mun.name}
+              {mun.nombre}
             </option>
           ))}
         </select>
