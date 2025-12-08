@@ -77,6 +77,11 @@ export const RegisterForm: React.FC = () => {
         dataToSend.limitacionFisicaCognitiva = formData.limitacionFisicaCognitiva;
       }
       if (formData.descripcionLimitacion) dataToSend.descripcionLimitacion = formData.descripcionLimitacion;
+      
+      // Agregar grupo poblacional si pertenece a uno
+      if (formData.perteneceGrupoPoblacional && formData.grupoId) {
+        dataToSend.grupoId = formData.grupoId;
+      }
 
       // Agregar datos del acudiente solo si es menor de edad
       if (!isAdult()) {
@@ -86,7 +91,7 @@ export const RegisterForm: React.FC = () => {
         if (formData.direccionAcudiente) dataToSend.direccionAcudiente = formData.direccionAcudiente;
       }
 
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -121,14 +126,21 @@ export const RegisterForm: React.FC = () => {
   };
 
   const renderProgressBar = () => {
-    const actualStep = isAdult() && currentStep === 4 ? 5 : currentStep;
-    const displaySteps = isAdult() ? 5 : 6;
-    const progress = ((actualStep + 1) / displaySteps) * 100;
+    // Calcular el paso actual mostrado al usuario
+    let displayStep = currentStep + 1;
+    let displaySteps = isAdult() ? 5 : 6;
+    
+    // Si es adulto y está en el paso final (índice 4), mostrarlo como paso 5 de 5
+    if (isAdult() && currentStep === 4) {
+      displayStep = 5;
+    }
+    
+    const progress = (displayStep / displaySteps) * 100;
 
     return (
       <div className="mb-6">
         <div className="flex justify-between text-xs text-gray-600 mb-2">
-          <span>Paso {actualStep + 1} de {displaySteps}</span>
+          <span>Paso {displayStep} de {displaySteps}</span>
           <span>{Math.round(progress)}%</span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">

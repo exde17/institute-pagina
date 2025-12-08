@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { FormData } from '../../hooks/useFormPersistence';
+import { useApiOptions } from '../../hooks/useApiOptions';
 
 interface StepProps {
   formData: FormData;
@@ -18,6 +19,8 @@ export const Step6Final: React.FC<StepProps> = ({
   isSubmitting,
   error 
 }) => {
+  const { options: grupos, loading: loadingGrupos } = useApiOptions('grupos');
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await onSubmit();
@@ -51,6 +54,45 @@ export const Step6Final: React.FC<StepProps> = ({
             rows={3}
             placeholder="Por favor describe tu situación para poder brindarte el mejor apoyo"
           />
+        </label>
+      )}
+
+      <div className="border rounded p-4 bg-gray-50 mt-4">
+        <label className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            checked={formData.perteneceGrupoPoblacional}
+            onChange={(e) => {
+              updateFormData({ 
+                perteneceGrupoPoblacional: e.target.checked,
+                grupoId: e.target.checked ? formData.grupoId : ''
+              });
+            }}
+            className="mt-1"
+          />
+          <span className="text-sm">
+            ¿Perteneces a algún grupo poblacional?
+          </span>
+        </label>
+      </div>
+
+      {formData.perteneceGrupoPoblacional && (
+        <label className="grid gap-1">
+          <span className="text-sm font-medium">Selecciona el grupo poblacional</span>
+          <select
+            value={formData.grupoId}
+            onChange={(e) => updateFormData({ grupoId: e.target.value })}
+            className="border rounded px-3 py-2"
+            required
+            disabled={loadingGrupos}
+          >
+            <option value="">{loadingGrupos ? 'Cargando...' : 'Selecciona un grupo'}</option>
+            {grupos.map((grupo) => (
+              <option key={grupo.id} value={grupo.id}>
+                {grupo.nombre}
+              </option>
+            ))}
+          </select>
         </label>
       )}
 

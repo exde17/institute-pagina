@@ -40,6 +40,10 @@ export interface FormData {
   // Limitación
   limitacionFisicaCognitiva: boolean;
   descripcionLimitacion: string;
+  
+  // Grupo poblacional
+  perteneceGrupoPoblacional: boolean;
+  grupoId: string;
 }
 
 export const initialFormData: FormData = {
@@ -68,6 +72,8 @@ export const initialFormData: FormData = {
   direccionAcudiente: '',
   limitacionFisicaCognitiva: false,
   descripcionLimitacion: '',
+  perteneceGrupoPoblacional: false,
+  grupoId: '',
 };
 
 export function useFormPersistence() {
