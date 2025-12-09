@@ -1,0 +1,107 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProgramasAdmin from '../components/admin/ProgramasAdmin';
+
+// Verificar autenticación en el servidor
+const token = Astro.cookies.get('auth_token')?.value;
+
+// Si no hay token en las cookies, verificar si viene del cliente
+// La verificación completa se hará en el cliente
+---
+
+<Layout title="Administración de Programas - FCM INSTITUTE">
+  <div id="admin-guard" class="hidden">
+    <div class="min-h-screen flex items-center justify-center bg-slate-100">
+      <div class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full mx-4">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-slate-900 mb-2">Acceso Restringido</h2>
+          <p class="text-slate-600 mb-6">
+            Esta página es solo para administradores. Por favor, inicia sesión con una cuenta de administrador.
+          </p>
+          <div class="space-y-3">
+            <a 
+              href="/auth/login" 
+              class="block w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-center"
+            >
+              Iniciar Sesión
+            </a>
+            <a 
+              href="/" 
+              class="block w-full px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-semibold text-center"
+            >
+              Volver al Inicio
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="admin-content" class="hidden">
+    <ProgramasAdmin client:load />
+  </div>
+</Layout>
+
+<script>
+  // Verificar autenticación y permisos en el cliente
+  function checkAuth() {
+    const token = localStorage.getItem('auth_token');
+    const userData = localStorage.getItem('auth_user');
+    
+    const adminGuard = document.getElementById('admin-guard');
+    const adminContent = document.getElementById('admin-content');
+    
+    if (!adminGuard || !adminContent) return;
+    
+    if (!token || !userData) {
+      // No hay sesión
+      adminGuard.classList.remove('hidden');
+      return;
+    }
+    
+    try {
+      const user = JSON.parse(userData);
+      const isAdmin = user && Array.isArray(user.role) && user.role.includes('admin');
+      
+      if (isAdmin) {
+        // Usuario es admin, mostrar contenido
+        adminContent.classList.remove('hidden');
+      } else {
+        // Usuario no es admin
+        adminGuard.classList.remove('hidden');
+      }
+    } catch (error) {
+      console.error('Error al verificar autenticación:', error);
+      adminGuard.classList.remove('hidden');
+    }
+  }
+  
+  // Ejecutar verificación al cargar la página
+  checkAuth();
+  
+  // Verificar periódicamente por si cambia la sesión
+  window.addEventListener('storage', checkAuth);
+</script>
+
+<style>
+  /* Animación de entrada */
+  #admin-content {
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
