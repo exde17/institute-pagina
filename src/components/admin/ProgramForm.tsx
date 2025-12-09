@@ -29,6 +29,25 @@ export default function ProgramForm({ programa, onClose, onSubmit }: ProgramForm
   const [nuevoDetalle, setNuevoDetalle] = useState('');
   const [nuevoSemestre, setNuevoSemestre] = useState({ nombre: '', asignaturas: [''] });
 
+  // Bloquear scroll del body cuando el modal está abierto
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    document.body.style.height = '100vh';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.top = '0';
+    document.body.style.left = '0';
+
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.height = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+    };
+  }, []);
+
   useEffect(() => {
     if (programa) {
       setFormData({
