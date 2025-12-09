@@ -7,10 +7,10 @@
   <div id="menu-backdrop" class="absolute inset-0 bg-black/80 opacity-0 transition-opacity duration-300"></div>
   
   <!-- Panel -->
-  <div id="menu-panel" class="absolute inset-y-0 right-0 w-full max-w-sm bg-slate-900 shadow-xl transform translate-x-full transition-transform duration-300 overflow-y-auto">
+  <div id="menu-panel" class="absolute inset-y-0 right-0 w-full max-w-sm bg-slate-900 shadow-xl transform translate-x-full transition-transform duration-300 overflow-y-auto z-50">
     <!-- Botón cerrar -->
-    <button id="menu-close-btn" class="absolute top-6 right-6 p-2 text-white hover:bg-white/10 rounded-lg transition-colors">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <button id="menu-close-btn" class="absolute top-6 right-6 p-2 text-white hover:bg-white/10 rounded-lg transition-colors z-[60]">
+      <svg class="w-6 h-6 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
       </svg>
     </button>
@@ -106,8 +106,16 @@
   });
 
   // Cerrar menú
-  menuCloseBtn?.addEventListener('click', closeMenu);
-  menuBackdrop?.addEventListener('click', closeMenu);
+  menuCloseBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    closeMenu();
+  });
+  menuBackdrop?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    closeMenu();
+  });
 
   // Cerrar al hacer clic en un link (excepto botones de dropdown)
   menuLinks.forEach(link => {
