@@ -448,9 +448,11 @@ const programasDataFallback = [
       </a>
     </div>
 
-    <!-- Modal de Éxito -->
-    <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl p-8 max-w-md w-full transform scale-95 opacity-0 transition-all duration-300" id="success-modal-content">
+  </section>
+
+  <!-- Modales fuera de la sección -->
+  <div id="success-modal" class="modal-overlay">
+    <div class="modal-content" id="success-modal-content">
         <div class="text-center">
           <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -466,9 +468,8 @@ const programasDataFallback = [
       </div>
     </div>
 
-    <!-- Modal de Error -->
-    <div id="error-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl p-8 max-w-md w-full transform scale-95 opacity-0 transition-all duration-300" id="error-modal-content">
+  <div id="error-modal" class="modal-overlay">
+    <div class="modal-content" id="error-modal-content">
         <div class="text-center">
           <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -484,9 +485,8 @@ const programasDataFallback = [
       </div>
     </div>
 
-    <!-- Modal de Confirmación -->
-    <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl p-8 max-w-md w-full transform scale-95 opacity-0 transition-all duration-300" id="confirm-modal-content">
+  <div id="confirm-modal" class="modal-overlay">
+    <div class="modal-content" id="confirm-modal-content">
         <div class="text-center">
           <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -507,9 +507,8 @@ const programasDataFallback = [
       </div>
     </div>
 
-    <!-- Modal de Prompt -->
-    <div id="prompt-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-2xl p-8 max-w-md w-full transform scale-95 opacity-0 transition-all duration-300" id="prompt-modal-content">
+  <div id="prompt-modal" class="modal-overlay">
+    <div class="modal-content" id="prompt-modal-content">
         <div class="text-center">
           <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -530,7 +529,7 @@ const programasDataFallback = [
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
   <style>
     @keyframes fade-in {
@@ -595,6 +594,57 @@ const programasDataFallback = [
       max-height: 500px;
       transition: max-height 0.5s ease-in-out;
     }
+
+    /* Estilos para modales - centrados perfectamente en viewport */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      max-width: 28rem;
+      width: 100%;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      transform: scale(0.95);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    /* Prevenir scroll del body cuando hay modal abierto */
+    body.modal-open {
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
+    }
   </style>
 
   <script>
@@ -607,98 +657,95 @@ const programasDataFallback = [
     // Función para mostrar modal de éxito
     function showSuccessModal(title, message) {
       const modal = document.getElementById('success-modal');
-      const modalContent = document.getElementById('success-modal-content');
       const titleEl = document.getElementById('success-title');
       const messageEl = document.getElementById('success-message');
       const closeBtn = document.getElementById('success-close');
 
+      if (!modal) return;
+      
       if (titleEl) titleEl.textContent = title;
       if (messageEl) messageEl.textContent = message;
 
-      modal.classList.remove('hidden');
-      setTimeout(() => {
-        modalContent.classList.remove('scale-95', 'opacity-0');
-        modalContent.classList.add('scale-100', 'opacity-100');
-      }, 10);
+      // Prevenir scroll del body
+      document.body.classList.add('modal-open');
+      
+      // Mostrar modal
+      modal.classList.add('active');
 
       const closeModal = () => {
-        modalContent.classList.remove('scale-100', 'opacity-100');
-        modalContent.classList.add('scale-95', 'opacity-0');
-        setTimeout(() => {
-          modal.classList.add('hidden');
-        }, 300);
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-open');
       };
 
-      closeBtn.addEventListener('click', closeModal, { once: true });
+      closeBtn?.addEventListener('click', closeModal, { once: true });
       modal.addEventListener('click', (e) => {
         if (e.target === modal) closeModal();
-      });
+      }, { once: true });
     }
 
     // Función para mostrar modal de error
     function showErrorModal(title, message) {
       const modal = document.getElementById('error-modal');
-      const modalContent = document.getElementById('error-modal-content');
       const titleEl = document.getElementById('error-title');
       const messageEl = document.getElementById('error-message');
       const closeBtn = document.getElementById('error-close');
 
+      if (!modal) return;
+      
       if (titleEl) titleEl.textContent = title;
       if (messageEl) messageEl.textContent = message;
 
-      modal.classList.remove('hidden');
-      setTimeout(() => {
-        modalContent.classList.remove('scale-95', 'opacity-0');
-        modalContent.classList.add('scale-100', 'opacity-100');
-      }, 10);
+      // Prevenir scroll del body
+      document.body.classList.add('modal-open');
+      
+      // Mostrar modal
+      modal.classList.add('active');
 
       const closeModal = () => {
-        modalContent.classList.remove('scale-100', 'opacity-100');
-        modalContent.classList.add('scale-95', 'opacity-0');
-        setTimeout(() => {
-          modal.classList.add('hidden');
-        }, 300);
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-open');
       };
 
-      closeBtn.addEventListener('click', closeModal, { once: true });
+      closeBtn?.addEventListener('click', closeModal, { once: true });
       modal.addEventListener('click', (e) => {
         if (e.target === modal) closeModal();
-      });
+      }, { once: true });
     }
 
     // Función para mostrar modal de confirmación
     function showConfirmModal(title, message) {
       return new Promise((resolve) => {
         const modal = document.getElementById('confirm-modal');
-        const modalContent = document.getElementById('confirm-modal-content');
         const titleEl = document.getElementById('confirm-title');
         const messageEl = document.getElementById('confirm-message');
         const cancelBtn = document.getElementById('confirm-cancel');
         const acceptBtn = document.getElementById('confirm-accept');
 
+        if (!modal) {
+          resolve(false);
+          return;
+        }
+        
         if (titleEl) titleEl.textContent = title;
         if (messageEl) messageEl.textContent = message;
 
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-          modalContent.classList.remove('scale-95', 'opacity-0');
-          modalContent.classList.add('scale-100', 'opacity-100');
-        }, 10);
+        // Prevenir scroll del body
+        document.body.classList.add('modal-open');
+        
+        // Mostrar modal
+        modal.classList.add('active');
 
         const closeModal = (result) => {
-          modalContent.classList.remove('scale-100', 'opacity-100');
-          modalContent.classList.add('scale-95', 'opacity-0');
-          setTimeout(() => {
-            modal.classList.add('hidden');
-            resolve(result);
-          }, 300);
+          modal.classList.remove('active');
+          document.body.classList.remove('modal-open');
+          resolve(result);
         };
 
-        cancelBtn.addEventListener('click', () => closeModal(false), { once: true });
-        acceptBtn.addEventListener('click', () => closeModal(true), { once: true });
+        cancelBtn?.addEventListener('click', () => closeModal(false), { once: true });
+        acceptBtn?.addEventListener('click', () => closeModal(true), { once: true });
         modal.addEventListener('click', (e) => {
           if (e.target === modal) closeModal(false);
-        });
+        }, { once: true });
       });
     }
 
@@ -706,40 +753,41 @@ const programasDataFallback = [
     function showPromptModal(title, message, defaultValue = '') {
       return new Promise((resolve) => {
         const modal = document.getElementById('prompt-modal');
-        const modalContent = document.getElementById('prompt-modal-content');
         const titleEl = document.getElementById('prompt-title');
         const messageEl = document.getElementById('prompt-message');
-        const inputEl = document.getElementById('prompt-input');
+        const inputEl = document.getElementById('prompt-input') as HTMLTextAreaElement;
         const cancelBtn = document.getElementById('prompt-cancel');
         const acceptBtn = document.getElementById('prompt-accept');
 
+        if (!modal) {
+          resolve(null);
+          return;
+        }
+        
         if (titleEl) titleEl.textContent = title;
         if (messageEl) messageEl.textContent = message;
         if (inputEl) inputEl.value = defaultValue;
 
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-          modalContent.classList.remove('scale-95', 'opacity-0');
-          modalContent.classList.add('scale-100', 'opacity-100');
-        }, 10);
+        // Prevenir scroll del body
+        document.body.classList.add('modal-open');
+        
+        // Mostrar modal
+        modal.classList.add('active');
 
         const closeModal = (result) => {
-          modalContent.classList.remove('scale-100', 'opacity-100');
-          modalContent.classList.add('scale-95', 'opacity-0');
-          setTimeout(() => {
-            modal.classList.add('hidden');
-            resolve(result);
-          }, 300);
+          modal.classList.remove('active');
+          document.body.classList.remove('modal-open');
+          resolve(result);
         };
 
-        cancelBtn.addEventListener('click', () => closeModal(null), { once: true });
-        acceptBtn.addEventListener('click', () => {
+        cancelBtn?.addEventListener('click', () => closeModal(null), { once: true });
+        acceptBtn?.addEventListener('click', () => {
           const value = inputEl ? inputEl.value : '';
           closeModal(value);
         }, { once: true });
         modal.addEventListener('click', (e) => {
           if (e.target === modal) closeModal(null);
-        });
+        }, { once: true });
 
         // Focus en el input
         setTimeout(() => {
@@ -1093,7 +1141,7 @@ const programasDataFallback = [
           `;
 
           try {
-            const API_BASE = import.meta.env.PUBLIC_API_BASE;
+            const API_BASE = import.meta.env.PUBLIC_API_BASE || 'http://localhost:3000/api';
             console.log('Enviando petición a:', `${API_BASE}/inscripcion`);
             
             const response = await fetch(`${API_BASE}/inscripcion`, {

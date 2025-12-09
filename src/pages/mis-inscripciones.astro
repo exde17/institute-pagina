@@ -83,6 +83,13 @@ import Layout from '../layouts/Layout.astro';
   <script>
     import { getUser, getInscripciones, generarLinkPago } from '../lib/auth.ts';
 
+    // Declaración de tipo para window.generarLink
+    declare global {
+      interface Window {
+        generarLink: (pagoId: string, monto: number, nombreCompleto: string, nombrePrograma: string) => Promise<void>;
+      }
+    }
+
     function checkAdminAccess() {
       const user = getUser();
       if (!user || !Array.isArray(user.role) || !user.role.includes('admin')) {
@@ -93,7 +100,7 @@ import Layout from '../layouts/Layout.astro';
       return true;
     }
 
-    function formatCurrency(amount) {
+    function formatCurrency(amount: number) {
       return new Intl.NumberFormat('es-CO', {
         style: 'currency',
         currency: 'COP',
@@ -101,7 +108,7 @@ import Layout from '../layouts/Layout.astro';
       }).format(amount);
     }
 
-    function formatDate(dateString) {
+    function formatDate(dateString: string) {
       return new Intl.DateTimeFormat('es-CO', {
         year: 'numeric',
         month: 'long',
@@ -111,8 +118,8 @@ import Layout from '../layouts/Layout.astro';
       }).format(new Date(dateString));
     }
 
-    function getStatusBadge(status) {
-      const statusMap = {
+    function getStatusBadge(status: string) {
+      const statusMap: Record<string, { bg: string; text: string; icon: string }> = {
         'Pendiente': { bg: 'bg-yellow-100', text: 'text-yellow-800', icon: '⏳' },
         'Completado': { bg: 'bg-green-100', text: 'text-green-800', icon: '✓' },
         'Fallido': { bg: 'bg-red-100', text: 'text-red-800', icon: '✗' },
@@ -141,7 +148,8 @@ import Layout from '../layouts/Layout.astro';
 
         tableContainer?.classList.remove('hidden');
 
-        tbody.innerHTML = inscripciones.map(insc => {
+        if (tbody) {
+          tbody.innerHTML = inscripciones.map(insc => {
           const user = insc.user;
           const programa = insc.programa;
           const pago = insc.pagos?.[0];
@@ -156,7 +164,10 @@ import Layout from '../layouts/Layout.astro';
               <td class="px-6 py-4 text-sm text-slate-600">${formatDate(insc.fechaInscripcion)}</td>
               <td class="px-6 py-4 text-sm">
                 ${pago?.estado === 'Pendiente' ? `
-                  <button onclick="generarLink('${pago.id}')" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs font-semibold">
+                  <button 
+                    onclick="generarLink('${pago.id}', ${programa.costo}, '${nombreCompleto}', '${programa.nombre}')" 
+                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs font-semibold"
+                  >
                     Generar Link
                   </button>
                 ` : `<span class="text-slate-400">—</span>`}
@@ -164,18 +175,19 @@ import Layout from '../layouts/Layout.astro';
             </tr>
           `;
         }).join('');
+        }
       } catch (error) {
         console.error('Error al cargar inscripciones:', error);
         loadingState?.classList.add('hidden');
         const errorMsg = document.getElementById('error-message');
-        if (errorMsg) errorMsg.textContent = error.message || 'Error al cargar inscripciones';
+        if (errorMsg) errorMsg.textContent = (error as Error).message || 'Error al cargar inscripciones';
         document.getElementById('error-modal')?.classList.remove('hidden');
       }
     }
 
-    window.generarLink = async (pagoId) => {
+    window.generarLink = async (pagoId: string, monto: number, nombreCompleto: string, nombrePrograma: string) => {
       try {
-        const result = await generarLinkPago(pagoId);
+        const result = await generarLinkPago(pagoId, monto, nombreCompleto, nombrePrograma);
         if (result?.url) {
           const successMsg = document.getElementById('success-message');
           if (successMsg) successMsg.textContent = 'Link de pago generado. Redirigiendo...';
@@ -185,7 +197,7 @@ import Layout from '../layouts/Layout.astro';
       } catch (error) {
         console.error('Error al generar link:', error);
         const errorMsg = document.getElementById('error-message');
-        if (errorMsg) errorMsg.textContent = error.message || 'Error al generar link de pago';
+        if (errorMsg) errorMsg.textContent = (error as Error).message || 'Error al generar link de pago';
         document.getElementById('error-modal')?.classList.remove('hidden');
       }
     };
