@@ -80,7 +80,7 @@ export const RegisterForm: React.FC = () => {
       
       // Agregar grupo poblacional si pertenece a uno
       if (formData.perteneceGrupoPoblacional && formData.grupoId) {
-        dataToSend.grupoId = formData.grupoId;
+        dataToSend.grupo = formData.grupoId;
       }
 
       // Agregar datos del acudiente solo si es menor de edad
