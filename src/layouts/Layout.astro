@@ -50,28 +50,39 @@ const ogUrl = Astro.url?.href ?? '';
         
         <!-- Menú Desktop -->
         <ul class="hidden lg:flex items-center gap-2 text-base font-semibold">
-          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-slate-100 text-slate-700 hover:text-blue-700 relative" href="/programas">
+          <li><a class="nav-link inline-block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-slate-100 text-slate-700 hover:text-blue-700 relative" href="/programas">
             Programas
           </a></li>
-          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-slate-100 text-slate-700 hover:text-blue-700 relative" href="/noticias">
+          <li><a class="nav-link inline-block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-slate-100 text-slate-700 hover:text-blue-700 relative" href="/noticias">
             Noticias
           </a></li>
-          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-slate-100 text-slate-700 hover:text-blue-700 relative" href="/nosotros">
+          <li><a class="nav-link inline-block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-slate-100 text-slate-700 hover:text-blue-700 relative" href="/nosotros">
             Nosotros
           </a></li>
-          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-slate-100 text-slate-700 hover:text-blue-700 relative" href="/aliados">
+          <li><a class="nav-link inline-block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-slate-100 text-slate-700 hover:text-blue-700 relative" href="/aliados">
             Aliados
           </a></li>
-          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-slate-100 text-slate-700 hover:text-blue-700 relative" href="https://fcminstitute.co/mod/page/view.php?id=325">
+          <li><a class="nav-link inline-block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-slate-100 text-slate-700 hover:text-blue-700 relative" href="https://fcminstitute.co/mod/page/view.php?id=325">
             PQRS
           </a></li>
-          <li><a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-slate-100 text-slate-700 hover:text-blue-700 relative" href="/contacto">
+          <li><a class="nav-link inline-block px-4 py-2 rounded-lg transition-all duration-300 hover:bg-slate-100 text-slate-700 hover:text-blue-700 relative" href="/contacto">
             Contacto
           </a></li>
-          <li id="admin-link" class="hidden">
-            <a class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-blue-100 text-slate-700 hover:text-blue-700 relative" href="/mis-inscripciones">
-              Inscripciones
-            </a>
+          <li id="admin-dropdown" class="hidden relative">
+            <button id="admin-dropdown-btn" class="nav-link px-4 py-2 rounded-lg transition-all duration-300 hover:bg-blue-100 text-slate-700 hover:text-blue-700 relative flex items-center gap-1">
+              Administración
+              <svg class="w-4 h-4 transition-transform duration-300" id="admin-dropdown-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div id="admin-dropdown-menu" class="hidden absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-slate-200 py-2 z-50">
+              <a href="/mis-inscripciones" class="block px-4 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
+                Inscripciones
+              </a>
+              <a href="/admin-programas" class="block px-4 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
+                Programas
+              </a>
+            </div>
           </li>
           <li id="auth-section" class="ml-4">
             <!-- Se actualizará dinámicamente con JavaScript -->
@@ -226,12 +237,13 @@ const ogUrl = Astro.url?.href ?? '';
         // Verificar si el usuario es admin
         const isAdmin = user && Array.isArray(user.role) && user.role.includes('admin');
         
-        // Mostrar u ocultar el enlace de inscripciones según el rol
-        if (adminLink) {
+        // Mostrar u ocultar el dropdown de administración según el rol
+        const adminDropdown = document.getElementById('admin-dropdown');
+        if (adminDropdown) {
           if (isAdmin) {
-            adminLink.classList.remove('hidden');
+            adminDropdown.classList.remove('hidden');
           } else {
-            adminLink.classList.add('hidden');
+            adminDropdown.classList.add('hidden');
           }
         }
         
@@ -294,6 +306,36 @@ const ogUrl = Astro.url?.href ?? '';
 
       // Actualizar UI de autenticación al cargar la página
       updateAuthUI();
+
+      // Manejar el dropdown de administración
+      const adminDropdownBtn = document.getElementById('admin-dropdown-btn');
+      const adminDropdownMenu = document.getElementById('admin-dropdown-menu');
+      const adminDropdownIcon = document.getElementById('admin-dropdown-icon');
+      
+      if (adminDropdownBtn && adminDropdownMenu) {
+        adminDropdownBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const isOpen = !adminDropdownMenu.classList.contains('hidden');
+          
+          if (isOpen) {
+            adminDropdownMenu.classList.add('hidden');
+            adminDropdownIcon?.classList.remove('rotate-180');
+          } else {
+            adminDropdownMenu.classList.remove('hidden');
+            adminDropdownIcon?.classList.add('rotate-180');
+          }
+        });
+
+        // Cerrar el dropdown al hacer clic fuera
+        document.addEventListener('click', (e) => {
+          const target = e.target as Node;
+          if (!adminDropdownBtn.contains(target) && !adminDropdownMenu.contains(target)) {
+            adminDropdownMenu.classList.add('hidden');
+            adminDropdownIcon?.classList.remove('rotate-180');
+          }
+        });
+      }
     </script>
 
     <main class="flex-1">

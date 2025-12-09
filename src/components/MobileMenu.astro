@@ -35,12 +35,30 @@
       <a href="/contacto" class="menu-link py-4 px-4 text-lg font-semibold text-white hover:text-blue-300 border-b border-slate-700 transition-colors">
         Contacto
       </a>
-      <a id="admin-menu-link" href="/mis-inscripciones" class="menu-link py-4 px-4 text-lg font-semibold text-white hover:text-amber-300 border-b border-slate-700 transition-colors hidden">
-        <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-        </svg>
-        Inscripciones
-      </a>
+      
+      <!-- Dropdown de Administración en móvil -->
+      <div id="admin-menu-section" class="hidden border-b border-slate-700">
+        <button id="admin-mobile-dropdown-btn" class="menu-link w-full flex items-center justify-between py-4 px-4 text-lg font-semibold text-white hover:text-amber-300 transition-colors">
+          <span class="flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+            Administración
+          </span>
+          <svg class="w-5 h-5 transition-transform duration-300" id="admin-mobile-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        <div id="admin-mobile-dropdown-menu" class="hidden bg-slate-800/50">
+          <a href="/mis-inscripciones" class="menu-link block py-3 px-8 text-base font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">
+            Inscripciones
+          </a>
+          <a href="/admin-programas" class="menu-link block py-3 px-8 text-base font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 transition-colors">
+            Programas
+          </a>
+        </div>
+      </div>
+      
       <div id="mobile-auth-section" class="py-4 px-4 border-t border-slate-700 mt-4">
         <!-- Se llenará con JavaScript -->
       </div>
@@ -91,9 +109,15 @@
   menuCloseBtn?.addEventListener('click', closeMenu);
   menuBackdrop?.addEventListener('click', closeMenu);
 
-  // Cerrar al hacer clic en un link
+  // Cerrar al hacer clic en un link (excepto botones de dropdown)
   menuLinks.forEach(link => {
-    link.addEventListener('click', closeMenu);
+    link.addEventListener('click', (e) => {
+      // No cerrar si es el botón del dropdown de administración
+      if (link.id === 'admin-mobile-dropdown-btn') {
+        return;
+      }
+      closeMenu();
+    });
   });
 
   // Cerrar con ESC
@@ -111,12 +135,13 @@
     const isAdmin = user && Array.isArray(user.role) && user.role.includes('admin');
     const mobileAuthSection = document.getElementById('mobile-auth-section');
     
-    // Actualizar link de admin
-    if (adminMenuLink) {
+    // Actualizar sección de administración
+    const adminMenuSection = document.getElementById('admin-menu-section');
+    if (adminMenuSection) {
       if (isAdmin) {
-        adminMenuLink.classList.remove('hidden');
+        adminMenuSection.classList.remove('hidden');
       } else {
-        adminMenuLink.classList.add('hidden');
+        adminMenuSection.classList.add('hidden');
       }
     }
 
@@ -150,11 +175,24 @@
 
   // Escuchar cambios en localStorage
   window.addEventListener('storage', updateMobileMenu);
+
+  // Manejar el dropdown de administración móvil
+  const adminMobileDropdownBtn = document.getElementById('admin-mobile-dropdown-btn');
+  const adminMobileDropdownMenu = document.getElementById('admin-mobile-dropdown-menu');
+  const adminMobileIcon = document.getElementById('admin-mobile-icon');
   
-  // Reejecutar cuando se abre el menú en caso de que haya cambios
-  const originalOpenMenu = openMenu;
-  window.openMenuWrapper = function() {
-    updateMobileMenu();
-    originalOpenMenu();
-  };
+  if (adminMobileDropdownBtn && adminMobileDropdownMenu) {
+    adminMobileDropdownBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const isOpen = !adminMobileDropdownMenu.classList.contains('hidden');
+      
+      if (isOpen) {
+        adminMobileDropdownMenu.classList.add('hidden');
+        adminMobileIcon?.classList.remove('rotate-180');
+      } else {
+        adminMobileDropdownMenu.classList.remove('hidden');
+        adminMobileIcon?.classList.add('rotate-180');
+      }
+    });
+  }
 </script>
