@@ -30,7 +30,7 @@ export interface Programa {
   badgeColor: string;
   semestres: Semestre[];
   detalles: string[];
-  costo: number | string;
+  costo: number;
 }
 
 export interface CreateProgramaDTO {

@@ -72,7 +72,12 @@ export default function ProgramForm({ programa, onClose, onSubmit }: ProgramForm
     setError(null);
 
     try {
-      await onSubmit(formData);
+      // Asegurar que costo sea un número válido
+      const dataToSubmit = {
+        ...formData,
+        costo: Number(formData.costo)
+      };
+      await onSubmit(dataToSubmit);
       onClose();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al guardar el programa');
@@ -296,8 +301,12 @@ export default function ProgramForm({ programa, onClose, onSubmit }: ProgramForm
                 type="number"
                 required
                 min="0"
+                step="1"
                 value={formData.costo}
-                onChange={(e) => setFormData({ ...formData, costo: parseFloat(e.target.value) })}
+                onChange={(e) => {
+                  const value = e.target.value === '' ? 0 : Number(e.target.value);
+                  setFormData({ ...formData, costo: value });
+                }}
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="2500000"
               />
