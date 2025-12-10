@@ -36,6 +36,11 @@
         Contacto
       </a>
       
+      <!-- Enlace de Matrícula para usuarios no admin -->
+      <a href="/matricula" id="user-matricula-mobile-link" class="hidden menu-link py-4 px-4 text-lg font-semibold text-white hover:text-green-300 border-b border-slate-700 transition-colors">
+        Mi Matrícula
+      </a>
+      
       <!-- Dropdown de Administración en móvil -->
       <div id="admin-menu-section" class="hidden border-b border-slate-700">
         <button id="admin-mobile-dropdown-btn" class="menu-link w-full flex items-center justify-between py-4 px-4 text-lg font-semibold text-white hover:text-amber-300 transition-colors">
@@ -150,6 +155,16 @@
         adminMenuSection.classList.remove('hidden');
       } else {
         adminMenuSection.classList.add('hidden');
+      }
+    }
+    
+    // Mostrar enlace de matrícula solo para usuarios no admin
+    const userMatriculaMobileLink = document.getElementById('user-matricula-mobile-link');
+    if (userMatriculaMobileLink) {
+      if (user && token && !isAdmin) {
+        userMatriculaMobileLink.classList.remove('hidden');
+      } else {
+        userMatriculaMobileLink.classList.add('hidden');
       }
     }
 

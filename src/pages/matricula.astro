@@ -1,0 +1,45 @@
+---
+import Layout from '../layouts/Layout.astro';
+import MatriculaForm from '../components/matricula/MatriculaForm';
+---
+
+<Layout title="Mi Matrícula — FCM INSTITUTE" description="Gestiona tu matrícula y sube los documentos requeridos">
+  <div class="mx-auto max-w-7xl px-4 py-12">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-center gap-3 mb-3">
+        <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+        <h1 class="text-4xl font-bold text-slate-900">Mi Matrícula</h1>
+      </div>
+      <p class="text-lg text-slate-600">Completa tu matrícula subiendo los documentos requeridos</p>
+    </div>
+
+    <!-- Información importante -->
+    <div class="mb-8 bg-amber-50 border-l-4 border-amber-500 p-6 rounded-lg">
+      <div class="flex items-start gap-3">
+        <svg class="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+        <div>
+          <h3 class="font-bold text-amber-900 mb-2">Información importante</h3>
+          <ul class="text-sm text-amber-800 space-y-1">
+            <li>• Todos los documentos son obligatorios</li>
+            <li>• Los archivos deben estar en formato PDF, JPG o PNG</li>
+            <li>• El tamaño máximo por archivo es de 5MB</li>
+            <li>• Asegúrate de que los documentos sean legibles</li>
+            <li>• Una vez enviada la matrícula, recibirás una confirmación</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de matrícula -->
+    <MatriculaForm client:load />
+  </div>
+</Layout>
+
+<style>
+  /* Estilos adicionales si son necesarios */
+</style>
