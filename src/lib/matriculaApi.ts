@@ -47,6 +47,7 @@ export interface Inscripcion {
 }
 
 export interface MatriculaDocuments {
+  inscripcionId: string;
   estudianteId: string;
   documentoEstudiante: File;
   diplomaCertificadoGrado10: File;
@@ -80,7 +81,8 @@ export async function getInscripcionesUsuario(userId: string, token: string): Pr
 export async function submitMatricula(data: MatriculaDocuments, token: string): Promise<any> {
   const formData = new FormData();
   
-  // Agregar el ID del estudiante como campo de texto
+  // Agregar el ID de la inscripción y del estudiante como campos de texto
+  formData.append('inscripcionId', data.inscripcionId);
   formData.append('estudianteId', data.estudianteId);
   
   // Agregar todos los archivos

@@ -124,8 +124,16 @@ export default function MatriculaForm() {
         return;
       }
       
+      // Obtener el ID del usuario de la inscripción seleccionada
+      const inscripcionSeleccionada = inscripciones.find(insc => insc.id === selectedInscripcion);
+      if (!inscripcionSeleccionada) {
+        setError('No se encontró la inscripción seleccionada');
+        return;
+      }
+      
       const matriculaData: any = {
-        estudianteId: selectedInscripcion,
+        inscripcionId: selectedInscripcion,
+        estudianteId: inscripcionSeleccionada.user.id,
         documentoEstudiante,
         diplomaCertificadoGrado10: diplomaCertificado,
         formularioMatricula,
@@ -238,12 +246,9 @@ export default function MatriculaForm() {
                   <div>
                     <h3 className="font-bold text-lg text-slate-900">{selectedPrograma.programa.nombre}</h3>
                     <p className="text-slate-600 text-sm">{selectedPrograma.programa.descripcion}</p>
-                    <div className="mt-2 flex gap-4 text-sm">
+                    <div className="mt-2 text-sm">
                       <span className="text-slate-700">
                         <strong>Duración:</strong> {selectedPrograma.programa.duracion} semestres
-                      </span>
-                      <span className="text-slate-700">
-                        <strong>Costo:</strong> ${parseInt(selectedPrograma.programa.costo).toLocaleString()}
                       </span>
                     </div>
                   </div>
