@@ -50,7 +50,7 @@ export interface MatriculaDocuments {
   estudianteId: string;
   documentoEstudiante: File;
   diplomaCertificadoGrado10: File;
-  documentoAcudiente: File;
+  documentoAcudiente?: File; // Opcional: solo para menores de 18 años
   formularioMatricula: File;
 }
 
@@ -86,7 +86,12 @@ export async function submitMatricula(data: MatriculaDocuments, token: string): 
   // Agregar todos los archivos
   formData.append('documentoEstudiante', data.documentoEstudiante);
   formData.append('diplomaCertificadoGrado10', data.diplomaCertificadoGrado10);
-  formData.append('documentoAcudiente', data.documentoAcudiente);
+  
+  // Agregar documento del acudiente solo si está presente (menores de 18)
+  if (data.documentoAcudiente) {
+    formData.append('documentoAcudiente', data.documentoAcudiente);
+  }
+  
   formData.append('formularioMatricula', data.formularioMatricula);
 
   const res = await fetch(`${API_BASE}/matricula`, {

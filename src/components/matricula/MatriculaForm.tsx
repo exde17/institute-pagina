@@ -10,12 +10,27 @@ export default function MatriculaForm() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [isMinor, setIsMinor] = useState(false);
   
   // Estados para los archivos
   const [documentoEstudiante, setDocumentoEstudiante] = useState<File | null>(null);
   const [diplomaCertificado, setDiplomaCertificado] = useState<File | null>(null);
   const [documentoAcudiente, setDocumentoAcudiente] = useState<File | null>(null);
   const [formularioMatricula, setFormularioMatricula] = useState<File | null>(null);
+
+  // Función para calcular si el usuario es menor de 18 años
+  const calculateIsMinor = (birthDate: string | null): boolean => {
+    if (!birthDate) return false;
+    const today = new Date();
+    const birth = new Date(birthDate);
+    const age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      return (age - 1) < 18;
+    }
+    return age < 18;
+  };
 
   useEffect(() => {
     loadInscripciones();
@@ -40,6 +55,12 @@ export default function MatriculaForm() {
       const inscripcionesSinMatricula = data.filter(insc => !insc.matriculas || insc.matriculas.length === 0);
       
       setInscripciones(inscripcionesSinMatricula);
+      
+      // Verificar si el usuario es menor de 18 años
+      if (inscripcionesSinMatricula.length > 0) {
+        const userBirthDate = inscripcionesSinMatricula[0].user.birthDate;
+        setIsMinor(calculateIsMinor(userBirthDate));
+      }
       
       if (inscripcionesSinMatricula.length === 0) {
         setError('No tienes inscripciones pendientes de matrícula.');
@@ -80,8 +101,15 @@ export default function MatriculaForm() {
       return;
     }
     
-    if (!documentoEstudiante || !diplomaCertificado || !documentoAcudiente || !formularioMatricula) {
+    // Validar documentos requeridos según la edad
+    if (!documentoEstudiante || !diplomaCertificado || !formularioMatricula) {
       setError('Todos los documentos son requeridos');
+      return;
+    }
+    
+    // Validar documento del acudiente solo si es menor de edad
+    if (isMinor && !documentoAcudiente) {
+      setError('El documento del acudiente es requerido para menores de 18 años');
       return;
     }
     
@@ -96,13 +124,19 @@ export default function MatriculaForm() {
         return;
       }
       
-      await submitMatricula({
+      const matriculaData: any = {
         estudianteId: selectedInscripcion,
         documentoEstudiante,
         diplomaCertificadoGrado10: diplomaCertificado,
-        documentoAcudiente,
         formularioMatricula,
-      }, token);
+      };
+      
+      // Solo agregar documento del acudiente si es menor de edad
+      if (isMinor && documentoAcudiente) {
+        matriculaData.documentoAcudiente = documentoAcudiente;
+      }
+      
+      await submitMatricula(matriculaData, token);
       
       setSuccess(true);
       
@@ -259,27 +293,34 @@ export default function MatriculaForm() {
                   )}
                 </div>
 
-                {/* Documento del acudiente */}
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    3. Documento de identidad del acudiente *
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/jpg,application/pdf"
-                    onChange={(e) => handleFileChange(e, setDocumentoAcudiente)}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                    required
-                  />
-                  {documentoAcudiente && (
-                    <p className="mt-2 text-sm text-green-600">✓ {documentoAcudiente.name}</p>
-                  )}
-                </div>
+                {/* Documento del acudiente - Solo para menores de 18 años */}
+                {isMinor && (
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      3. Documento de identidad del acudiente *
+                    </label>
+                    <div className="mb-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <p className="text-sm text-amber-800">
+                        ℹ️ Como eres menor de 18 años, necesitamos el documento de identidad de tu acudiente.
+                      </p>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/jpg,application/pdf"
+                      onChange={(e) => handleFileChange(e, setDocumentoAcudiente)}
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                      required
+                    />
+                    {documentoAcudiente && (
+                      <p className="mt-2 text-sm text-green-600">✓ {documentoAcudiente.name}</p>
+                    )}
+                  </div>
+                )}
 
                 {/* Formulario de matrícula */}
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    4. Formulario de matrícula firmado *
+                    {isMinor ? '4' : '3'}. Formulario de matrícula firmado *
                   </label>
                   <input
                     type="file"
@@ -301,8 +342,8 @@ export default function MatriculaForm() {
             <div className="flex justify-end gap-4">
               <button
                 type="button"
-                onClick={() => window.location.href = '/mis-inscripciones'}
-                className="px-6 py-3 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition-colors"
+                onClick={() => window.location.href = '/mi-cuenta'}
+                className="cursor-pointer px-6 py-3 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition-colors"
               >
                 Cancelar
               </button>
