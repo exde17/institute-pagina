@@ -12,11 +12,9 @@ interface StepProps {
 export const Step2Document: React.FC<StepProps> = ({ formData, updateFormData, onNext, onBack }) => {
   const { options: tiposDocumento, loading: loadingTipos } = useApiOptions('tipo-documento');
   const { options: departamentos, loading: loadingDeptos } = useApiOptions('departamento');
+  const { options: municipios, loading: loadingMunicipios } = useApiOptions('municipio');
   const { municipios: municipiosNacimiento, loading: loadingMunicipiosNac } = useMunicipios(
     formData.departamentoNacimiento
-  );
-  const { municipios: municipiosExpedicion, loading: loadingMunicipiosExp } = useMunicipios(
-    formData.lugarExpedicion ? formData.lugarExpedicion.split('-')[0] : ''
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -99,13 +97,19 @@ export const Step2Document: React.FC<StepProps> = ({ formData, updateFormData, o
 
       <label className="grid gap-1">
         <span className="text-sm font-medium">Lugar de Expedición del Documento</span>
-        <input
-          type="text"
+        <select
           value={formData.lugarExpedicion}
           onChange={(e) => updateFormData({ lugarExpedicion: e.target.value })}
           className="border rounded px-3 py-2"
-          placeholder="Ciudad/Municipio de expedición"
-        />
+          disabled={loadingMunicipios}
+        >
+          <option value="">Selecciona un municipio...</option>
+          {municipios.map((mun) => (
+            <option key={mun.id} value={mun.id}>
+              {mun.nombre}
+            </option>
+          ))}
+        </select>
       </label>
 
       <div className="flex gap-2 mt-4">
