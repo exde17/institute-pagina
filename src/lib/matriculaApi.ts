@@ -55,6 +55,46 @@ export interface MatriculaDocuments {
   formularioMatricula: File;
 }
 
+export interface Matricula {
+  id: string;
+  documentoEstudiante: string;
+  diplomaCertificadoGrado10: string;
+  documentoAcudiente: string | null;
+  formularioMatricula: string;
+  createdAt: string;
+  updatedAt: string;
+  estudiante: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    telephone: string;
+    documentNumber: string | null;
+    birthDate: string | null;
+    address: string;
+    nombreAcudiente: string | null;
+    numeroContactoAcudiente: string | null;
+  };
+  inscripcion: {
+    id: string;
+    observacion: string;
+    estado: boolean;
+    fechaInscripcion: string;
+    programa: {
+      id: string;
+      nombre: string;
+      imagen: string;
+      descripcion: string;
+      modalidad: string;
+      duracion: number;
+      categoria: string;
+      badge?: string;
+      badgeColor?: string;
+      costo: string;
+    };
+  };
+}
+
 /**
  * Obtiene las inscripciones del usuario autenticado
  */
@@ -70,6 +110,26 @@ export async function getInscripcionesUsuario(userId: string, token: string): Pr
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData?.message || `Error ${res.status}: No se pudieron cargar las inscripciones`);
+  }
+
+  return res.json();
+}
+
+/**
+ * Obtiene todas las matrículas (solo admin)
+ */
+export async function getAllMatriculas(token: string): Promise<Matricula[]> {
+  const res = await fetch(`${API_BASE}/matricula`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData?.message || `Error ${res.status}: No se pudieron cargar las matrículas`);
   }
 
   return res.json();
