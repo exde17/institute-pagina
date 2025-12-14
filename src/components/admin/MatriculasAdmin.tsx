@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { getAllMatriculas, type Matricula } from '../../lib/matriculaApi';
 import { getToken } from '../../lib/auth';
 
+const API_BASE = import.meta.env.PUBLIC_API_BASE || 'http://localhost:3000';
+
 export default function MatriculasAdmin() {
   const [matriculas, setMatriculas] = useState<Matricula[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,8 +46,14 @@ export default function MatriculasAdmin() {
     });
   }
 
-  function openDocument(url: string) {
-    window.open(url, '_blank');
+  function getDocumentUrl(relativePath: string): string {
+    // Construir URL completa apuntando al backend
+    return `${API_BASE}/${relativePath}`;
+  }
+
+  function openDocument(relativePath: string) {
+    const fullUrl = getDocumentUrl(relativePath);
+    window.open(fullUrl, '_blank');
   }
 
   if (loading) {
@@ -134,7 +142,7 @@ export default function MatriculasAdmin() {
                 <td className="px-6 py-4">
                   <button
                     onClick={() => setSelectedMatricula(matricula)}
-                    className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                    className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
                   >
                     Ver Documentos
                   </button>
@@ -155,7 +163,7 @@ export default function MatriculasAdmin() {
               </h3>
               <button
                 onClick={() => setSelectedMatricula(null)}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -215,7 +223,7 @@ export default function MatriculasAdmin() {
               <div>
                 <h4 className="font-bold text-slate-900 mb-4">Documentos Cargados</h4>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
                     <div className="flex items-center gap-3">
                       <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -227,13 +235,13 @@ export default function MatriculasAdmin() {
                     </div>
                     <button
                       onClick={() => openDocument(selectedMatricula.documentoEstudiante)}
-                      className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                      className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
                     >
                       Ver
                     </button>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
                     <div className="flex items-center gap-3">
                       <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -245,14 +253,14 @@ export default function MatriculasAdmin() {
                     </div>
                     <button
                       onClick={() => openDocument(selectedMatricula.diplomaCertificadoGrado10)}
-                      className="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors"
+                      className="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors cursor-pointer"
                     >
                       Ver
                     </button>
                   </div>
 
                   {selectedMatricula.documentoAcudiente && (
-                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
                       <div className="flex items-center gap-3">
                         <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -264,14 +272,14 @@ export default function MatriculasAdmin() {
                       </div>
                       <button
                         onClick={() => openDocument(selectedMatricula.documentoAcudiente!)}
-                        className="px-4 py-2 bg-amber-600 text-white text-sm font-semibold rounded-lg hover:bg-amber-700 transition-colors"
+                        className="px-4 py-2 bg-amber-600 text-white text-sm font-semibold rounded-lg hover:bg-amber-700 transition-colors cursor-pointer"
                       >
                         Ver
                       </button>
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
                     <div className="flex items-center gap-3">
                       <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -283,7 +291,7 @@ export default function MatriculasAdmin() {
                     </div>
                     <button
                       onClick={() => openDocument(selectedMatricula.formularioMatricula)}
-                      className="px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 transition-colors"
+                      className="px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 transition-colors cursor-pointer"
                     >
                       Ver
                     </button>
