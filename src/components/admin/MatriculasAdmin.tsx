@@ -1,6 +1,6 @@
 // src/components/admin/MatriculasAdmin.tsx
 import { useEffect, useState } from 'react';
-import { getAllMatriculas, type Matricula } from '../../lib/matriculaApi';
+import { getAllMatriculas, generarLinkPagoMatricula, type Matricula } from '../../lib/matriculaApi';
 import { getToken } from '../../lib/auth';
 
 const API_BASE = import.meta.env.PUBLIC_API_BASE || 'http://localhost:3000';
@@ -10,6 +10,10 @@ export default function MatriculasAdmin() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedMatricula, setSelectedMatricula] = useState<Matricula | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentMatricula, setPaymentMatricula] = useState<Matricula | null>(null);
+  const [paymentAmount, setPaymentAmount] = useState('');
+  const [generatingLink, setGeneratingLink] = useState(false);
 
   useEffect(() => {
     loadMatriculas();
@@ -54,6 +58,66 @@ export default function MatriculasAdmin() {
   function openDocument(relativePath: string) {
     const fullUrl = getDocumentUrl(relativePath);
     window.open(fullUrl, '_blank');
+  }
+
+  function openPaymentModal(matricula: Matricula) {
+    setPaymentMatricula(matricula);
+    setPaymentAmount('');
+    setShowPaymentModal(true);
+  }
+
+  function closePaymentModal() {
+    setShowPaymentModal(false);
+    setPaymentMatricula(null);
+    setPaymentAmount('');
+  }
+
+  async function handleGeneratePaymentLink() {
+    if (!paymentMatricula || !paymentAmount) {
+      alert('Por favor ingresa un monto válido');
+      return;
+    }
+
+    const montoPesos = parseFloat(paymentAmount);
+    if (isNaN(montoPesos) || montoPesos <= 0) {
+      alert('El monto debe ser un número mayor a 0');
+      return;
+    }
+
+    try {
+      setGeneratingLink(true);
+      
+      const token = getToken();
+      if (!token) {
+        window.location.href = '/auth/login';
+        return;
+      }
+
+      const nombreCompleto = `${paymentMatricula.estudiante.firstName} ${paymentMatricula.estudiante.lastName}`;
+      const nombrePrograma = paymentMatricula.inscripcion.programa.nombre;
+
+      // Convertir de pesos a "miles" para la función (divide entre 1000)
+      const montoEnMiles = montoPesos / 1000;
+
+      const result = await generarLinkPagoMatricula(
+        paymentMatricula.id,
+        montoEnMiles,
+        nombreCompleto,
+        nombrePrograma,
+        token
+      );
+
+      // Abrir el link en una nueva pestaña
+      window.open(result.url, '_blank');
+      
+      // Cerrar el modal
+      closePaymentModal();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Error al generar link de pago');
+      console.error('Error generando link de pago:', err);
+    } finally {
+      setGeneratingLink(false);
+    }
   }
 
   if (loading) {
@@ -140,12 +204,20 @@ export default function MatriculasAdmin() {
                   <p className="text-sm text-slate-900">{formatDate(matricula.createdAt)}</p>
                 </td>
                 <td className="px-6 py-4">
-                  <button
-                    onClick={() => setSelectedMatricula(matricula)}
-                    className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
-                  >
-                    Ver Documentos
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setSelectedMatricula(matricula)}
+                      className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+                    >
+                      Ver Documentos
+                    </button>
+                    <button
+                      onClick={() => openPaymentModal(matricula)}
+                      className="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors cursor-pointer"
+                    >
+                      Generar link de pago
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -297,6 +369,83 @@ export default function MatriculasAdmin() {
                     </button>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de pago */}
+      {showPaymentModal && paymentMatricula && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={closePaymentModal}>
+          <div className="bg-white rounded-lg max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 rounded-t-lg">
+              <h3 className="text-xl font-bold text-white">Generar Link de Pago</h3>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {/* Información del estudiante y programa */}
+              <div className="bg-slate-50 rounded-lg p-4 space-y-2">
+                <p className="text-sm text-slate-600">
+                  <span className="font-semibold">Estudiante:</span> {paymentMatricula.estudiante.firstName} {paymentMatricula.estudiante.lastName}
+                </p>
+                <p className="text-sm text-slate-600">
+                  <span className="font-semibold">Programa:</span> {paymentMatricula.inscripcion.programa.nombre}
+                </p>
+              </div>
+
+              {/* Input del monto */}
+              <div>
+                <label htmlFor="paymentAmount" className="block text-sm font-semibold text-slate-900 mb-2">
+                  Monto (en pesos colombianos)
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+                  <input
+                    type="number"
+                    id="paymentAmount"
+                    value={paymentAmount}
+                    onChange={(e) => setPaymentAmount(e.target.value)}
+                    placeholder="Ej: 500000"
+                    className="w-full pl-8 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    min="0"
+                    step="1000"
+                    disabled={generatingLink}
+                  />
+                </div>
+                <p className="text-xs text-slate-500 mt-1">
+                  {paymentAmount && !isNaN(parseFloat(paymentAmount)) 
+                    ? `$${parseFloat(paymentAmount).toLocaleString('es-CO')} COP`
+                    : 'Ingresa el monto en pesos'}
+                </p>
+              </div>
+
+              {/* Botones */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={closePaymentModal}
+                  disabled={generatingLink}
+                  className="flex-1 px-4 py-2 bg-slate-200 text-slate-800 font-semibold rounded-lg hover:bg-slate-300 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleGeneratePaymentLink}
+                  disabled={generatingLink || !paymentAmount}
+                  className="flex-1 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {generatingLink ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Generando...
+                    </>
+                  ) : (
+                    'Generar Link'
+                  )}
+                </button>
               </div>
             </div>
           </div>

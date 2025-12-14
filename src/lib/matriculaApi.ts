@@ -136,6 +136,80 @@ export async function getAllMatriculas(token: string): Promise<Matricula[]> {
 }
 
 /**
+ * Genera un link de pago para una matrícula
+ */
+export async function generarLinkPagoMatricula(
+  matriculaId: string,
+  monto: number,
+  nombreCompleto: string,
+  nombrePrograma: string,
+  token: string
+): Promise<{ url: string }> {
+  // Convertir el monto de miles de pesos a centavos (Wompi requiere amount_in_cents)
+  const amountInCents = Math.round(monto * 1000 * 100); // miles * 1000 para pesos, * 100 para centavos
+  
+  // Construir el nombre y descripción del link de pago
+  const paymentLinkName = `Matrícula de ${nombreCompleto} al programa ${nombrePrograma}`;
+  const paymentLinkDescription = "Pago de matrícula";
+  
+  // Obtener la clave privada de Wompi desde variables de entorno
+  const wompiPrivateKey = import.meta.env.WOMPI_PRIVATE_KEY || 'prv_test_xX2lSTCi4QdKr6BGFmht6Xzu2yhqcJf9';
+  const appEnv = import.meta.env.APP_ENV || 'dev';
+  const wompiUrl = appEnv === 'prod' 
+    ? (import.meta.env.PUBLIC_WOMPI_URL || 'https://api.wompi.co/v1')
+    : (import.meta.env.SANDBOX_WOMPI_URL || 'https://sandbox.wompi.co/v1');
+  
+  // Información para debug
+  console.log('Generando link de pago para matrícula:', {
+    matriculaId,
+    monto,
+    amountInCents,
+    nombreCompleto,
+    nombrePrograma,
+  });
+  
+  // Crear el link de pago en Wompi
+  const wompiResponse = await fetch(`${wompiUrl}/payment_links`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${wompiPrivateKey}`,
+    },
+    body: JSON.stringify({
+      name: paymentLinkName,
+      description: paymentLinkDescription,
+      single_use: true,
+      collect_shipping: false,
+      currency: "COP",
+      amount_in_cents: amountInCents,
+    }),
+  });
+  
+  const wompiData = await wompiResponse.json().catch(() => ({}));
+  
+  if (!wompiResponse.ok) {
+    const errorMsg = wompiData?.error?.message || wompiData?.message || 'Error al crear link de pago en Wompi';
+    throw new Error(errorMsg);
+  }
+  
+  const paymentLinkId = wompiData?.data?.id;
+  
+  if (!paymentLinkId) {
+    throw new Error('No se recibió el ID del link de pago de Wompi');
+  }
+  
+  const checkoutUrl = `https://checkout.wompi.co/l/${paymentLinkId}`;
+  
+  console.log('Link de pago generado:', {
+    paymentLinkId,
+    checkoutUrl,
+    wompiData,
+  });
+  
+  return { url: checkoutUrl };
+}
+
+/**
  * Envía los documentos de matrícula
  */
 export async function submitMatricula(data: MatriculaDocuments, token: string): Promise<any> {
