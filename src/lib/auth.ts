@@ -84,7 +84,7 @@ async function apiGet<T>(path: string): Promise<T> {
 
 // 👇 Ahora el registro usa firstName / lastName / telephone / address
 export function registerReq(data: { firstName: string; lastName: string; email: string; password: string; telephone: string; address: string }) {
-  return apiPost<AuthResponse>('/auth/register', data);
+  return apiPost<AuthResponse>('/api/auth/register', data);
 }
 export function loginReq(data: { email: string; password: string }) {
   return apiPost<AuthResponse>('/auth/login', data);
