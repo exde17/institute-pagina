@@ -52,7 +52,7 @@ export default function MatriculasAdmin() {
 
   function getDocumentUrl(relativePath: string): string {
     // Construir URL completa apuntando al backend
-    return `${API_BASE}/${relativePath}`;
+    return `https://apifcm.bg3sas.com/${relativePath}`;
   }
 
   function openDocument(relativePath: string) {
