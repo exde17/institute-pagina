@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Usar variable de entorno o hardcodear la URL como fallback
-const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.PUBLIC_API_URL || 'https://apifcm.bg3sas.com';
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('auth_token');

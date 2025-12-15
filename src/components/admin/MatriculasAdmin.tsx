@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { getAllMatriculas, generarLinkPagoMatricula, type Matricula } from '../../lib/matriculaApi';
 import { getToken } from '../../lib/auth';
 
-const API_BASE = import.meta.env.PUBLIC_API_BASE || 'http://localhost:3000';
+const API_BASE = import.meta.env.PUBLIC_API_BASE || 'https://apifcm.bg3sas.com';
 
 export default function MatriculasAdmin() {
   const [matriculas, setMatriculas] = useState<Matricula[]>([]);

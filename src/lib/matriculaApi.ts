@@ -1,5 +1,5 @@
 // src/lib/matriculaApi.ts
-const API_BASE = import.meta.env.PUBLIC_API_BASE || 'http://localhost:3000/api';
+const API_BASE = import.meta.env.PUBLIC_API_BASE || 'https://apifcm.bg3sas.com/api';
 
 export interface Inscripcion {
   id: string;

@@ -6,7 +6,7 @@ export interface ApiOption {
   [key: string]: any;
 }
 
-const API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'https://apifcm.bg3sas.com/api';
 
 export function useApiOptions(endpoint: string) {
   const [options, setOptions] = useState<ApiOption[]>([]);

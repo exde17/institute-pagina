@@ -7,7 +7,7 @@ import { Step4Education } from './Step4Education';
 import { Step5Guardian } from './Step5Guardian';
 import { Step6Final } from './Step6Final';
 
-const API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'https://apifcm.bg3sas.com';
 
 export const RegisterForm: React.FC = () => {
   const { formData, updateFormData, currentStep, goToStep, clearFormData, isAdult } = useFormPersistence();
