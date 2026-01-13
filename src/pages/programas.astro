@@ -1156,10 +1156,10 @@ const programasDataFallback = [
           `;
 
           try {
-            const API_BASE = import.meta.env.PUBLIC_API_BASE || 'https://apifcm.bg3sas.com/api';
-            console.log('Enviando petición a:', `${API_BASE}/inscripcion`);
-            
-            const response = await fetch(`${API_BASE}/inscripcion`, {
+            const API_BASE = import.meta.env.PUBLIC_API_URL || 'https://apifcm.bg3sas.com';
+            console.log('Enviando petición a:', `${API_BASE}/api/inscripcion`);
+
+            const response = await fetch(`${API_BASE}/api/inscripcion`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',

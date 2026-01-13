@@ -6,7 +6,7 @@ export interface ApiOption {
   [key: string]: any;
 }
 
-const API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'https://apifcm.bg3sas.com/api';
+const API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'https://apifcm.bg3sas.com';
 
 export function useApiOptions(endpoint: string) {
   const [options, setOptions] = useState<ApiOption[]>([]);
@@ -20,7 +20,7 @@ export function useApiOptions(endpoint: string) {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`${API_BASE_URL}/${endpoint}`);
+        const response = await fetch(`${API_BASE_URL}/api/${endpoint}`);
         if (!response.ok) {
           throw new Error(`Error al cargar ${endpoint}`);
         }
@@ -56,7 +56,7 @@ export function useMunicipios(departamentoId: string) {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`${API_BASE_URL}/municipio?departamentoId=${departamentoId}`);
+        const response = await fetch(`${API_BASE_URL}/api/municipio?departamentoId=${departamentoId}`);
         if (!response.ok) {
           throw new Error('Error al cargar municipios');
         }

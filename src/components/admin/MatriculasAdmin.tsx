@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { getAllMatriculas, generarLinkPagoMatricula, type Matricula } from '../../lib/matriculaApi';
 import { getToken } from '../../lib/auth';
 
-const API_BASE = import.meta.env.PUBLIC_API_BASE || 'https://apifcm.bg3sas.com';
+const API_BASE = import.meta.env.PUBLIC_API_URL || 'https://apifcm.bg3sas.com';
 
 export default function MatriculasAdmin() {
   const [matriculas, setMatriculas] = useState<Matricula[]>([]);
@@ -52,7 +52,7 @@ export default function MatriculasAdmin() {
 
   function getDocumentUrl(relativePath: string): string {
     // Construir URL completa apuntando al backend
-    return `https://apifcm.bg3sas.com/${relativePath}`;
+    return `${API_BASE}/${relativePath}`;
   }
 
   function openDocument(relativePath: string) {

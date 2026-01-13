@@ -1,5 +1,5 @@
 // src/lib/matriculaApi.ts
-const API_BASE = import.meta.env.PUBLIC_API_BASE || 'https://apifcm.bg3sas.com/api';
+const API_BASE = import.meta.env.PUBLIC_API_URL || 'https://apifcm.bg3sas.com';
 
 export interface Inscripcion {
   id: string;
@@ -99,7 +99,7 @@ export interface Matricula {
  * Obtiene las inscripciones del usuario autenticado
  */
 export async function getInscripcionesUsuario(userId: string, token: string): Promise<Inscripcion[]> {
-  const res = await fetch(`${API_BASE}/inscripcion/user/${userId}`, {
+  const res = await fetch(`${API_BASE}/api/inscripcion/user/${userId}`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -119,7 +119,7 @@ export async function getInscripcionesUsuario(userId: string, token: string): Pr
  * Obtiene todas las matrículas (solo admin)
  */
 export async function getAllMatriculas(token: string): Promise<Matricula[]> {
-  const res = await fetch(`${API_BASE}/matricula`, {
+  const res = await fetch(`${API_BASE}/api/matricula`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -230,7 +230,7 @@ export async function submitMatricula(data: MatriculaDocuments, token: string): 
   
   formData.append('formularioMatricula', data.formularioMatricula);
 
-  const res = await fetch(`${API_BASE}/matricula`, {
+  const res = await fetch(`${API_BASE}/api/matricula`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,

@@ -1,5 +1,5 @@
 // src/lib/auth.ts
-const API_BASE = import.meta.env.PUBLIC_API_BASE || 'https://apifcm.bg3sas.com/api';
+const API_BASE = import.meta.env.PUBLIC_API_URL || 'https://apifcm.bg3sas.com';
 
 export type User = { 
   id: string; 
@@ -87,7 +87,7 @@ export function registerReq(data: { firstName: string; lastName: string; email: 
   return apiPost<AuthResponse>('/api/auth/register', data);
 }
 export function loginReq(data: { email: string; password: string }) {
-  return apiPost<AuthResponse>('/auth/login', data);
+  return apiPost<AuthResponse>('/api/auth/login', data);
 }
 
 // 👇 Nueva función para obtener programas
@@ -100,7 +100,7 @@ export type Programa = {
 };
 
 export function getProgramas() {
-  return apiGet<Programa[]>('/programas');
+  return apiGet<Programa[]>('/api/programas');
 }
 
 // 👇 Nueva función para obtener noticias
@@ -144,7 +144,7 @@ export type Inscripcion = {
 };
 
 export function getInscripciones() {
-  return apiGet<Inscripcion[]>('/inscripcion');
+  return apiGet<Inscripcion[]>('/api/inscripcion');
 }
 
 // Función para generar link de pago con Wompi
@@ -206,7 +206,7 @@ export async function generarLinkPago(
   
   // Opcionalmente, actualizar el backend con el link generado
   try {
-    await fetch(`${API_BASE}/pagos/${pagoId}/link-pago`, {
+    await fetch(`${API_BASE}/api/pagos/${pagoId}/link-pago`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -226,5 +226,5 @@ export async function generarLinkPago(
 }
 
 export function getNoticias() {
-  return apiGet<Noticia[]>('/noticias');
+  return apiGet<Noticia[]>('/api/noticias');
 }
