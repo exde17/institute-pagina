@@ -609,26 +609,38 @@ export async function getResumenPagoMatricula(matriculaId: string, token: string
 }
 
 /**
- * Genera link de pago desde la matrícula (envía al correo de la entidad si es becado)
+ * Envía email con link de pago al estudiante/entidad
+ * El link de Wompi ya debe estar generado
  */
-export async function generarLinkPagoDesdeMatricula(
+export async function enviarEmailLinkPago(
   matriculaId: string,
   email: string,
+  linkPago: string,
+  monto: number,
   cuotaId?: string,
   token?: string
-): Promise<{ url: string; linkId: string; email: string }> {
+): Promise<{
+  success: boolean;
+  url: string;
+  email: string;
+  monto: number;
+  conceptoPago: string;
+  numeroCuota?: number;
+  totalCuotas?: number;
+  message: string;
+}> {
   const res = await fetch(`${API_BASE}/api/matricula/${matriculaId}/generar-link`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ email, cuotaId }),
+    body: JSON.stringify({ email, linkPago, monto, cuotaId }),
   });
 
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData?.message || `Error ${res.status}: No se pudo generar el link de pago`);
+    throw new Error(errorData?.message || `Error ${res.status}: No se pudo enviar el link de pago`);
   }
 
   return res.json();

@@ -2,11 +2,11 @@
 import { useEffect, useState } from 'react';
 import {
   getAllMatriculas,
-  generarLinkPagoMatricula,
   getEntidadesActivas,
   markAsBecado,
   removeBecado,
-  marcarCuotaPagada,
+  generarLinkPagoMatricula,
+  enviarEmailLinkPago,
   type Matricula,
   type Entidad,
   type Cuota,
@@ -22,7 +22,6 @@ export default function MatriculasAdmin() {
   const [selectedMatricula, setSelectedMatricula] = useState<Matricula | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentMatricula, setPaymentMatricula] = useState<Matricula | null>(null);
-  const [paymentAmount, setPaymentAmount] = useState('');
   const [generatingLink, setGeneratingLink] = useState(false);
 
   // Estados para gestión de becas
@@ -35,7 +34,10 @@ export default function MatriculasAdmin() {
   // Estados para cuotas
   const [showCuotasModal, setShowCuotasModal] = useState(false);
   const [cuotasMatricula, setCuotasMatricula] = useState<Matricula | null>(null);
-  const [markingPaid, setMarkingPaid] = useState<string | null>(null);
+  const [sendingLinkCuota, setSendingLinkCuota] = useState<string | null>(null);
+
+  // Estado para resultado del envío
+  const [sendResult, setSendResult] = useState<{ success: boolean; message: string } | null>(null);
 
   useEffect(() => {
     loadMatriculas();
@@ -101,14 +103,14 @@ export default function MatriculasAdmin() {
 
   function openPaymentModal(matricula: Matricula) {
     setPaymentMatricula(matricula);
-    setPaymentAmount(matricula.valorTotal?.toString() || '');
+    setSendResult(null);
     setShowPaymentModal(true);
   }
 
   function closePaymentModal() {
     setShowPaymentModal(false);
     setPaymentMatricula(null);
-    setPaymentAmount('');
+    setSendResult(null);
   }
 
   function openBecaModal(matricula: Matricula) {
@@ -133,20 +135,12 @@ export default function MatriculasAdmin() {
     setCuotasMatricula(null);
   }
 
-  async function handleGeneratePaymentLink() {
-    if (!paymentMatricula || !paymentAmount) {
-      alert('Por favor ingresa un monto válido');
-      return;
-    }
-
-    const montoPesos = parseFloat(paymentAmount);
-    if (isNaN(montoPesos) || montoPesos <= 0) {
-      alert('El monto debe ser un número mayor a 0');
-      return;
-    }
+  async function handleSendPaymentLink() {
+    if (!paymentMatricula) return;
 
     try {
       setGeneratingLink(true);
+      setSendResult(null);
 
       const token = getToken();
       if (!token) {
@@ -154,25 +148,125 @@ export default function MatriculasAdmin() {
         return;
       }
 
+      // Determinar el email destinatario
+      const email = paymentMatricula.esBecado && paymentMatricula.entidad?.correo
+        ? paymentMatricula.entidad.correo
+        : paymentMatricula.estudiante.email;
+
+      // Determinar monto y cuota según tipo de pago
+      let monto: number;
+      let cuotaId: string | undefined;
+
+      if (paymentMatricula.tipoPago === 'CUOTAS' && paymentMatricula.cuotas?.length > 0) {
+        const primeraCuotaPendiente = paymentMatricula.cuotas.find(c => !c.pagado);
+        if (primeraCuotaPendiente) {
+          cuotaId = primeraCuotaPendiente.id;
+          monto = Number(primeraCuotaPendiente.monto);
+        } else {
+          setSendResult({
+            success: false,
+            message: 'No hay cuotas pendientes de pago',
+          });
+          return;
+        }
+      } else {
+        monto = Number(paymentMatricula.valorTotal) || 0;
+      }
+
       const nombreCompleto = `${paymentMatricula.estudiante.firstName} ${paymentMatricula.estudiante.lastName}`;
       const nombrePrograma = paymentMatricula.inscripcion.programa.nombre;
-      const montoEnMiles = montoPesos / 1000;
 
-      const result = await generarLinkPagoMatricula(
+      // 1. Primero generar el link de Wompi
+      const wompiResult = await generarLinkPagoMatricula(
         paymentMatricula.id,
-        montoEnMiles,
+        monto / 1000, // La función espera el monto en miles
         nombreCompleto,
         nombrePrograma,
         token
       );
 
-      window.open(result.url, '_blank');
-      closePaymentModal();
+      // 2. Luego enviar el email con el link generado
+      const result = await enviarEmailLinkPago(
+        paymentMatricula.id,
+        email,
+        wompiResult.url,
+        monto,
+        cuotaId,
+        token
+      );
+
+      setSendResult({
+        success: result.success,
+        message: result.message,
+      });
+
+      if (result.success) {
+        // Esperar 3 segundos antes de cerrar
+        setTimeout(() => {
+          closePaymentModal();
+          setSendResult(null);
+        }, 3000);
+      }
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Error al generar link de pago');
-      console.error('Error generando link de pago:', err);
+      setSendResult({
+        success: false,
+        message: err instanceof Error ? err.message : 'Error al enviar link de pago',
+      });
+      console.error('Error enviando link de pago:', err);
     } finally {
       setGeneratingLink(false);
+    }
+  }
+
+  async function handleSendCuotaLink(cuota: Cuota) {
+    if (!cuotasMatricula) return;
+
+    try {
+      setSendingLinkCuota(cuota.id);
+
+      const token = getToken();
+      if (!token) {
+        window.location.href = '/auth/login';
+        return;
+      }
+
+      const email = cuotasMatricula.esBecado && cuotasMatricula.entidad?.correo
+        ? cuotasMatricula.entidad.correo
+        : cuotasMatricula.estudiante.email;
+
+      const monto = Number(cuota.monto);
+      const nombreCompleto = `${cuotasMatricula.estudiante.firstName} ${cuotasMatricula.estudiante.lastName}`;
+      const nombrePrograma = cuotasMatricula.inscripcion.programa.nombre;
+
+      // 1. Primero generar el link de Wompi
+      const wompiResult = await generarLinkPagoMatricula(
+        cuotasMatricula.id,
+        monto / 1000, // La función espera el monto en miles
+        nombreCompleto,
+        nombrePrograma,
+        token
+      );
+
+      // 2. Luego enviar el email con el link generado
+      const result = await enviarEmailLinkPago(
+        cuotasMatricula.id,
+        email,
+        wompiResult.url,
+        monto,
+        cuota.id,
+        token
+      );
+
+      if (result.success) {
+        alert(`Link de pago para la cuota #${cuota.numeroCuota} enviado exitosamente a ${result.email}`);
+      } else {
+        alert('Error al enviar el link de pago');
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Error al enviar link de pago');
+      console.error('Error enviando link de cuota:', err);
+    } finally {
+      setSendingLinkCuota(null);
     }
   }
 
@@ -225,32 +319,6 @@ export default function MatriculasAdmin() {
     }
   }
 
-  async function handleMarkCuotaPaid(cuotaId: string) {
-    try {
-      setMarkingPaid(cuotaId);
-      const token = getToken();
-      if (!token) {
-        window.location.href = '/auth/login';
-        return;
-      }
-
-      await marcarCuotaPagada(cuotaId, token);
-      await loadMatriculas();
-
-      // Refresh cuotas modal
-      if (cuotasMatricula) {
-        const updatedMatricula = matriculas.find(m => m.id === cuotasMatricula.id);
-        if (updatedMatricula) {
-          setCuotasMatricula(updatedMatricula);
-        }
-      }
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Error al marcar cuota como pagada');
-      console.error('Error marking cuota paid:', err);
-    } finally {
-      setMarkingPaid(null);
-    }
-  }
 
   function getEstadoMatriculaBadge(estadoMatricula: string | undefined) {
     switch (estadoMatricula) {
@@ -688,11 +756,11 @@ export default function MatriculasAdmin() {
                         {getCuotaEstadoBadge(cuota.estado)}
                         {!cuota.pagado && (
                           <button
-                            onClick={() => handleMarkCuotaPaid(cuota.id)}
-                            disabled={markingPaid === cuota.id}
-                            className="mt-2 px-3 py-1 bg-green-600 text-white text-xs font-semibold rounded hover:bg-green-700 transition-colors cursor-pointer disabled:opacity-50 block w-full"
+                            onClick={() => handleSendCuotaLink(cuota)}
+                            disabled={sendingLinkCuota === cuota.id}
+                            className="mt-2 px-3 py-1 bg-blue-600 text-white text-xs font-semibold rounded hover:bg-blue-700 transition-colors cursor-pointer disabled:opacity-50 block w-full"
                           >
-                            {markingPaid === cuota.id ? 'Marcando...' : 'Marcar Pagado'}
+                            {sendingLinkCuota === cuota.id ? 'Enviando...' : 'Enviar link de pago'}
                           </button>
                         )}
                       </div>
@@ -709,83 +777,124 @@ export default function MatriculasAdmin() {
         </div>
       )}
 
-      {/* Modal de pago */}
+      {/* Modal de pago - Confirmación de envío de link */}
       {showPaymentModal && paymentMatricula && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={closePaymentModal}>
           <div className="bg-white rounded-lg max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <div className="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 rounded-t-lg">
-              <h3 className="text-xl font-bold text-white">Generar Link de Pago</h3>
+              <h3 className="text-xl font-bold text-white">Enviar Link de Pago</h3>
             </div>
 
             <div className="p-6 space-y-4">
-              <div className="bg-slate-50 rounded-lg p-4 space-y-2">
-                <p className="text-sm text-slate-600">
-                  <span className="font-semibold">Estudiante:</span> {paymentMatricula.estudiante.firstName} {paymentMatricula.estudiante.lastName}
-                </p>
-                <p className="text-sm text-slate-600">
-                  <span className="font-semibold">Programa:</span> {paymentMatricula.inscripcion.programa.nombre}
-                </p>
-                {paymentMatricula.esBecado && paymentMatricula.entidad && (
-                  <p className="text-sm text-amber-700">
-                    <span className="font-semibold">Beca:</span> {paymentMatricula.entidad.razonSocial}
-                    {paymentMatricula.entidad.correo && (
-                      <span className="block text-xs">El link se enviará a: {paymentMatricula.entidad.correo}</span>
-                    )}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="paymentAmount" className="block text-sm font-semibold text-slate-900 mb-2">
-                  Monto (en pesos colombianos)
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
-                  <input
-                    type="number"
-                    id="paymentAmount"
-                    value={paymentAmount}
-                    onChange={(e) => setPaymentAmount(e.target.value)}
-                    placeholder="Ej: 500000"
-                    className="w-full pl-8 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    min="0"
-                    step="1000"
-                    disabled={generatingLink}
-                  />
-                </div>
-                <p className="text-xs text-slate-500 mt-1">
-                  {paymentAmount && !isNaN(parseFloat(paymentAmount))
-                    ? `$${parseFloat(paymentAmount).toLocaleString('es-CO')} COP`
-                    : 'Ingresa el monto en pesos'}
-                </p>
-              </div>
-
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={closePaymentModal}
-                  disabled={generatingLink}
-                  className="flex-1 px-4 py-2 bg-slate-200 text-slate-800 font-semibold rounded-lg hover:bg-slate-300 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleGeneratePaymentLink}
-                  disabled={generatingLink || !paymentAmount}
-                  className="flex-1 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {generatingLink ? (
-                    <>
-                      <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              {/* Resultado del envío */}
+              {sendResult && (
+                <div className={`p-4 rounded-lg ${sendResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                  <div className="flex items-center gap-2">
+                    {sendResult.success ? (
+                      <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
-                      Generando...
-                    </>
-                  ) : (
-                    'Generar Link'
-                  )}
-                </button>
-              </div>
+                    ) : (
+                      <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                    <p className={`font-semibold ${sendResult.success ? 'text-green-800' : 'text-red-800'}`}>
+                      {sendResult.message}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {!sendResult && (
+                <>
+                  <div className="bg-slate-50 rounded-lg p-4 space-y-2">
+                    <p className="text-sm text-slate-600">
+                      <span className="font-semibold">Estudiante:</span> {paymentMatricula.estudiante.firstName} {paymentMatricula.estudiante.lastName}
+                    </p>
+                    <p className="text-sm text-slate-600">
+                      <span className="font-semibold">Programa:</span> {paymentMatricula.inscripcion.programa.nombre}
+                    </p>
+                    <p className="text-sm text-slate-600">
+                      <span className="font-semibold">Tipo de pago:</span> {paymentMatricula.tipoPago === 'CONTADO' ? 'Contado' : 'Cuotas'}
+                    </p>
+                    <p className="text-sm text-slate-600">
+                      <span className="font-semibold">Valor total:</span> {formatCurrency(paymentMatricula.valorTotal)}
+                    </p>
+                    {paymentMatricula.esBecado && paymentMatricula.entidad && (
+                      <p className="text-sm text-amber-700">
+                        <span className="font-semibold">Beca:</span> {paymentMatricula.entidad.razonSocial}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Info del pago que se enviará */}
+                  <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                    <h4 className="font-semibold text-blue-900 mb-2">Se enviará:</h4>
+                    {paymentMatricula.tipoPago === 'CUOTAS' && paymentMatricula.cuotas?.length > 0 ? (
+                      <>
+                        {(() => {
+                          const cuotaPendiente = paymentMatricula.cuotas.find(c => !c.pagado);
+                          if (cuotaPendiente) {
+                            return (
+                              <div className="text-sm text-blue-800">
+                                <p><span className="font-semibold">Cuota:</span> #{cuotaPendiente.numeroCuota} de {paymentMatricula.cuotas.length}</p>
+                                <p><span className="font-semibold">Monto:</span> {formatCurrency(cuotaPendiente.monto)}</p>
+                                <p><span className="font-semibold">Vencimiento:</span> {new Date(cuotaPendiente.fechaVencimiento).toLocaleDateString('es-ES')}</p>
+                              </div>
+                            );
+                          }
+                          return <p className="text-sm text-green-700">Todas las cuotas están pagadas</p>;
+                        })()}
+                      </>
+                    ) : (
+                      <div className="text-sm text-blue-800">
+                        <p><span className="font-semibold">Concepto:</span> Pago Total - Matrícula</p>
+                        <p><span className="font-semibold">Monto:</span> {formatCurrency(paymentMatricula.valorTotal)}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Destinatario */}
+                  <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
+                    <p className="text-sm text-amber-800">
+                      <span className="font-semibold">Destinatario del email:</span>
+                      <br />
+                      {paymentMatricula.esBecado && paymentMatricula.entidad?.correo
+                        ? `${paymentMatricula.entidad.correo} (Entidad patrocinadora)`
+                        : paymentMatricula.estudiante.email
+                      }
+                    </p>
+                  </div>
+
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      onClick={closePaymentModal}
+                      disabled={generatingLink}
+                      className="flex-1 px-4 py-2 bg-slate-200 text-slate-800 font-semibold rounded-lg hover:bg-slate-300 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={handleSendPaymentLink}
+                      disabled={generatingLink || (paymentMatricula.tipoPago === 'CUOTAS' && !paymentMatricula.cuotas?.find(c => !c.pagado))}
+                      className="flex-1 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {generatingLink ? (
+                        <>
+                          <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Enviando...
+                        </>
+                      ) : (
+                        'Enviar Link de Pago'
+                      )}
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
