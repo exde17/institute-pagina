@@ -1,6 +1,6 @@
 // src/components/matricula/MatriculaForm.tsx
 import { useEffect, useState } from 'react';
-import { getInscripcionesUsuario, submitMatricula, type Inscripcion } from '../../lib/matriculaApi';
+import { getInscripcionesUsuario, getPlanesPagoPredefinidos, submitMatricula, type Inscripcion, type PlanPagoPredefinido, type TipoPago } from '../../lib/matriculaApi';
 import { getToken, getUser } from '../../lib/auth';
 
 export default function MatriculaForm() {
@@ -11,12 +11,18 @@ export default function MatriculaForm() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [isMinor, setIsMinor] = useState(false);
-  
+
   // Estados para los archivos
   const [documentoEstudiante, setDocumentoEstudiante] = useState<File | null>(null);
   const [diplomaCertificado, setDiplomaCertificado] = useState<File | null>(null);
   const [documentoAcudiente, setDocumentoAcudiente] = useState<File | null>(null);
   const [formularioMatricula, setFormularioMatricula] = useState<File | null>(null);
+
+  // Estados para tipo de pago
+  const [planesPago, setPlanesPago] = useState<PlanPagoPredefinido[]>([]);
+  const [tipoPago, setTipoPago] = useState<TipoPago | ''>('');
+  const [selectedPlanPago, setSelectedPlanPago] = useState<string>('');
+  const [loadingPlanes, setLoadingPlanes] = useState(false);
 
   // Función para calcular si el usuario es menor de 18 años
   const calculateIsMinor = (birthDate: string | null): boolean => {
@@ -25,7 +31,7 @@ export default function MatriculaForm() {
     const birth = new Date(birthDate);
     const age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
       return (age - 1) < 18;
     }
@@ -34,34 +40,35 @@ export default function MatriculaForm() {
 
   useEffect(() => {
     loadInscripciones();
+    loadPlanesPago();
   }, []);
 
   async function loadInscripciones() {
     try {
       setLoading(true);
       setError('');
-      
+
       const user = getUser();
       const token = getToken();
-      
+
       if (!user || !token) {
         window.location.href = '/auth/login';
         return;
       }
 
       const data = await getInscripcionesUsuario(user.id, token);
-      
+
       // Filtrar solo inscripciones que no tienen matrícula
       const inscripcionesSinMatricula = data.filter(insc => !insc.matriculas || insc.matriculas.length === 0);
-      
+
       setInscripciones(inscripcionesSinMatricula);
-      
+
       // Verificar si el usuario es menor de 18 años
       if (inscripcionesSinMatricula.length > 0) {
         const userBirthDate = inscripcionesSinMatricula[0].user.birthDate;
         setIsMinor(calculateIsMinor(userBirthDate));
       }
-      
+
       if (inscripcionesSinMatricula.length === 0) {
         setError('No tienes inscripciones pendientes de matrícula.');
       }
@@ -73,6 +80,21 @@ export default function MatriculaForm() {
     }
   }
 
+  async function loadPlanesPago() {
+    try {
+      setLoadingPlanes(true);
+      const token = getToken();
+      if (!token) return;
+
+      const planes = await getPlanesPagoPredefinidos(token);
+      setPlanesPago(planes);
+    } catch (err) {
+      console.error('Error loading planes de pago:', err);
+    } finally {
+      setLoadingPlanes(false);
+    }
+  }
+
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>, setter: (file: File | null) => void) {
     const file = e.target.files?.[0];
     if (file) {
@@ -81,85 +103,121 @@ export default function MatriculaForm() {
         alert('El archivo no debe superar los 5MB');
         return;
       }
-      
+
       // Validar tipo
       const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
       if (!allowedTypes.includes(file.type)) {
         alert('Solo se permiten archivos PDF, JPG o PNG');
         return;
       }
-      
+
       setter(file);
     }
   }
 
+  function handleTipoPagoChange(tipo: TipoPago) {
+    setTipoPago(tipo);
+    if (tipo === 'CONTADO') {
+      setSelectedPlanPago('');
+    }
+  }
+
+  // Obtener el valor del programa seleccionado
+  const selectedPrograma = inscripciones.find(insc => insc.id === selectedInscripcion);
+  const valorPrograma = selectedPrograma ? parseFloat(selectedPrograma.programa.costo.replace(/[^0-9.-]+/g, '')) || 0 : 0;
+
+  // Calcular valor por cuota según el plan seleccionado
+  const planSeleccionado = planesPago.find(p => p.id === selectedPlanPago);
+  const valorPorCuota = planSeleccionado ? Math.round(valorPrograma / planSeleccionado.numeroCuotas) : 0;
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    
+
     if (!selectedInscripcion) {
       setError('Selecciona un programa inscrito');
       return;
     }
-    
+
     // Validar documentos requeridos según la edad
     if (!documentoEstudiante || !diplomaCertificado || !formularioMatricula) {
       setError('Todos los documentos son requeridos');
       return;
     }
-    
+
     // Validar documento del acudiente solo si es menor de edad
     if (isMinor && !documentoAcudiente) {
       setError('El documento del acudiente es requerido para menores de 18 años');
       return;
     }
-    
+
+    // Validar tipo de pago
+    if (!tipoPago) {
+      setError('Selecciona un tipo de pago');
+      return;
+    }
+
+    // Validar plan de pago si es cuotas
+    if (tipoPago === 'CUOTAS' && !selectedPlanPago) {
+      setError('Selecciona un plan de pago');
+      return;
+    }
+
     try {
       setSubmitting(true);
       setError('');
       setSuccess(false);
-      
+
       const token = getToken();
       if (!token) {
         window.location.href = '/auth/login';
         return;
       }
-      
+
       // Obtener el ID del usuario de la inscripción seleccionada
       const inscripcionSeleccionada = inscripciones.find(insc => insc.id === selectedInscripcion);
       if (!inscripcionSeleccionada) {
         setError('No se encontró la inscripción seleccionada');
         return;
       }
-      
+
       const matriculaData: any = {
         inscripcionId: selectedInscripcion,
         estudianteId: inscripcionSeleccionada.user.id,
         documentoEstudiante,
         diplomaCertificadoGrado10: diplomaCertificado,
         formularioMatricula,
+        tipoPago,
+        valorTotal: valorPrograma,
       };
-      
+
       // Solo agregar documento del acudiente si es menor de edad
       if (isMinor && documentoAcudiente) {
         matriculaData.documentoAcudiente = documentoAcudiente;
       }
-      
+
+      // Agregar plan de pago si es cuotas
+      if (tipoPago === 'CUOTAS' && selectedPlanPago) {
+        matriculaData.planPagoId = selectedPlanPago;
+      }
+
       await submitMatricula(matriculaData, token);
-      
+
       setSuccess(true);
-      
+
       // Reset form
       setSelectedInscripcion('');
       setDocumentoEstudiante(null);
       setDiplomaCertificado(null);
       setDocumentoAcudiente(null);
       setFormularioMatricula(null);
-      
+      setTipoPago('');
+      setSelectedPlanPago('');
+
       // Reload inscripciones
       setTimeout(() => {
         loadInscripciones();
       }, 2000);
-      
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al enviar la matrícula');
       console.error('Error submitting matricula:', err);
@@ -167,8 +225,6 @@ export default function MatriculaForm() {
       setSubmitting(false);
     }
   }
-
-  const selectedPrograma = inscripciones.find(insc => insc.id === selectedInscripcion);
 
   if (loading) {
     return (
@@ -237,8 +293,8 @@ export default function MatriculaForm() {
               <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="flex items-start gap-4">
                   {selectedPrograma.programa.imagen && (
-                    <img 
-                      src={selectedPrograma.programa.imagen} 
+                    <img
+                      src={selectedPrograma.programa.imagen}
                       alt={selectedPrograma.programa.nombre}
                       className="w-24 h-24 object-cover rounded-lg"
                     />
@@ -250,6 +306,9 @@ export default function MatriculaForm() {
                       <span className="text-slate-700">
                         <strong>Duración:</strong> {selectedPrograma.programa.duracion} semestres
                       </span>
+                    </div>
+                    <div className="mt-2 text-lg font-bold text-green-700">
+                      Valor: ${valorPrograma.toLocaleString('es-CO')} COP
                     </div>
                   </div>
                 </div>
@@ -306,7 +365,7 @@ export default function MatriculaForm() {
                     </label>
                     <div className="mb-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
                       <p className="text-sm text-amber-800">
-                        ℹ️ Como eres menor de 18 años, necesitamos el documento de identidad de tu acudiente.
+                        Como eres menor de 18 años, necesitamos el documento de identidad de tu acudiente.
                       </p>
                     </div>
                     <input
@@ -339,6 +398,148 @@ export default function MatriculaForm() {
                   )}
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* Sección de tipo de pago */}
+          {selectedInscripcion && (
+            <div className="bg-white rounded-lg shadow-md border border-slate-200 p-6">
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">Información de Pago</h2>
+
+              <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-lg font-semibold text-green-800">
+                  Valor del programa: ${valorPrograma.toLocaleString('es-CO')} COP
+                </p>
+              </div>
+
+              <p className="text-slate-600 mb-4">Selecciona cómo deseas realizar el pago:</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                {/* Opción Contado */}
+                <div
+                  onClick={() => handleTipoPagoChange('CONTADO')}
+                  className={`cursor-pointer p-4 border-2 rounded-lg transition-all ${
+                    tipoPago === 'CONTADO'
+                      ? 'border-blue-600 bg-blue-50'
+                      : 'border-slate-200 hover:border-blue-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      tipoPago === 'CONTADO' ? 'border-blue-600' : 'border-slate-300'
+                    }`}>
+                      {tipoPago === 'CONTADO' && (
+                        <div className="w-3 h-3 rounded-full bg-blue-600"></div>
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-900">Pago de Contado</h3>
+                      <p className="text-sm text-slate-600">Pago único por el valor total</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Opción Cuotas */}
+                <div
+                  onClick={() => handleTipoPagoChange('CUOTAS')}
+                  className={`cursor-pointer p-4 border-2 rounded-lg transition-all ${
+                    tipoPago === 'CUOTAS'
+                      ? 'border-blue-600 bg-blue-50'
+                      : 'border-slate-200 hover:border-blue-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      tipoPago === 'CUOTAS' ? 'border-blue-600' : 'border-slate-300'
+                    }`}>
+                      {tipoPago === 'CUOTAS' && (
+                        <div className="w-3 h-3 rounded-full bg-blue-600"></div>
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-900">Pago en Cuotas</h3>
+                      <p className="text-sm text-slate-600">Divide el pago en cuotas mensuales</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Selección de plan de cuotas */}
+              {tipoPago === 'CUOTAS' && (
+                <div className="mt-6">
+                  <h3 className="font-bold text-slate-900 mb-3">Selecciona un plan de pago:</h3>
+
+                  {loadingPlanes ? (
+                    <div className="text-center py-4">
+                      <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                      <p className="mt-2 text-sm text-slate-600">Cargando planes...</p>
+                    </div>
+                  ) : planesPago.length === 0 ? (
+                    <p className="text-slate-600">No hay planes de pago disponibles.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {planesPago.map((plan) => {
+                        const valorCuota = Math.round(valorPrograma / plan.numeroCuotas);
+                        return (
+                          <div
+                            key={plan.id}
+                            onClick={() => setSelectedPlanPago(plan.id)}
+                            className={`cursor-pointer p-4 border-2 rounded-lg transition-all ${
+                              selectedPlanPago === plan.id
+                                ? 'border-green-600 bg-green-50'
+                                : 'border-slate-200 hover:border-green-300'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                                  selectedPlanPago === plan.id ? 'border-green-600' : 'border-slate-300'
+                                }`}>
+                                  {selectedPlanPago === plan.id && (
+                                    <div className="w-3 h-3 rounded-full bg-green-600"></div>
+                                  )}
+                                </div>
+                                <div>
+                                  <h4 className="font-bold text-slate-900">{plan.nombre}</h4>
+                                  <p className="text-sm text-slate-600">{plan.descripcion}</p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-lg font-bold text-green-700">
+                                  ${valorCuota.toLocaleString('es-CO')}/cuota
+                                </p>
+                                <p className="text-xs text-slate-500">{plan.numeroCuotas} cuotas mensuales</p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {selectedPlanPago && planSeleccionado && (
+                    <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <h4 className="font-bold text-slate-900 mb-2">Resumen del plan seleccionado:</h4>
+                      <ul className="text-sm text-slate-700 space-y-1">
+                        <li>Plan: <strong>{planSeleccionado.nombre}</strong></li>
+                        <li>Número de cuotas: <strong>{planSeleccionado.numeroCuotas}</strong></li>
+                        <li>Valor por cuota: <strong>${valorPorCuota.toLocaleString('es-CO')} COP</strong></li>
+                        <li>Total: <strong>${valorPrograma.toLocaleString('es-CO')} COP</strong></li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {tipoPago === 'CONTADO' && (
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <h4 className="font-bold text-slate-900 mb-2">Resumen de pago:</h4>
+                  <ul className="text-sm text-slate-700 space-y-1">
+                    <li>Tipo de pago: <strong>Contado</strong></li>
+                    <li>Total a pagar: <strong>${valorPrograma.toLocaleString('es-CO')} COP</strong></li>
+                  </ul>
+                </div>
+              )}
             </div>
           )}
 
