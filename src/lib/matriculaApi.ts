@@ -251,10 +251,11 @@ export async function generarLinkPagoMatricula(
     : (import.meta.env.SANDBOX_WOMPI_URL || 'https://sandbox.wompi.co/v1');
 
   // El SKU contiene el identificador de referencia para el webhook de Wompi
-  // Formato: "cuota:{cuotaId}" para cuotas o "matricula:{matriculaId}" para pago de contado
+  // Formato: "c:{uuid}" para cuotas o "m:{uuid}" para pago de contado
+  // Se quitan los guiones del UUID para cumplir con el límite de 36 caracteres de Wompi
   const sku = cuotaId
-    ? `cuota:${cuotaId}`
-    : `matricula:${matriculaId}`;
+    ? `c:${cuotaId.replace(/-/g, '')}`
+    : `m:${matriculaId.replace(/-/g, '')}`;
 
   console.log('Generando link de pago para matrícula:', {
     matriculaId,

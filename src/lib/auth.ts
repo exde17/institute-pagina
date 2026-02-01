@@ -164,7 +164,8 @@ export async function generarLinkPago(
   const paymentLinkDescription = "Pago de inscripción";
 
   // El SKU contiene el identificador de referencia para el webhook de Wompi
-  const sku = `inscripcion:${pagoId}`;
+  // Formato: "i:{uuid}" para inscripciones (límite de 36 caracteres en Wompi)
+  const sku = `i:${pagoId.replace(/-/g, '')}`;
 
   // Obtener la clave privada de Wompi desde variables de entorno
   const wompiPrivateKey = import.meta.env.WOMPI_PRIVATE_KEY || 'prv_test_xX2lSTCi4QdKr6BGFmht6Xzu2yhqcJf9';
