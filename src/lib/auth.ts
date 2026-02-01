@@ -149,27 +149,30 @@ export function getInscripciones() {
 
 // Función para generar link de pago con Wompi
 export async function generarLinkPago(
-  pagoId: string, 
-  monto: number, 
-  nombreCompleto: string, 
+  pagoId: string,
+  monto: number,
+  nombreCompleto: string,
   nombrePrograma: string
-): Promise<{ url: string }> {
+): Promise<{ url: string; linkId: string }> {
   const token = getToken();
-  
+
   // Convertir el monto a centavos (Wompi requiere amount_in_cents)
   const amountInCents = Math.round(monto * 100);
-  
+
   // Construir el nombre y descripción del link de pago
   const paymentLinkName = `Inscripción de ${nombreCompleto} al programa ${nombrePrograma}`;
   const paymentLinkDescription = "Pago de inscripción";
-  
+
+  // El SKU contiene el identificador de referencia para el webhook de Wompi
+  const sku = `inscripcion:${pagoId}`;
+
   // Obtener la clave privada de Wompi desde variables de entorno
   const wompiPrivateKey = import.meta.env.WOMPI_PRIVATE_KEY || 'prv_test_xX2lSTCi4QdKr6BGFmht6Xzu2yhqcJf9';
   const appEnv = import.meta.env.APP_ENV || 'dev';
-  const wompiUrl = appEnv === 'prod' 
+  const wompiUrl = appEnv === 'prod'
     ? (import.meta.env.PUBLIC_WOMPI_URL || 'https://api.wompi.co/v1')
     : (import.meta.env.SANDBOX_WOMPI_URL || 'https://sandbox.wompi.co/v1');
-  
+
   // Crear el link de pago en Wompi
   const wompiResponse = await fetch(`${wompiUrl}/payment_links`, {
     method: 'POST',
@@ -184,6 +187,7 @@ export async function generarLinkPago(
       collect_shipping: false,
       currency: "COP",
       amount_in_cents: amountInCents,
+      sku: sku, // Identificador personalizado para referencia en webhooks
     }),
   });
   
@@ -203,7 +207,7 @@ export async function generarLinkPago(
   
   // Construir la URL del checkout de Wompi
   const checkoutUrl = `https://checkout.wompi.co/l/${paymentLinkId}`;
-  
+
   // Opcionalmente, actualizar el backend con el link generado
   try {
     await fetch(`${API_BASE}/api/pagos/${pagoId}/link-pago`, {
@@ -221,8 +225,8 @@ export async function generarLinkPago(
     console.warn('No se pudo actualizar el backend con el link de pago:', error);
     // No lanzamos error aquí porque el link ya fue creado exitosamente
   }
-  
-  return { url: checkoutUrl };
+
+  return { url: checkoutUrl, linkId: paymentLinkId };
 }
 
 export function getNoticias() {

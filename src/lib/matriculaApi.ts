@@ -222,18 +222,27 @@ export async function getPlanesPagoPredefinidos(token: string): Promise<PlanPago
 
 /**
  * Genera un link de pago para una matrícula
+ * @param matriculaId - ID de la matrícula
+ * @param monto - Monto en miles (ej: 1500 = $1,500,000)
+ * @param nombreCompleto - Nombre completo del estudiante
+ * @param nombrePrograma - Nombre del programa
+ * @param token - Token de autenticación
+ * @param cuotaId - ID de la cuota (opcional, para pagos a cuotas)
  */
 export async function generarLinkPagoMatricula(
   matriculaId: string,
   monto: number,
   nombreCompleto: string,
   nombrePrograma: string,
-  token: string
-): Promise<{ url: string }> {
+  token: string,
+  cuotaId?: string
+): Promise<{ url: string; linkId: string }> {
   const amountInCents = Math.round(monto * 1000 * 100);
 
   const paymentLinkName = `Matrícula de ${nombreCompleto} al programa ${nombrePrograma}`;
-  const paymentLinkDescription = "Pago de matrícula";
+  const paymentLinkDescription = cuotaId
+    ? "Pago de cuota de matrícula"
+    : "Pago de matrícula";
 
   const wompiPrivateKey = import.meta.env.WOMPI_PRIVATE_KEY || 'prv_test_xX2lSTCi4QdKr6BGFmht6Xzu2yhqcJf9';
   const appEnv = import.meta.env.APP_ENV || 'dev';
@@ -241,12 +250,20 @@ export async function generarLinkPagoMatricula(
     ? (import.meta.env.PUBLIC_WOMPI_URL || 'https://api.wompi.co/v1')
     : (import.meta.env.SANDBOX_WOMPI_URL || 'https://sandbox.wompi.co/v1');
 
+  // El SKU contiene el identificador de referencia para el webhook de Wompi
+  // Formato: "cuota:{cuotaId}" para cuotas o "matricula:{matriculaId}" para pago de contado
+  const sku = cuotaId
+    ? `cuota:${cuotaId}`
+    : `matricula:${matriculaId}`;
+
   console.log('Generando link de pago para matrícula:', {
     matriculaId,
+    cuotaId,
     monto,
     amountInCents,
     nombreCompleto,
     nombrePrograma,
+    sku,
   });
 
   const wompiResponse = await fetch(`${wompiUrl}/payment_links`, {
@@ -262,6 +279,7 @@ export async function generarLinkPagoMatricula(
       collect_shipping: false,
       currency: "COP",
       amount_in_cents: amountInCents,
+      sku: sku,
     }),
   });
 
@@ -283,10 +301,11 @@ export async function generarLinkPagoMatricula(
   console.log('Link de pago generado:', {
     paymentLinkId,
     checkoutUrl,
+    sku,
     wompiData,
   });
 
-  return { url: checkoutUrl };
+  return { url: checkoutUrl, linkId: paymentLinkId };
 }
 
 /**

@@ -176,13 +176,14 @@ export default function MatriculasAdmin() {
       const nombreCompleto = `${paymentMatricula.estudiante.firstName} ${paymentMatricula.estudiante.lastName}`;
       const nombrePrograma = paymentMatricula.inscripcion.programa.nombre;
 
-      // 1. Primero generar el link de Wompi
+      // 1. Primero generar el link de Wompi (con cuotaId para referencia en el SKU)
       const wompiResult = await generarLinkPagoMatricula(
         paymentMatricula.id,
         monto / 1000, // La función espera el monto en miles
         nombreCompleto,
         nombrePrograma,
-        token
+        token,
+        cuotaId // Pasar cuotaId para que Wompi lo guarde en el SKU
       );
 
       // 2. Luego enviar el email con el link generado
@@ -238,13 +239,14 @@ export default function MatriculasAdmin() {
       const nombreCompleto = `${cuotasMatricula.estudiante.firstName} ${cuotasMatricula.estudiante.lastName}`;
       const nombrePrograma = cuotasMatricula.inscripcion.programa.nombre;
 
-      // 1. Primero generar el link de Wompi
+      // 1. Primero generar el link de Wompi (con cuota.id para referencia en el SKU)
       const wompiResult = await generarLinkPagoMatricula(
         cuotasMatricula.id,
         monto / 1000, // La función espera el monto en miles
         nombreCompleto,
         nombrePrograma,
-        token
+        token,
+        cuota.id // Pasar cuota.id para que Wompi lo guarde en el SKU
       );
 
       // 2. Luego enviar el email con el link generado
