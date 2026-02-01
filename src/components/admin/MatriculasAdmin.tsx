@@ -158,7 +158,9 @@ export default function MatriculasAdmin() {
       let cuotaId: string | undefined;
 
       if (paymentMatricula.tipoPago === 'CUOTAS' && paymentMatricula.cuotas?.length > 0) {
-        const primeraCuotaPendiente = paymentMatricula.cuotas.find(c => !c.pagado);
+        const primeraCuotaPendiente = [...paymentMatricula.cuotas]
+          .sort((a, b) => a.numeroCuota - b.numeroCuota)
+          .find(c => !c.pagado);
         if (primeraCuotaPendiente) {
           cuotaId = primeraCuotaPendiente.id;
           monto = Number(primeraCuotaPendiente.monto);
@@ -838,7 +840,9 @@ export default function MatriculasAdmin() {
                     {paymentMatricula.tipoPago === 'CUOTAS' && paymentMatricula.cuotas?.length > 0 ? (
                       <>
                         {(() => {
-                          const cuotaPendiente = paymentMatricula.cuotas.find(c => !c.pagado);
+                          const cuotaPendiente = [...paymentMatricula.cuotas]
+                            .sort((a, b) => a.numeroCuota - b.numeroCuota)
+                            .find(c => !c.pagado);
                           if (cuotaPendiente) {
                             return (
                               <div className="text-sm text-blue-800">
