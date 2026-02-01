@@ -154,10 +154,16 @@ export default function MatriculasAdmin() {
         : paymentMatricula.estudiante.email;
 
       // Determinar monto y cuota según tipo de pago
+      // Si está becado, siempre se cobra el monto TOTAL a la entidad (no por cuotas)
       let monto: number;
       let cuotaId: string | undefined;
 
-      if (paymentMatricula.tipoPago === 'CUOTAS' && paymentMatricula.cuotas?.length > 0) {
+      if (paymentMatricula.esBecado) {
+        // Becado: siempre el monto total, sin importar si eligió cuotas
+        monto = Number(paymentMatricula.valorTotal) || 0;
+        cuotaId = undefined; // No es pago de cuota, es pago total
+      } else if (paymentMatricula.tipoPago === 'CUOTAS' && paymentMatricula.cuotas?.length > 0) {
+        // No becado con cuotas: pagar cuota por cuota
         const primeraCuotaPendiente = [...paymentMatricula.cuotas]
           .sort((a, b) => a.numeroCuota - b.numeroCuota)
           .find(c => !c.pagado);
@@ -172,6 +178,7 @@ export default function MatriculasAdmin() {
           return;
         }
       } else {
+        // No becado, pago de contado
         monto = Number(paymentMatricula.valorTotal) || 0;
       }
 
@@ -837,7 +844,17 @@ export default function MatriculasAdmin() {
                   {/* Info del pago que se enviará */}
                   <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                     <h4 className="font-semibold text-blue-900 mb-2">Se enviará:</h4>
-                    {paymentMatricula.tipoPago === 'CUOTAS' && paymentMatricula.cuotas?.length > 0 ? (
+                    {paymentMatricula.esBecado ? (
+                      // Becado: siempre muestra el pago total (la entidad paga todo)
+                      <div className="text-sm text-blue-800">
+                        <p><span className="font-semibold">Concepto:</span> Pago Total - Beca</p>
+                        <p><span className="font-semibold">Monto:</span> {formatCurrency(paymentMatricula.valorTotal)}</p>
+                        <p className="text-amber-700 mt-1">
+                          <span className="font-semibold">Pagado por:</span> {paymentMatricula.entidad?.razonSocial || 'Entidad'}
+                        </p>
+                      </div>
+                    ) : paymentMatricula.tipoPago === 'CUOTAS' && paymentMatricula.cuotas?.length > 0 ? (
+                      // No becado con cuotas
                       <>
                         {(() => {
                           const cuotaPendiente = [...paymentMatricula.cuotas]
@@ -856,6 +873,7 @@ export default function MatriculasAdmin() {
                         })()}
                       </>
                     ) : (
+                      // No becado, pago de contado
                       <div className="text-sm text-blue-800">
                         <p><span className="font-semibold">Concepto:</span> Pago Total - Matrícula</p>
                         <p><span className="font-semibold">Monto:</span> {formatCurrency(paymentMatricula.valorTotal)}</p>
