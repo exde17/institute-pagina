@@ -741,7 +741,7 @@ export default function MatriculasAdmin() {
               </div>
 
               <div className="space-y-3">
-                {cuotasMatricula.cuotas.map((cuota) => (
+                {[...cuotasMatricula.cuotas].sort((a, b) => a.numeroCuota - b.numeroCuota).map((cuota) => (
                   <div key={cuota.id} className={`p-4 rounded-lg border ${cuota.pagado ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200'}`}>
                     <div className="flex items-center justify-between">
                       <div>
