@@ -186,14 +186,15 @@ export default function MatriculasAdmin() {
         cuotaId // Pasar cuotaId para que Wompi lo guarde en el SKU
       );
 
-      // 2. Luego enviar el email con el link generado
+      // 2. Luego enviar el email con el link generado (incluye linkId para asociar en BD)
       const result = await enviarEmailLinkPago(
         paymentMatricula.id,
         email,
         wompiResult.url,
         monto,
         cuotaId,
-        token
+        token,
+        wompiResult.linkId
       );
 
       setSendResult({
@@ -249,14 +250,15 @@ export default function MatriculasAdmin() {
         cuota.id // Pasar cuota.id para que Wompi lo guarde en el SKU
       );
 
-      // 2. Luego enviar el email con el link generado
+      // 2. Luego enviar el email con el link generado (incluye linkId para asociar en BD)
       const result = await enviarEmailLinkPago(
         cuotasMatricula.id,
         email,
         wompiResult.url,
         monto,
         cuota.id,
-        token
+        token,
+        wompiResult.linkId
       );
 
       if (result.success) {

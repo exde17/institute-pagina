@@ -631,6 +631,7 @@ export async function getResumenPagoMatricula(matriculaId: string, token: string
 /**
  * Envía email con link de pago al estudiante/entidad
  * El link de Wompi ya debe estar generado
+ * @param linkId - ID del link de pago de Wompi (payment_link_id) para asociar con la cuota/matrícula
  */
 export async function enviarEmailLinkPago(
   matriculaId: string,
@@ -638,7 +639,8 @@ export async function enviarEmailLinkPago(
   linkPago: string,
   monto: number,
   cuotaId?: string,
-  token?: string
+  token?: string,
+  linkId?: string
 ): Promise<{
   success: boolean;
   url: string;
@@ -655,7 +657,7 @@ export async function enviarEmailLinkPago(
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ email, linkPago, monto, cuotaId }),
+    body: JSON.stringify({ email, linkPago, monto, cuotaId, linkId }),
   });
 
   if (!res.ok) {
