@@ -280,11 +280,11 @@ const programasDataFallback = [
           style={`animation-delay: ${index * 0.1}s`}
         >
           <!-- Imagen del programa -->
-          <div class="relative h-64 overflow-hidden">
-            <img 
-              src={programa.imagen} 
+          <div class="relative h-64 overflow-hidden bg-slate-100">
+            <img
+              src={programa.imagen}
               alt={programa.nombre}
-              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              class="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
             />
             <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent opacity-70"></div>
             
@@ -925,11 +925,11 @@ const programasDataFallback = [
         
         article.innerHTML = `
           <!-- Imagen del programa -->
-          <div class="relative h-64 overflow-hidden">
+          <div class="relative h-64 overflow-hidden bg-slate-100">
             <img
               src="${programa.imagen}"
               alt="${programa.nombre}"
-              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              class="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
             />
             <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent opacity-70"></div>
 
