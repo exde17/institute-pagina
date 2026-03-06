@@ -1,6 +1,7 @@
 import React from 'react';
 import type { FormData } from '../../hooks/useFormPersistence';
 import { useApiOptions, useMunicipios } from '../../hooks/useApiOptions';
+import { SearchableSelect } from './SearchableSelect';
 
 interface StepProps {
   formData: FormData;
@@ -88,19 +89,13 @@ export const Step4Education: React.FC<StepProps> = ({ formData, updateFormData, 
 
       <label className="grid gap-1">
         <span className="text-sm font-medium">Municipio de la Institución</span>
-        <select
+        <SearchableSelect
+          options={municipios}
           value={formData.municipioInstitucion}
-          onChange={(e) => updateFormData({ municipioInstitucion: e.target.value })}
-          className="border rounded px-3 py-2"
+          onChange={(val) => updateFormData({ municipioInstitucion: val })}
+          placeholder="Buscar municipio..."
           disabled={!formData.departamentoInstitucion || loadingMunicipios}
-        >
-          <option value="">Selecciona...</option>
-          {municipios.map((mun: any) => (
-            <option key={mun.id} value={mun.id}>
-              {mun.nombre}
-            </option>
-          ))}
-        </select>
+        />
       </label>
 
       <div className="flex gap-2 mt-4">

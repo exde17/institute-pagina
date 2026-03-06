@@ -1,6 +1,7 @@
 import React from 'react';
 import type { FormData } from '../../hooks/useFormPersistence';
 import { useApiOptions, useMunicipios } from '../../hooks/useApiOptions';
+import { SearchableSelect } from './SearchableSelect';
 
 interface StepProps {
   formData: FormData;
@@ -80,36 +81,24 @@ export const Step2Document: React.FC<StepProps> = ({ formData, updateFormData, o
 
       <label className="grid gap-1">
         <span className="text-sm font-medium">Municipio de Nacimiento</span>
-        <select
+        <SearchableSelect
+          options={municipiosNacimiento}
           value={formData.municipioNacimiento}
-          onChange={(e) => updateFormData({ municipioNacimiento: e.target.value })}
-          className="border rounded px-3 py-2"
+          onChange={(val) => updateFormData({ municipioNacimiento: val })}
+          placeholder="Buscar municipio..."
           disabled={!formData.departamentoNacimiento || loadingMunicipiosNac}
-        >
-          <option value="">Selecciona...</option>
-          {municipiosNacimiento.map((mun) => (
-            <option key={mun.id} value={mun.id}>
-              {mun.nombre}
-            </option>
-          ))}
-        </select>
+        />
       </label>
 
       <label className="grid gap-1">
         <span className="text-sm font-medium">Lugar de Expedición del Documento</span>
-        <select
+        <SearchableSelect
+          options={municipios}
           value={formData.lugarExpedicion}
-          onChange={(e) => updateFormData({ lugarExpedicion: e.target.value })}
-          className="border rounded px-3 py-2"
+          onChange={(val) => updateFormData({ lugarExpedicion: val })}
+          placeholder="Buscar municipio..."
           disabled={loadingMunicipios}
-        >
-          <option value="">Selecciona un municipio...</option>
-          {municipios.map((mun) => (
-            <option key={mun.id} value={mun.id}>
-              {mun.nombre}
-            </option>
-          ))}
-        </select>
+        />
       </label>
 
       <div className="flex gap-2 mt-4">
