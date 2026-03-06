@@ -840,22 +840,26 @@ const programasDataFallback = [
         article.style.animationDelay = `${index * 0.1}s`;
         
         // Determinar el color del badge
-        const badgeColorClass = 
+        const isHexColor = programa.badgeColor && programa.badgeColor.startsWith('#');
+        const badgeColorClass = isHexColor ? '' :
           programa.badgeColor === 'green' ? 'bg-green-500' :
           programa.badgeColor === 'purple' ? 'bg-purple-500' :
           programa.badgeColor === 'blue' ? 'bg-blue-500' :
           programa.badgeColor === 'emerald' ? 'bg-emerald-500' :
           programa.badgeColor === 'pink' ? 'bg-pink-500' :
           'bg-orange-500';
+        const badgeStyle = isHexColor ? `background-color: ${programa.badgeColor}` : '';
         
         // Renderizar semestres o detalles
         let contenidoPrograma = '';
-        if (programa.semestres && programa.semestres.length > 0) {
+        // Filtrar semestres válidos (objetos con propiedad materias)
+        const semestresValidos = (programa.semestres || []).filter(s => s && s.materias && s.materias.length > 0);
+        if (semestresValidos.length > 0) {
           // Mostrar estructura de semestres
           contenidoPrograma = `
             <div class="space-y-3">
               <div class="semestres-preview">
-                ${programa.semestres.map((semestre, idx) => `
+                ${semestresValidos.map((semestre, idx) => `
                   <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
                     <div class="flex items-center gap-2 mb-2">
                       <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white flex items-center justify-center text-xs font-bold">
@@ -881,7 +885,7 @@ const programasDataFallback = [
               </div>
               
               <div class="semestres-full hidden">
-                ${programa.semestres.map(semestre => `
+                ${semestresValidos.map(semestre => `
                   <div class="bg-gradient-to-br from-slate-50 to-blue-50 rounded-lg p-4 border-2 border-blue-200 mb-3">
                     <div class="flex items-center gap-3 mb-3">
                       <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white flex items-center justify-center text-sm font-bold shadow-lg">
@@ -934,7 +938,7 @@ const programasDataFallback = [
             <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent opacity-70"></div>
 
             <!-- Badge -->
-            <div class="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold text-white ${badgeColorClass}">
+            <div class="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold text-white ${badgeColorClass}" style="${badgeStyle}">
               ${programa.badge}
             </div>
 
