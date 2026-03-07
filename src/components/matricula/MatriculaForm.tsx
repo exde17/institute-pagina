@@ -343,7 +343,7 @@ export default function MatriculaForm() {
                 {/* Diploma o certificado */}
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    2. Diploma o certificado de grado 10° *
+                    2. Certificado de estudio *
                   </label>
                   <input
                     type="file"
@@ -384,7 +384,7 @@ export default function MatriculaForm() {
                 {/* Formulario de matrícula */}
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    {isMinor ? '4' : '3'}. Formulario de matrícula firmado *
+                    {isMinor ? '4' : '3'}. Consentimiento de matrícula *
                   </label>
                   <input
                     type="file"
