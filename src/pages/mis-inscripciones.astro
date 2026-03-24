@@ -12,8 +12,19 @@ import Layout from '../layouts/Layout.astro';
         </svg>
         <h1 class="text-4xl font-bold text-slate-900">Panel de Administración</h1>
       </div>
-      <div class="inline-block bg-amber-100 text-amber-800 px-4 py-2 rounded-full text-sm font-semibold">
-        🛡️ Solo accesible para administradores
+      <div class="flex items-center gap-4 flex-wrap">
+        <div class="inline-block bg-amber-100 text-amber-800 px-4 py-2 rounded-full text-sm font-semibold">
+          Solo accesible para administradores
+        </div>
+        <button
+          id="btn-export-excel"
+          class="hidden inline-flex items-center gap-2 bg-green-600 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-green-700 transition-colors shadow-md"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          Descargar Excel
+        </button>
       </div>
     </div>
 
@@ -82,6 +93,7 @@ import Layout from '../layouts/Layout.astro';
 
   <script>
     import { getUser, getInscripciones, generarLinkPago } from '../lib/auth.ts';
+    import * as XLSX from 'xlsx';
 
     // Declaración de tipo para window.generarLink
     declare global {
@@ -89,6 +101,8 @@ import Layout from '../layouts/Layout.astro';
         generarLink: (pagoId: string, monto: number, nombreCompleto: string, nombrePrograma: string) => Promise<void>;
       }
     }
+
+    let inscripcionesData: Awaited<ReturnType<typeof getInscripciones>> = [];
 
     function checkAdminAccess() {
       const user = getUser();
@@ -138,6 +152,7 @@ import Layout from '../layouts/Layout.astro';
 
       try {
         const inscripciones = await getInscripciones();
+        inscripcionesData = inscripciones;
 
         loadingState?.classList.add('hidden');
 
@@ -147,6 +162,7 @@ import Layout from '../layouts/Layout.astro';
         }
 
         tableContainer?.classList.remove('hidden');
+        document.getElementById('btn-export-excel')?.classList.remove('hidden');
 
         if (tbody) {
           tbody.innerHTML = inscripciones.map(insc => {
@@ -202,7 +218,52 @@ import Layout from '../layouts/Layout.astro';
       }
     };
 
+    function exportToExcel() {
+      if (!inscripcionesData || inscripcionesData.length === 0) return;
+
+      const rows = inscripcionesData.map((insc) => {
+        const user = insc.user;
+        const programa = insc.programa;
+        const pago = insc.pagos?.[0];
+        return {
+          'Nombre': `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+          'Email': user.email || '',
+          'Programa': programa.nombre || '',
+          'Categoria': programa.categoria || '',
+          'Modalidad': programa.modalidad || '',
+          'Costo': Number(programa.costo) || 0,
+          'Estado Pago': pago?.estado || 'Pendiente',
+          'Monto Pago': Number(pago?.monto) || 0,
+          'Referencia Pago': pago?.referenciaPago || '',
+          'Fecha Inscripcion': insc.fechaInscripcion ? new Date(insc.fechaInscripcion).toLocaleDateString('es-CO') : '',
+          'Fecha Pago': pago?.fechaPago ? new Date(pago.fechaPago).toLocaleDateString('es-CO') : '',
+          'Observacion': insc.observacion || '',
+        };
+      });
+
+      const ws = XLSX.utils.json_to_sheet(rows);
+
+      // Auto-ajustar ancho de columnas
+      const colWidths = Object.keys(rows[0]).map((key) => {
+        const maxLen = Math.max(
+          key.length,
+          ...rows.map((r) => String((r as any)[key] || '').length)
+        );
+        return { wch: Math.min(maxLen + 2, 50) };
+      });
+      ws['!cols'] = colWidths;
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Inscripciones');
+
+      const today = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(wb, `inscripciones_${today}.xlsx`);
+    }
+
     // Render cuando carga la página
-    document.addEventListener('DOMContentLoaded', renderInscripciones);
+    document.addEventListener('DOMContentLoaded', () => {
+      renderInscripciones();
+      document.getElementById('btn-export-excel')?.addEventListener('click', exportToExcel);
+    });
   </script>
 </Layout>
