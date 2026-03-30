@@ -45,6 +45,10 @@ export default function MatriculasAdmin() {
   // Filtro activo
   const [activeFilter, setActiveFilter] = useState<FilterType>('TODOS');
 
+  // Paginacion
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [currentPage, setCurrentPage] = useState(1);
+
   useEffect(() => {
     loadMatriculas();
     loadEntidades();
@@ -464,6 +468,11 @@ export default function MatriculasAdmin() {
   }
 
   const filteredMatriculas = getFilteredMatriculas();
+  const totalPages = pageSize === 0 ? 1 : Math.ceil(filteredMatriculas.length / pageSize);
+  const safePage = Math.min(currentPage, totalPages || 1);
+  const paginatedMatriculas = pageSize === 0
+    ? filteredMatriculas
+    : filteredMatriculas.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   const filterButtons: { label: string; value: FilterType; count: number }[] = [
     { label: 'Todos', value: 'TODOS', count: matriculas.length },
@@ -479,7 +488,7 @@ export default function MatriculasAdmin() {
         {filterButtons.map((fb) => (
           <button
             key={fb.value}
-            onClick={() => setActiveFilter(fb.value)}
+            onClick={() => { setActiveFilter(fb.value); setCurrentPage(1); }}
             className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors cursor-pointer ${
               activeFilter === fb.value
                 ? 'bg-blue-600 text-white shadow-md'
@@ -518,14 +527,14 @@ export default function MatriculasAdmin() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
-            {filteredMatriculas.length === 0 ? (
+            {paginatedMatriculas.length === 0 ? (
               <tr>
                 <td colSpan={8} className="px-6 py-12 text-center text-slate-500">
                   No hay matriculas con este filtro.
                 </td>
               </tr>
             ) : null}
-            {filteredMatriculas.map((matricula) => (
+            {paginatedMatriculas.map((matricula) => (
               <tr key={matricula.id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-4 py-4">
                   <div>
@@ -599,6 +608,81 @@ export default function MatriculasAdmin() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Paginacion */}
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-white rounded-lg shadow-md border border-slate-200 px-6 py-3">
+        <div className="flex items-center gap-2 text-sm text-slate-600">
+          <span>Mostrar</span>
+          <select
+            value={pageSize}
+            onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
+            className="border border-slate-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+            <option value={0}>Todo</option>
+          </select>
+          <span>de {filteredMatriculas.length} matriculas</span>
+        </div>
+
+        {pageSize !== 0 && totalPages > 1 && (
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setCurrentPage(1)}
+              disabled={safePage <= 1}
+              className="px-2 py-1 text-sm rounded hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            >
+              &laquo;
+            </button>
+            <button
+              onClick={() => setCurrentPage(safePage - 1)}
+              disabled={safePage <= 1}
+              className="px-2 py-1 text-sm rounded hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            >
+              &lsaquo;
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter((p) => p === 1 || p === totalPages || Math.abs(p - safePage) <= 1)
+              .reduce<(number | string)[]>((acc, p, idx, arr) => {
+                if (idx > 0 && p - (arr[idx - 1] as number) > 1) acc.push('...');
+                acc.push(p);
+                return acc;
+              }, [])
+              .map((item, idx) =>
+                typeof item === 'string' ? (
+                  <span key={`dots-${idx}`} className="px-2 py-1 text-sm text-slate-400">...</span>
+                ) : (
+                  <button
+                    key={item}
+                    onClick={() => setCurrentPage(item)}
+                    className={`px-3 py-1 text-sm rounded cursor-pointer ${
+                      item === safePage ? 'bg-blue-600 text-white' : 'hover:bg-slate-100 text-slate-700'
+                    }`}
+                  >
+                    {item}
+                  </button>
+                )
+              )}
+
+            <button
+              onClick={() => setCurrentPage(safePage + 1)}
+              disabled={safePage >= totalPages}
+              className="px-2 py-1 text-sm rounded hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            >
+              &rsaquo;
+            </button>
+            <button
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={safePage >= totalPages}
+              className="px-2 py-1 text-sm rounded hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            >
+              &raquo;
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Modal de documentos */}
