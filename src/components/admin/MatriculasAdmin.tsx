@@ -1,5 +1,6 @@
 // src/components/admin/MatriculasAdmin.tsx
 import { useEffect, useState } from 'react';
+import * as XLSX from 'xlsx';
 import {
   getAllMatriculas,
   getEntidadesActivas,
@@ -12,6 +13,8 @@ import {
   type Cuota,
 } from '../../lib/matriculaApi';
 import { getToken } from '../../lib/auth';
+
+type FilterType = 'TODOS' | 'PAGADO' | 'BECADO' | 'PENDIENTE';
 
 const API_BASE = import.meta.env.PUBLIC_API_URL || 'https://apifcm.bg3sas.com';
 
@@ -38,6 +41,9 @@ export default function MatriculasAdmin() {
 
   // Estado para resultado del envío
   const [sendResult, setSendResult] = useState<{ success: boolean; message: string } | null>(null);
+
+  // Filtro activo
+  const [activeFilter, setActiveFilter] = useState<FilterType>('TODOS');
 
   useEffect(() => {
     loadMatriculas();
@@ -333,6 +339,58 @@ export default function MatriculasAdmin() {
   }
 
 
+  function getFilteredMatriculas(): Matricula[] {
+    switch (activeFilter) {
+      case 'PAGADO':
+        return matriculas.filter((m) => m.estadoMatricula === 'PAGADO');
+      case 'BECADO':
+        return matriculas.filter((m) => m.esBecado);
+      case 'PENDIENTE':
+        return matriculas.filter((m) => m.estadoMatricula === 'PENDIENTE_PAGO' || m.estadoMatricula === 'PAGO_PARCIAL');
+      default:
+        return matriculas;
+    }
+  }
+
+  function exportToExcel() {
+    const data = getFilteredMatriculas();
+    if (data.length === 0) return;
+
+    const rows = data.map((m) => ({
+      'Nombre': `${m.estudiante.firstName} ${m.estudiante.lastName}`,
+      'Email': m.estudiante.email,
+      'Telefono': m.estudiante.telephone || '',
+      'Documento': m.estudiante.documentNumber || '',
+      'Programa': m.inscripcion.programa.nombre,
+      'Modalidad': m.inscripcion.programa.modalidad || '',
+      'Categoria': m.inscripcion.programa.categoria || '',
+      'Tipo Pago': m.tipoPago === 'CONTADO' ? 'Contado' : m.tipoPago === 'CUOTAS' ? 'Cuotas' : 'No definido',
+      'Valor Total': Number(m.valorTotal) || 0,
+      'Estado': m.estadoMatricula === 'PAGADO' ? 'Pagado' : m.estadoMatricula === 'PAGO_PARCIAL' ? 'Pago Parcial' : 'Pendiente',
+      'Becado': m.esBecado ? 'Si' : 'No',
+      'Entidad Beca': m.entidad?.razonSocial || '',
+      'Cuotas Pagadas': m.cuotas ? `${m.cuotas.filter((c) => c.pagado).length}/${m.cuotas.length}` : '',
+      'Fecha Matricula': m.createdAt ? new Date(m.createdAt).toLocaleDateString('es-CO') : '',
+      'Direccion': m.estudiante.address || '',
+      'Acudiente': m.estudiante.nombreAcudiente || '',
+      'Tel. Acudiente': m.estudiante.numeroContactoAcudiente || '',
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const colWidths = Object.keys(rows[0]).map((key) => {
+      const maxLen = Math.max(key.length, ...rows.map((r) => String((r as any)[key] || '').length));
+      return { wch: Math.min(maxLen + 2, 50) };
+    });
+    ws['!cols'] = colWidths;
+
+    const wb = XLSX.utils.book_new();
+    const sheetName = activeFilter === 'TODOS' ? 'Todas' : activeFilter === 'PAGADO' ? 'Pagados' : activeFilter === 'BECADO' ? 'Becados' : 'Pendientes';
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+
+    const today = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(wb, `matriculas_${sheetName.toLowerCase()}_${today}.xlsx`);
+  }
+
   function getEstadoMatriculaBadge(estadoMatricula: string | undefined) {
     switch (estadoMatricula) {
       case 'PAGADO':
@@ -405,8 +463,45 @@ export default function MatriculasAdmin() {
     );
   }
 
+  const filteredMatriculas = getFilteredMatriculas();
+
+  const filterButtons: { label: string; value: FilterType; count: number }[] = [
+    { label: 'Todos', value: 'TODOS', count: matriculas.length },
+    { label: 'Pagados', value: 'PAGADO', count: matriculas.filter((m) => m.estadoMatricula === 'PAGADO').length },
+    { label: 'Becados', value: 'BECADO', count: matriculas.filter((m) => m.esBecado).length },
+    { label: 'Pendientes', value: 'PENDIENTE', count: matriculas.filter((m) => m.estadoMatricula === 'PENDIENTE_PAGO' || m.estadoMatricula === 'PAGO_PARCIAL').length },
+  ];
+
   return (
     <div className="space-y-6">
+      {/* Filtros y exportar */}
+      <div className="flex flex-wrap items-center gap-3">
+        {filterButtons.map((fb) => (
+          <button
+            key={fb.value}
+            onClick={() => setActiveFilter(fb.value)}
+            className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors cursor-pointer ${
+              activeFilter === fb.value
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            {fb.label} ({fb.count})
+          </button>
+        ))}
+
+        <button
+          onClick={exportToExcel}
+          disabled={filteredMatriculas.length === 0}
+          className="ml-auto inline-flex items-center gap-2 px-5 py-2 bg-green-600 text-white rounded-full text-sm font-semibold hover:bg-green-700 transition-colors shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Descargar Excel
+        </button>
+      </div>
+
       {/* Tabla de matrículas */}
       <div className="overflow-x-auto bg-white rounded-lg shadow-md border border-slate-200">
         <table className="w-full">
@@ -423,7 +518,14 @@ export default function MatriculasAdmin() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
-            {matriculas.map((matricula) => (
+            {filteredMatriculas.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="px-6 py-12 text-center text-slate-500">
+                  No hay matriculas con este filtro.
+                </td>
+              </tr>
+            ) : null}
+            {filteredMatriculas.map((matricula) => (
               <tr key={matricula.id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-4 py-4">
                   <div>
