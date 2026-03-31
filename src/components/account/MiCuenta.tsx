@@ -115,16 +115,23 @@ export default function MiCuenta() {
   const { municipios: municipiosNacimiento, loading: loadingMunicNac } = useMunicipios(form?.departamentoNacimiento || '');
   const { municipios: municipiosInstitucion, loading: loadingMunicInst } = useMunicipios(form?.departamentoInstitucion || '');
 
-  const token = getToken();
-  const user = getUser();
+  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<ReturnType<typeof getUser>>(null);
 
   useEffect(() => {
-    if (!token || !user) {
+    const t = getToken();
+    const u = getUser();
+    if (!t || !u) {
       window.location.href = '/auth/login';
       return;
     }
-    fetchProfile();
+    setToken(t);
+    setUser(u);
   }, []);
+
+  useEffect(() => {
+    if (token && user) fetchProfile();
+  }, [token, user]);
 
   async function fetchProfile() {
     try {
