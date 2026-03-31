@@ -121,6 +121,7 @@ export interface Matricula {
     address: string;
     nombreAcudiente: string | null;
     numeroContactoAcudiente: string | null;
+    tipoDocumento: { id: string; nombre: string } | null;
   };
   inscripcion: {
     id: string;

@@ -360,11 +360,23 @@ export default function MatriculasAdmin() {
     const data = getFilteredMatriculas();
     if (data.length === 0) return;
 
+    const calcAge = (birthDate: string | null): number | string => {
+      if (!birthDate) return '';
+      const birth = new Date(birthDate);
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
+      return age;
+    };
+
     const rows = data.map((m) => ({
       'Nombre': `${m.estudiante.firstName} ${m.estudiante.lastName}`,
+      'Tipo Documento': m.estudiante.tipoDocumento?.nombre || '',
+      'Documento': m.estudiante.documentNumber || '',
+      'Edad': calcAge(m.estudiante.birthDate),
       'Email': m.estudiante.email,
       'Telefono': m.estudiante.telephone || '',
-      'Documento': m.estudiante.documentNumber || '',
       'Programa': m.inscripcion.programa.nombre,
       'Modalidad': m.inscripcion.programa.modalidad || '',
       'Categoria': m.inscripcion.programa.categoria || '',
