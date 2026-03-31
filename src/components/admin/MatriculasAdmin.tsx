@@ -394,6 +394,8 @@ export default function MatriculasAdmin() {
       'Direccion': m.estudiante.address || '',
       'Acudiente': m.estudiante.nombreAcudiente || '',
       'Tel. Acudiente': m.estudiante.numeroContactoAcudiente || '',
+      'Limitacion Fisica/Cognitiva': m.estudiante.limitacionFisicaCognitiva ? (m.estudiante.descripcionLimitacion || 'Si') : 'N/A',
+      'Grupo Poblacional': m.estudiante.grupo?.nombre || 'N/A',
     }));
 
     const ws = XLSX.utils.json_to_sheet(rows);

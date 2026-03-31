@@ -125,6 +125,9 @@ export interface Matricula {
     departamentoNacimiento: { id: string; nombre: string } | null;
     municipioNacimiento: { id: string; nombre: string } | null;
     institucionEducativa: string | null;
+    limitacionFisicaCognitiva: boolean | null;
+    descripcionLimitacion: string | null;
+    grupo: { id: string; nombre: string } | null;
   };
   inscripcion: {
     id: string;
