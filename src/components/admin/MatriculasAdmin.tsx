@@ -374,6 +374,7 @@ export default function MatriculasAdmin() {
       'Nombre': `${m.estudiante.firstName} ${m.estudiante.lastName}`,
       'Tipo Documento': m.estudiante.tipoDocumento?.nombre || '',
       'Documento': m.estudiante.documentNumber || '',
+      'Fecha Nacimiento': m.estudiante.birthDate ? new Date(m.estudiante.birthDate).toLocaleDateString('es-CO') : '',
       'Edad': calcAge(m.estudiante.birthDate),
       'Email': m.estudiante.email,
       'Telefono': m.estudiante.telephone || '',
