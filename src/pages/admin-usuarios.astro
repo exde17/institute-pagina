@@ -1,0 +1,25 @@
+---
+import Layout from '../layouts/Layout.astro';
+import UsuariosAdmin from '../components/admin/UsuariosAdmin';
+---
+
+<Layout title="Gestión de Usuarios — FCM INSTITUTE" description="Panel de administración de usuarios">
+  <div class="mx-auto max-w-7xl px-4 py-12">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-center gap-3 mb-3">
+        <svg class="w-8 h-8 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10a3 3 0 11-6 0 3 3 0 016 0zM6 20a9 9 0 0118 0v2H6v-2z"/>
+        </svg>
+        <h1 class="text-4xl font-bold text-slate-900">Gestión de Usuarios</h1>
+      </div>
+      <p class="text-slate-600 mb-3">Administra los usuarios del sistema y sus contraseñas.</p>
+      <div class="inline-block bg-amber-100 text-amber-800 px-4 py-2 rounded-full text-sm font-semibold">
+        Solo accesible para administradores
+      </div>
+    </div>
+
+    <!-- Componente de usuarios -->
+    <UsuariosAdmin client:load />
+  </div>
+</Layout>

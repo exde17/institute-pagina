@@ -774,3 +774,85 @@ export async function deletePlanPago(id: string, token: string): Promise<void> {
     throw new Error(errorData?.message || `Error ${res.status}: No se pudo eliminar el plan de pago`);
   }
 }
+
+// ==================== USUARIOS API ====================
+
+export interface Usuario {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string[];
+}
+
+export interface PaginationInfo {
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+}
+
+export interface UsuariosResponse {
+  data: Usuario[];
+  pagination: PaginationInfo;
+}
+
+export interface GetUsuariosParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  role?: string;
+  email?: string;
+}
+
+/**
+ * Obtiene usuarios con paginación y filtros (solo para admin)
+ */
+export async function getUsuarios(
+  token: string,
+  params?: GetUsuariosParams
+): Promise<UsuariosResponse> {
+  const queryParams = new URLSearchParams();
+  
+  if (params?.page) queryParams.append('page', params.page.toString());
+  if (params?.limit) queryParams.append('limit', params.limit.toString());
+  if (params?.search) queryParams.append('search', params.search);
+  if (params?.role) queryParams.append('role', params.role);
+  if (params?.email) queryParams.append('email', params.email);
+
+  const url = `${API_BASE}/api/auth/users${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData?.message || `Error ${res.status}: No se pudieron cargar los usuarios`);
+  }
+
+  return res.json();
+}
+
+/**
+ * Cambia la contraseña de un usuario
+ */
+export async function changeUserPassword(userId: string, newPassword: string, token: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/auth/change-password/${userId}`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ newPassword }),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData?.message || `Error ${res.status}: No se pudo cambiar la contraseña`);
+  }
+}
