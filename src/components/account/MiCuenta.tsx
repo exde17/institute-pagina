@@ -226,7 +226,7 @@ export default function MiCuenta() {
     if (!user) return;
 
     if (newPassword !== confirmPassword) {
-      setPasswordMsg({ type: 'error', text: 'Las contrasenas no coinciden' });
+      setPasswordMsg({ type: 'error', text: 'Las contraseñas no coinciden' });
       return;
     }
 
@@ -244,11 +244,11 @@ export default function MiCuenta() {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        const msg = Array.isArray(data.message) ? data.message.join(', ') : data.message || 'Error al cambiar contrasena';
+        const msg = Array.isArray(data.message) ? data.message.join(', ') : data.message || 'Error al cambiar contraseña';
         throw new Error(msg);
       }
 
-      setPasswordMsg({ type: 'success', text: 'Contrasena actualizada correctamente' });
+      setPasswordMsg({ type: 'success', text: 'contraseña actualizada correctamente' });
       setNewPassword('');
       setConfirmPassword('');
       setShowPassword(false);
@@ -528,10 +528,10 @@ export default function MiCuenta() {
         </button>
       </form>
 
-      {/* Cambiar contrasena */}
+      {/* Cambiar contraseña */}
       <div className={sectionCls}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-slate-900">Cambiar Contrasena</h2>
+          <h2 className="text-xl font-bold text-slate-900">Cambiar contraseña</h2>
           <button
             type="button"
             onClick={() => { setShowPassword(!showPassword); setPasswordMsg(null); }}
@@ -549,7 +549,7 @@ export default function MiCuenta() {
               </div>
             )}
             <div>
-              <label className={labelCls}>Nueva contrasena</label>
+              <label className={labelCls}>Nueva contraseña</label>
               <input
                 type="password"
                 required
@@ -561,7 +561,7 @@ export default function MiCuenta() {
               />
             </div>
             <div>
-              <label className={labelCls}>Confirmar contrasena</label>
+              <label className={labelCls}>Confirmar contraseña</label>
               <input
                 type="password"
                 required
@@ -576,7 +576,7 @@ export default function MiCuenta() {
               disabled={savingPassword}
               className="px-6 py-2 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-50 cursor-pointer"
             >
-              {savingPassword ? 'Guardando...' : 'Actualizar contrasena'}
+              {savingPassword ? 'Guardando...' : 'Actualizar contraseña'}
             </button>
           </form>
         )}
