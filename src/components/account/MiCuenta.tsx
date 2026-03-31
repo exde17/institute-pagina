@@ -111,7 +111,7 @@ export default function MiCuenta() {
   const { options: allMunicipios, loading: loadingAllMunicipios } = useApiOptions('municipio');
   const { options: nivelesEducativos } = useApiOptions('nivel-educativo');
   const { options: parentescos } = useApiOptions('parentesco');
-  const { options: grupos } = useApiOptions('grupo');
+  const { options: grupos } = useApiOptions('grupos');
   const { municipios: municipiosNacimiento, loading: loadingMunicNac } = useMunicipios(form?.departamentoNacimiento || '');
   const { municipios: municipiosInstitucion, loading: loadingMunicInst } = useMunicipios(form?.departamentoInstitucion || '');
 
@@ -130,13 +130,13 @@ export default function MiCuenta() {
   }, []);
 
   useEffect(() => {
-    if (token && user) fetchProfile();
+    if (token && user) fetchProfile(token, user.id);
   }, [token, user]);
 
-  async function fetchProfile() {
+  async function fetchProfile(authToken: string, userId: string) {
     try {
-      const res = await fetch(`${API_BASE}/api/auth/${user!.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await fetch(`${API_BASE}/api/auth/${userId}`, {
+        headers: { Authorization: `Bearer ${authToken}` },
       });
       if (!res.ok) throw new Error('Error al cargar perfil');
       const data: UserProfile = await res.json();
