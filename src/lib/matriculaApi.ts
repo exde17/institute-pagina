@@ -122,6 +122,7 @@ export interface Matricula {
     nombreAcudiente: string | null;
     numeroContactoAcudiente: string | null;
     tipoDocumento: { id: string; nombre: string } | null;
+    institucionEducativa: string | null;
   };
   inscripcion: {
     id: string;

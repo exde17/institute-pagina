@@ -387,6 +387,7 @@ export default function MatriculasAdmin() {
       'Entidad Beca': m.entidad?.razonSocial || '',
       'Cuotas Pagadas': m.cuotas ? `${m.cuotas.filter((c) => c.pagado).length}/${m.cuotas.length}` : '',
       'Fecha Matricula': m.createdAt ? new Date(m.createdAt).toLocaleDateString('es-CO') : '',
+      'Institucion Educativa': m.estudiante.institucionEducativa || '',
       'Direccion': m.estudiante.address || '',
       'Acudiente': m.estudiante.nombreAcudiente || '',
       'Tel. Acudiente': m.estudiante.numeroContactoAcudiente || '',
