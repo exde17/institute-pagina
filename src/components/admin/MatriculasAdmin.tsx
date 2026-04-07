@@ -45,6 +45,9 @@ export default function MatriculasAdmin() {
   // Filtro activo
   const [activeFilter, setActiveFilter] = useState<FilterType>('TODOS');
 
+  // Busqueda
+  const [searchQuery, setSearchQuery] = useState('');
+
   // Paginacion
   const [pageSize, setPageSize] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState(1);
@@ -344,16 +347,31 @@ export default function MatriculasAdmin() {
 
 
   function getFilteredMatriculas(): Matricula[] {
+    let result: Matricula[];
     switch (activeFilter) {
       case 'PAGADO':
-        return matriculas.filter((m) => m.estadoMatricula === 'PAGADO');
+        result = matriculas.filter((m) => m.estadoMatricula === 'PAGADO');
+        break;
       case 'BECADO':
-        return matriculas.filter((m) => m.esBecado);
+        result = matriculas.filter((m) => m.esBecado);
+        break;
       case 'PENDIENTE':
-        return matriculas.filter((m) => m.estadoMatricula === 'PENDIENTE_PAGO' || m.estadoMatricula === 'PAGO_PARCIAL');
+        result = matriculas.filter((m) => m.estadoMatricula === 'PENDIENTE_PAGO' || m.estadoMatricula === 'PAGO_PARCIAL');
+        break;
       default:
-        return matriculas;
+        result = matriculas;
     }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      result = result.filter((m) => {
+        const name = `${m.estudiante.firstName} ${m.estudiante.lastName}`.toLowerCase();
+        const email = m.estudiante.email.toLowerCase();
+        return name.includes(q) || email.includes(q);
+      });
+    }
+
+    return result;
   }
 
   function exportToExcel() {
@@ -517,10 +535,23 @@ export default function MatriculasAdmin() {
           </button>
         ))}
 
+        <div className="relative ml-auto">
+          <svg className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+            placeholder="Buscar por nombre o email..."
+            className="pl-9 pr-3 py-2 border border-slate-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
+          />
+        </div>
+
         <button
           onClick={exportToExcel}
           disabled={filteredMatriculas.length === 0}
-          className="ml-auto inline-flex items-center gap-2 px-5 py-2 bg-green-600 text-white rounded-full text-sm font-semibold hover:bg-green-700 transition-colors shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 px-5 py-2 bg-green-600 text-white rounded-full text-sm font-semibold hover:bg-green-700 transition-colors shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
