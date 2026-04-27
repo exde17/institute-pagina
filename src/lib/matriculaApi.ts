@@ -362,6 +362,42 @@ export async function submitMatricula(data: MatriculaDocuments, token: string): 
   return res.json();
 }
 
+/**
+ * Actualiza los documentos de una matricula existente
+ */
+export async function updateMatriculaDocuments(
+  matriculaId: string,
+  files: {
+    documentoEstudiante?: File;
+    diplomaCertificadoGrado10?: File;
+    documentoAcudiente?: File;
+    formularioMatricula?: File;
+  },
+  token: string,
+): Promise<Matricula> {
+  const formData = new FormData();
+
+  if (files.documentoEstudiante) formData.append('documentoEstudiante', files.documentoEstudiante);
+  if (files.diplomaCertificadoGrado10) formData.append('diplomaCertificadoGrado10', files.diplomaCertificadoGrado10);
+  if (files.documentoAcudiente) formData.append('documentoAcudiente', files.documentoAcudiente);
+  if (files.formularioMatricula) formData.append('formularioMatricula', files.formularioMatricula);
+
+  const res = await fetch(`${API_BASE}/api/matricula/${matriculaId}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData?.message || `Error ${res.status}: No se pudieron actualizar los documentos`);
+  }
+
+  return res.json();
+}
+
 // ==================== ENTIDAD API ====================
 
 /**

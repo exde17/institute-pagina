@@ -8,6 +8,7 @@ import {
   removeBecado,
   generarLinkPagoMatricula,
   enviarEmailLinkPago,
+  updateMatriculaDocuments,
   type Matricula,
   type Entidad,
   type Cuota,
@@ -23,6 +24,10 @@ export default function MatriculasAdmin() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedMatricula, setSelectedMatricula] = useState<Matricula | null>(null);
+
+  // Estado para actualizar documentos
+  const [updatingDocField, setUpdatingDocField] = useState<string | null>(null);
+  const [docUpdateMsg, setDocUpdateMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentMatricula, setPaymentMatricula] = useState<Matricula | null>(null);
   const [generatingLink, setGeneratingLink] = useState(false);
@@ -345,6 +350,45 @@ export default function MatriculasAdmin() {
     }
   }
 
+
+  async function handleUpdateDocument(
+    fieldName: 'documentoEstudiante' | 'diplomaCertificadoGrado10' | 'documentoAcudiente' | 'formularioMatricula',
+    file: File,
+  ) {
+    if (!selectedMatricula) return;
+
+    try {
+      setUpdatingDocField(fieldName);
+      setDocUpdateMsg(null);
+
+      const token = getToken();
+      if (!token) {
+        window.location.href = '/auth/login';
+        return;
+      }
+
+      const updated = await updateMatriculaDocuments(
+        selectedMatricula.id,
+        { [fieldName]: file },
+        token,
+      );
+
+      // Actualizar localmente la matricula seleccionada y la lista
+      setSelectedMatricula({ ...selectedMatricula, ...updated });
+      setMatriculas((prev) =>
+        prev.map((m) => (m.id === selectedMatricula.id ? { ...m, ...updated } : m)),
+      );
+
+      setDocUpdateMsg({ type: 'success', text: 'Documento actualizado correctamente' });
+    } catch (err) {
+      setDocUpdateMsg({
+        type: 'error',
+        text: err instanceof Error ? err.message : 'Error al actualizar documento',
+      });
+    } finally {
+      setUpdatingDocField(null);
+    }
+  }
 
   function getFilteredMatriculas(): Matricula[] {
     let result: Matricula[];
@@ -736,14 +780,14 @@ export default function MatriculasAdmin() {
 
       {/* Modal de documentos */}
       {selectedMatricula && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setSelectedMatricula(null)}>
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => { setSelectedMatricula(null); setDocUpdateMsg(null); }}>
           <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
               <h3 className="text-xl font-bold text-slate-900">
                 Documentos de {selectedMatricula.estudiante.firstName} {selectedMatricula.estudiante.lastName}
               </h3>
               <button
-                onClick={() => setSelectedMatricula(null)}
+                onClick={() => { setSelectedMatricula(null); setDocUpdateMsg(null); }}
                 className="p-2 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -803,75 +847,142 @@ export default function MatriculasAdmin() {
               {/* Documentos */}
               <div>
                 <h4 className="font-bold text-slate-900 mb-4">Documentos Cargados</h4>
+
+                {docUpdateMsg && (
+                  <div className={`mb-3 p-3 rounded-lg text-sm ${docUpdateMsg.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>
+                    {docUpdateMsg.text}
+                  </div>
+                )}
+
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {/* Documento estudiante */}
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors gap-3">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <svg className="w-8 h-8 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
-                      <div>
-                        <p className="font-semibold text-slate-900">Documento de identidad del estudiante</p>
-                      </div>
+                      <p className="font-semibold text-slate-900 truncate">Documento de identidad del estudiante</p>
                     </div>
-                    <button
-                      onClick={() => openDocument(selectedMatricula.documentoEstudiante)}
-                      className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
-                    >
-                      Ver
-                    </button>
-                  </div>
-
-                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <div>
-                        <p className="font-semibold text-slate-900">Certificado de estudio</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => openDocument(selectedMatricula.diplomaCertificadoGrado10)}
-                      className="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors cursor-pointer"
-                    >
-                      Ver
-                    </button>
-                  </div>
-
-                  {selectedMatricula.documentoAcudiente && (
-                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <div>
-                          <p className="font-semibold text-slate-900">Documento de identidad del acudiente</p>
-                        </div>
-                      </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       <button
-                        onClick={() => openDocument(selectedMatricula.documentoAcudiente!)}
-                        className="px-4 py-2 bg-amber-600 text-white text-sm font-semibold rounded-lg hover:bg-amber-700 transition-colors cursor-pointer"
+                        onClick={() => openDocument(selectedMatricula.documentoEstudiante)}
+                        className="px-3 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
                       >
                         Ver
                       </button>
+                      <label className={`px-3 py-2 bg-slate-700 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors cursor-pointer ${updatingDocField === 'documentoEstudiante' ? 'opacity-60 cursor-wait' : ''}`}>
+                        {updatingDocField === 'documentoEstudiante' ? 'Subiendo...' : 'Actualizar'}
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          className="hidden"
+                          disabled={updatingDocField !== null}
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleUpdateDocument('documentoEstudiante', f);
+                            e.target.value = '';
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Diploma */}
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors gap-3">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <svg className="w-8 h-8 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <p className="font-semibold text-slate-900 truncate">Certificado de estudio</p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <button
+                        onClick={() => openDocument(selectedMatricula.diplomaCertificadoGrado10)}
+                        className="px-3 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors cursor-pointer"
+                      >
+                        Ver
+                      </button>
+                      <label className={`px-3 py-2 bg-slate-700 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors cursor-pointer ${updatingDocField === 'diplomaCertificadoGrado10' ? 'opacity-60 cursor-wait' : ''}`}>
+                        {updatingDocField === 'diplomaCertificadoGrado10' ? 'Subiendo...' : 'Actualizar'}
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          className="hidden"
+                          disabled={updatingDocField !== null}
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleUpdateDocument('diplomaCertificadoGrado10', f);
+                            e.target.value = '';
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Documento acudiente (opcional) */}
+                  {selectedMatricula.documentoAcudiente && (
+                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors gap-3">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <svg className="w-8 h-8 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p className="font-semibold text-slate-900 truncate">Documento de identidad del acudiente</p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <button
+                          onClick={() => openDocument(selectedMatricula.documentoAcudiente!)}
+                          className="px-3 py-2 bg-amber-600 text-white text-sm font-semibold rounded-lg hover:bg-amber-700 transition-colors cursor-pointer"
+                        >
+                          Ver
+                        </button>
+                        <label className={`px-3 py-2 bg-slate-700 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors cursor-pointer ${updatingDocField === 'documentoAcudiente' ? 'opacity-60 cursor-wait' : ''}`}>
+                          {updatingDocField === 'documentoAcudiente' ? 'Subiendo...' : 'Actualizar'}
+                          <input
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            className="hidden"
+                            disabled={updatingDocField !== null}
+                            onChange={(e) => {
+                              const f = e.target.files?.[0];
+                              if (f) handleUpdateDocument('documentoAcudiente', f);
+                              e.target.value = '';
+                            }}
+                          />
+                        </label>
+                      </div>
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {/* Formulario matricula */}
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors gap-3">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <svg className="w-8 h-8 text-purple-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
-                      <div>
-                        <p className="font-semibold text-slate-900">Consentimiento de matrícula</p>
-                      </div>
+                      <p className="font-semibold text-slate-900 truncate">Consentimiento de matrícula</p>
                     </div>
-                    <button
-                      onClick={() => openDocument(selectedMatricula.formularioMatricula)}
-                      className="px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 transition-colors cursor-pointer"
-                    >
-                      Ver
-                    </button>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <button
+                        onClick={() => openDocument(selectedMatricula.formularioMatricula)}
+                        className="px-3 py-2 bg-purple-600 text-white text-sm font-semibold rounded-lg hover:bg-purple-700 transition-colors cursor-pointer"
+                      >
+                        Ver
+                      </button>
+                      <label className={`px-3 py-2 bg-slate-700 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors cursor-pointer ${updatingDocField === 'formularioMatricula' ? 'opacity-60 cursor-wait' : ''}`}>
+                        {updatingDocField === 'formularioMatricula' ? 'Subiendo...' : 'Actualizar'}
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          className="hidden"
+                          disabled={updatingDocField !== null}
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handleUpdateDocument('formularioMatricula', f);
+                            e.target.value = '';
+                          }}
+                        />
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
