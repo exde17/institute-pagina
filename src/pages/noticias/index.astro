@@ -30,11 +30,11 @@ const otrasNoticias = sortedNoticias.slice(1);
     <div class="absolute bottom-0 right-0 w-72 h-72 bg-purple-500 rounded-full blur-3xl opacity-20 animate-pulse" style="animation-delay: 1s"></div>
     
     <div class="relative mx-auto max-w-6xl px-4 text-center">
-      <div class="inline-block mb-4 px-4 py-2 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-full text-sm font-semibold">
-        📰 Actualidad Institucional
+      <div class="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-full text-sm font-semibold">
+        <i class="fa-solid fa-newspaper"></i> Actualidad institucional
       </div>
       <h1 class="text-4xl md:text-6xl font-extrabold mb-6 bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
-        Noticias y Novedades
+        Noticias y novedades
       </h1>
       <p class="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
         Mantente informado sobre nuestras últimas actividades, logros, eventos y todo lo que sucede 
@@ -58,7 +58,7 @@ const otrasNoticias = sortedNoticias.slice(1);
   <section class="mx-auto max-w-7xl px-4 py-16">
     {sortedNoticias.length === 0 ? (
       <div class="text-center py-20">
-        <div class="text-6xl mb-4">📰</div>
+        <i class="fa-solid fa-newspaper text-6xl text-slate-300 mb-4 block"></i>
         <p class="text-slate-600 text-xl">No hay noticias disponibles en este momento.</p>
         <p class="text-slate-500 mt-2">Vuelve pronto para ver nuestras novedades.</p>
       </div>
@@ -68,8 +68,8 @@ const otrasNoticias = sortedNoticias.slice(1);
         {noticiaDestacada && (
           <div class="mb-16">
             <div class="flex items-center gap-2 mb-6">
-              <span class="text-2xl">⭐</span>
-              <h2 class="text-2xl font-bold text-slate-900">Noticia Destacada</h2>
+              <i class="fa-solid fa-star text-amber-400 text-xl"></i>
+              <h2 class="text-2xl font-bold text-slate-900">Noticia destacada</h2>
             </div>
             
             <article class="group bg-white rounded-3xl overflow-hidden shadow-2xl border border-slate-200 hover:shadow-3xl transition-all duration-500">
@@ -88,8 +88,8 @@ const otrasNoticias = sortedNoticias.slice(1);
                 {/* Contenido */}
                 <div class="p-8 md:p-12 flex flex-col justify-center">
                   <div class="flex items-center gap-3 mb-4">
-                    <span class="px-4 py-1 bg-gradient-to-r from-blue-100 to-blue-50 text-blue-700 rounded-full text-sm font-bold border border-blue-200">
-                      🔥 Más reciente
+                    <span class="inline-flex items-center gap-1.5 px-4 py-1 bg-gradient-to-r from-blue-100 to-blue-50 text-blue-700 rounded-full text-sm font-bold border border-blue-200">
+                      <i class="fa-solid fa-fire"></i> Más reciente
                     </span>
                     <span class="text-sm text-slate-500 font-medium">
                       {formatDate(noticiaDestacada.data.fecha)}
@@ -123,8 +123,8 @@ const otrasNoticias = sortedNoticias.slice(1);
         {otrasNoticias.length > 0 && (
           <div>
             <h2 class="text-2xl font-bold text-slate-900 mb-8 flex items-center gap-2">
-              <span>📋</span>
-              Todas las Noticias
+              <i class="fa-solid fa-list text-slate-500"></i>
+              Todas las noticias
             </h2>
             
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -147,22 +147,22 @@ const otrasNoticias = sortedNoticias.slice(1);
                       </div>
                     ) : (
                       <div class="aspect-video bg-slate-200 flex items-center justify-center">
-                        <span class="text-6xl">📰</span>
+                        <i class="fa-solid fa-newspaper text-5xl text-slate-400"></i>
                       </div>
                     )}
 
                     {/* Badge de fecha */}
                     <div class="absolute top-4 right-4">
-                      <span class="badge-date bg-white/95 backdrop-blur-sm text-slate-700 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg border border-slate-200">
-                        📅 {formatDate(noticia.data.fecha)}
+                      <span class="badge-date inline-flex items-center gap-1.5 bg-white/95 backdrop-blur-sm text-slate-700 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg border border-slate-200">
+                        <i class="fa-regular fa-calendar"></i> {formatDate(noticia.data.fecha)}
                       </span>
                     </div>
 
                     {/* Badge destacado */}
                     {noticia.data.destacado && (
                       <div class="absolute top-4 left-4">
-                        <span class="bg-amber-400 text-amber-900 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                          ⭐ Destacado
+                        <span class="inline-flex items-center gap-1 bg-amber-400 text-amber-900 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                          <i class="fa-solid fa-star text-xs"></i> Destacado
                         </span>
                       </div>
                     )}
@@ -207,7 +207,7 @@ const otrasNoticias = sortedNoticias.slice(1);
   <section class="bg-gradient-to-r from-blue-600 via-blue-700 to-purple-600 text-white py-16 mt-16">
     <div class="mx-auto max-w-4xl px-4 text-center">
       <h2 class="text-3xl md:text-4xl font-bold mb-4">
-        ¿Quieres Recibir Nuestras Noticias?
+        ¿Quieres recibir nuestras noticias?
       </h2>
       <p class="text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
         Mantente al día con todas nuestras actividades, eventos y logros. 
@@ -217,7 +217,7 @@ const otrasNoticias = sortedNoticias.slice(1);
         href="/contacto" 
         class="inline-block px-8 py-4 bg-white text-blue-700 font-bold rounded-full shadow-xl hover:bg-blue-50 hover:scale-105 transition-all duration-300"
       >
-        Contactar Ahora →
+        Contactar ahora →
       </a>
     </div>
   </section>
