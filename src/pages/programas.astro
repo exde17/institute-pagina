@@ -260,16 +260,16 @@ const programasDataFallback = [
   <section class="mx-auto max-w-7xl px-4 py-12">
     <header class="mb-12 text-center animate-fade-in">
       <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-800 via-purple-700 to-blue-600 bg-clip-text text-transparent mb-4">
-        Nuestros Programas de Formación
+        Nuestros programas de formación
       </h1>
       <div class="w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto rounded-full mb-6"></div>
       <p class="text-lg text-slate-600 max-w-3xl mx-auto">
         Explora nuestra oferta completa de programas diseñados para transformar tu futuro profesional y personal.
       </p>
       <div class="mt-6 flex flex-wrap justify-center gap-3">
-        <span id="programas-count" class="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">📚 6 Programas</span>
-        <span class="px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-semibold">👥 +500 Estudiantes</span>
-        <span class="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-semibold">✓ Certificados</span>
+        <span id="programas-count" class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold"><i class="fa-solid fa-book"></i> 6 Programas</span>
+        <span class="inline-flex items-center gap-1.5 px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-semibold"><i class="fa-solid fa-users"></i> +500 Estudiantes</span>
+        <span class="inline-flex items-center gap-1.5 px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-semibold"><i class="fa-solid fa-certificate"></i> Certificados</span>
       </div>
     </header>
 
@@ -319,8 +319,8 @@ const programasDataFallback = [
 
             <!-- Detalles del programa -->
             <div class="mb-4 space-y-2">
-              <h3 class="text-sm font-bold text-slate-700 mb-2">📋 Contenido del programa:</h3>
-              
+              <h3 class="text-sm font-bold text-slate-700 mb-2 flex items-center gap-1.5"><i class="fa-solid fa-list-ul"></i> Contenido del programa:</h3>
+
               {/* Si el programa tiene semestres, mostrar estructura semestral */}
               {programa.semestres ? (
                 <div class="space-y-3">
@@ -351,7 +351,7 @@ const programasDataFallback = [
                   </div>
                   
                   <div class="semestres-full hidden">
-                    {programa.semestres.map((semestre, idx) => (
+                    {programa.semestres.map((semestre) => (
                       <div class="bg-gradient-to-br from-slate-50 to-blue-50 rounded-lg p-4 border-2 border-blue-200 mb-3">
                         <div class="flex items-center gap-3 mb-3">
                           <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white flex items-center justify-center text-sm font-bold shadow-lg">
@@ -459,7 +459,7 @@ const programasDataFallback = [
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
             </svg>
           </div>
-          <h3 class="text-xl font-bold text-slate-900 mb-2" id="success-title">¡Inscripción Exitosa!</h3>
+          <h3 class="text-xl font-bold text-slate-900 mb-2" id="success-title">¡Inscripción exitosa!</h3>
           <p class="text-slate-600 mb-6" id="success-message">Pronto nos pondremos en contacto contigo.</p>
           <button id="success-close" class="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-3 rounded-xl font-bold transform hover:scale-105 transition-all duration-300">
             ¡Perfecto!
@@ -493,7 +493,7 @@ const programasDataFallback = [
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
           </div>
-          <h3 class="text-xl font-bold text-slate-900 mb-2" id="confirm-title">Confirmar Inscripción</h3>
+          <h3 class="text-xl font-bold text-slate-900 mb-2" id="confirm-title">Confirmar inscripción</h3>
           <p class="text-slate-600 mb-6" id="confirm-message">¿Confirmas tu inscripción?</p>
           <div class="flex gap-3">
             <button id="confirm-cancel" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-3 rounded-xl font-bold transform hover:scale-105 transition-all duration-300">
@@ -654,11 +654,9 @@ const programasDataFallback = [
     // Importar la función de la API
     import { getProgramas } from '../lib/auth.ts';
 
-    // Variable global para almacenar los programas cargados
-    let programasCargados = [];
 
     // Función para mostrar modal de éxito
-    function showSuccessModal(title, message) {
+    function showSuccessModal(title: string, message: string) {
       const modal = document.getElementById('success-modal');
       const titleEl = document.getElementById('success-title');
       const messageEl = document.getElementById('success-message');
@@ -690,7 +688,7 @@ const programasDataFallback = [
     }
 
     // Función para mostrar modal de error
-    function showErrorModal(title, message) {
+    function showErrorModal(title: string, message: string) {
       const modal = document.getElementById('error-modal');
       const titleEl = document.getElementById('error-title');
       const messageEl = document.getElementById('error-message');
@@ -722,7 +720,7 @@ const programasDataFallback = [
     }
 
     // Función para mostrar modal de confirmación
-    function showConfirmModal(title, message) {
+    function showConfirmModal(title: string, message: string) {
       return new Promise((resolve) => {
         const modal = document.getElementById('confirm-modal');
         const titleEl = document.getElementById('confirm-title');
@@ -747,7 +745,7 @@ const programasDataFallback = [
         // Mostrar modal
         modal.classList.add('active');
 
-        const closeModal = (result) => {
+        const closeModal = (result: boolean) => {
           modal.classList.remove('active');
           document.body.classList.remove('modal-open');
           resolve(result);
@@ -762,7 +760,7 @@ const programasDataFallback = [
     }
 
     // Función para mostrar modal de prompt
-    function showPromptModal(title, message, defaultValue = '') {
+    function showPromptModal(title: string, message: string, defaultValue = '') {
       return new Promise((resolve) => {
         const modal = document.getElementById('prompt-modal');
         const titleEl = document.getElementById('prompt-title');
@@ -789,7 +787,7 @@ const programasDataFallback = [
         // Mostrar modal
         modal.classList.add('active');
 
-        const closeModal = (result) => {
+        const closeModal = (result: string | null) => {
           modal.classList.remove('active');
           document.body.classList.remove('modal-open');
           resolve(result);
@@ -812,10 +810,7 @@ const programasDataFallback = [
     }
 
     // Función para renderizar los programas
-    function renderProgramas(programas) {
-      // Guardar los programas para usarlos en la inscripción
-      programasCargados = programas;
-      
+    function renderProgramas(programas: any[]) {
       const grid = document.getElementById('programas-grid');
       const countSpan = document.getElementById('programas-count');
       
@@ -823,7 +818,7 @@ const programasDataFallback = [
       
       // Actualizar contador
       if (countSpan) {
-        countSpan.textContent = `📚 ${programas.length} Programas`;
+        countSpan.innerHTML = `<i class="fa-solid fa-book"></i> ${programas.length} Programas`;
       }
       
       // Limpiar grid
@@ -853,13 +848,13 @@ const programasDataFallback = [
         // Renderizar semestres o detalles
         let contenidoPrograma = '';
         // Filtrar semestres válidos (objetos con propiedad materias)
-        const semestresValidos = (programa.semestres || []).filter(s => s && s.materias && s.materias.length > 0);
+        const semestresValidos = (programa.semestres || []).filter((s: any) => s && s.materias && s.materias.length > 0);
         if (semestresValidos.length > 0) {
           // Mostrar estructura de semestres
           contenidoPrograma = `
             <div class="space-y-3">
               <div class="semestres-preview">
-                ${semestresValidos.map((semestre, idx) => `
+                ${semestresValidos.map((semestre: any, idx: number) => `
                   <div class="bg-slate-50 rounded-lg p-3 border border-slate-200">
                     <div class="flex items-center gap-2 mb-2">
                       <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white flex items-center justify-center text-xs font-bold">
@@ -871,7 +866,7 @@ const programasDataFallback = [
                       </div>
                     </div>
                     <ul class="space-y-1 ml-10">
-                      ${semestre.materias.slice(0, idx === 0 ? 2 : 0).map(materia => `
+                      ${semestre.materias.slice(0, idx === 0 ? 2 : 0).map((materia: any) => `
                         <li class="text-xs text-slate-600 flex items-start gap-2">
                           <svg class="w-3 h-3 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
@@ -885,7 +880,7 @@ const programasDataFallback = [
               </div>
               
               <div class="semestres-full hidden">
-                ${semestresValidos.map(semestre => `
+                ${semestresValidos.map((semestre: any) => `
                   <div class="bg-gradient-to-br from-slate-50 to-blue-50 rounded-lg p-4 border-2 border-blue-200 mb-3">
                     <div class="flex items-center gap-3 mb-3">
                       <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white flex items-center justify-center text-sm font-bold shadow-lg">
@@ -897,7 +892,7 @@ const programasDataFallback = [
                       </div>
                     </div>
                     <ul class="space-y-2 ml-13">
-                      ${semestre.materias.map(materia => `
+                      ${semestre.materias.map((materia: any) => `
                         <li class="text-xs text-slate-700 flex items-start gap-2 bg-white px-3 py-2 rounded-md shadow-sm">
                           <svg class="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
@@ -915,7 +910,7 @@ const programasDataFallback = [
           // Mostrar lista de detalles tradicional
           contenidoPrograma = `
             <ul class="space-y-1">
-              ${programa.detalles.slice(0, 3).map(detalle => `
+              ${programa.detalles.slice(0, 3).map((detalle: any) => `
                 <li class="text-xs text-slate-600 flex items-start gap-2">
                   <svg class="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
@@ -961,7 +956,7 @@ const programasDataFallback = [
 
             <!-- Detalles del programa -->
             <div class="mb-4 space-y-2">
-              <h3 class="text-sm font-bold text-slate-700 mb-2">📋 Contenido del programa:</h3>
+              <h3 class="text-sm font-bold text-slate-700 mb-2 flex items-center gap-1.5"><i class="fa-solid fa-list-ul"></i> Contenido del programa:</h3>
               ${contenidoPrograma}
               <button
                 class="show-more-btn text-xs text-blue-600 hover:text-blue-800 font-semibold mt-2 flex items-center gap-1"
@@ -1107,7 +1102,7 @@ const programasDataFallback = [
           // Verificar que tenemos el ID del programa
           if (!programaId) {
             console.error('Error: No se pudo obtener el ID del programa');
-            await showErrorModal(
+            showErrorModal(
               'Error',
               'No se pudo obtener la información del programa. Por favor, recarga la página e intenta nuevamente.'
             );
@@ -1204,7 +1199,7 @@ const programasDataFallback = [
                 mensaje = `¡Inscripción exitosa! Te has inscrito en "${programaNombre}".`;
               }
               
-              await showSuccessModal('¡Inscripción Exitosa!', `${mensaje} Pronto nos pondremos en contacto contigo.`);
+              showSuccessModal('¡Inscripción exitosa!', `${mensaje} Pronto nos pondremos en contacto contigo.`);
               
               // Cambiar el botón para indicar que ya está inscrito
               button.innerHTML = `
@@ -1229,7 +1224,7 @@ const programasDataFallback = [
                 
                 // Manejar caso específico de inscripción duplicada (409)
                 if (response.status === 409) {
-                  errorTitle = 'Inscripción Ya Existente';
+                  errorTitle = 'Inscripción ya existente';
                   errorMessage = errorData.message || 'Ya existe una inscripción para este usuario en este programa';
                 } else {
                   errorMessage = errorData.message || errorData.error || 'Error al procesar la inscripción';
@@ -1239,7 +1234,7 @@ const programasDataFallback = [
                 errorMessage = `Error ${response.status}: ${response.statusText}`;
               }
               
-              await showErrorModal(errorTitle, errorMessage);
+              showErrorModal(errorTitle, errorMessage);
               
               // Restaurar el botón
               button.disabled = false;
@@ -1255,7 +1250,7 @@ const programasDataFallback = [
           } catch (error) {
             console.error('=== ERROR AL PROCESAR INSCRIPCIÓN ===');
             console.error('Detalles del error:', error);
-            await showErrorModal('Error de Conexión', 'Error de conexión. Por favor, intenta nuevamente.');
+            showErrorModal('Error de Conexión', 'Error de conexión. Por favor, intenta nuevamente.');
             
             // Restaurar el botón
             button.disabled = false;
