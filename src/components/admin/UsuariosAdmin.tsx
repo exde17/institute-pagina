@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
 import {
   getUsuarios,
   changeUserPassword,
+  toggleUserStatus,
   type Usuario,
   type PaginationInfo,
 } from '../../lib/matriculaApi';
@@ -122,7 +124,12 @@ export default function UsuariosAdmin() {
         token
       );
 
-      alert('Contraseña cambiada exitosamente');
+      await Swal.fire({
+        icon: 'success',
+        title: '¡Éxito!',
+        text: 'Contraseña cambiada exitosamente',
+        confirmButtonColor: '#f59e0b',
+      });
       closePasswordModal();
       await loadUsuarios(); // Recargar usuario con misma paginación
     } catch (err) {
@@ -132,6 +139,53 @@ export default function UsuariosAdmin() {
       console.error('Error changing password:', err);
     } finally {
       setChanging(false);
+    }
+  }
+
+  async function handleDeleteUsuario(usuario: Usuario) {
+    const result = await Swal.fire({
+      title: 'Desactivar usuario',
+      html: `¿Está seguro de que desea desactivar a <strong>${usuario.firstName} ${usuario.lastName}</strong>?<br><br><small class="text-gray-500">El usuario no podrá acceder a su cuenta hasta que sea reactivado.</small>`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#f59e0b',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Desactivar',
+      cancelButtonText: 'Cancelar',
+      buttonsStyling: false,
+      customClass: {
+        confirmButton: 'px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-semibold mr-2',
+        cancelButton: 'px-4 py-2 bg-slate-500 hover:bg-slate-600 text-white rounded-lg font-semibold',
+      },
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const token = getToken();
+      if (!token) {
+        window.location.href = '/auth/login';
+        return;
+      }
+
+      await toggleUserStatus(usuario.id, false, token);
+
+      await Swal.fire({
+        icon: 'success',
+        title: '¡Éxito!',
+        text: 'Usuario desactivado exitosamente',
+        confirmButtonColor: '#f59e0b',
+      });
+
+      await loadUsuarios();
+    } catch (err) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err instanceof Error ? err.message : 'Error al desactivar el usuario',
+        confirmButtonColor: '#f59e0b',
+      });
+      console.error('Error toggling user status:', err);
     }
   }
 
@@ -253,6 +307,7 @@ export default function UsuariosAdmin() {
                       </button>
                       <button
                         type="button"
+                        onClick={() => handleDeleteUsuario(usuario)}
                         className="inline-flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white px-3 py-1 rounded text-sm font-semibold transition-colors shadow-sm"
                         title="Eliminar usuario"
                       >

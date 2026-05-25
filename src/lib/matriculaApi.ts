@@ -899,3 +899,24 @@ export async function changeUserPassword(userId: string, newPassword: string, to
     throw new Error(errorData?.message || `Error ${res.status}: No se pudo cambiar la contraseña`);
   }
 }
+
+/**
+ * Activa o desactiva un usuario
+ */
+export async function toggleUserStatus(userId: string, isActive: boolean, token: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/auth/users/${userId}/status`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ isActive }),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(
+      errorData?.message || `Error ${res.status}: No se pudo ${isActive ? 'activar' : 'desactivar'} el usuario`
+    );
+  }
+}
