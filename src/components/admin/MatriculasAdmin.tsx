@@ -780,9 +780,9 @@ export default function MatriculasAdmin() {
 
       {/* Modal de documentos */}
       {selectedMatricula && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => { setSelectedMatricula(null); setDocUpdateMsg(null); }}>
-          <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => { setSelectedMatricula(null); setDocUpdateMsg(null); }}>
+          <div className="flex w-full max-w-3xl max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
               <h3 className="text-xl font-bold text-slate-900">
                 Documentos de {selectedMatricula.estudiante.firstName} {selectedMatricula.estudiante.lastName}
               </h3>
@@ -796,7 +796,7 @@ export default function MatriculasAdmin() {
               </button>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
               {/* Información del estudiante */}
               <div className="bg-slate-50 rounded-lg p-4">
                 <h4 className="font-bold text-slate-900 mb-3">Información del Estudiante</h4>
@@ -993,13 +993,13 @@ export default function MatriculasAdmin() {
 
       {/* Modal de beca */}
       {showBecaModal && becaMatricula && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={closeBecaModal}>
-          <div className="bg-white rounded-lg max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-            <div className="bg-gradient-to-r from-amber-600 to-amber-700 px-6 py-4 rounded-t-lg">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={closeBecaModal}>
+          <div className="flex w-full max-w-md max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-gradient-to-r from-amber-600 to-amber-700 px-6 py-4">
               <h3 className="text-xl font-bold text-white">Gestionar Beca</h3>
             </div>
 
-            <div className="p-6 space-y-4">
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
               <div className="bg-slate-50 rounded-lg p-4">
                 <p className="text-sm text-slate-600">
                   <span className="font-semibold">Estudiante:</span> {becaMatricula.estudiante.firstName} {becaMatricula.estudiante.lastName}
@@ -1068,9 +1068,9 @@ export default function MatriculasAdmin() {
 
       {/* Modal de cuotas */}
       {showCuotasModal && cuotasMatricula && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={closeCuotasModal}>
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4 rounded-t-lg flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={closeCuotasModal}>
+          <div className="flex w-full max-w-2xl max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
               <h3 className="text-xl font-bold text-white">Cuotas de Pago</h3>
               <button
                 onClick={closeCuotasModal}
@@ -1082,7 +1082,7 @@ export default function MatriculasAdmin() {
               </button>
             </div>
 
-            <div className="p-6 space-y-4">
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
               <div className="bg-slate-50 rounded-lg p-4">
                 <p className="text-sm text-slate-600">
                   <span className="font-semibold">Estudiante:</span> {cuotasMatricula.estudiante.firstName} {cuotasMatricula.estudiante.lastName}
@@ -1138,13 +1138,13 @@ export default function MatriculasAdmin() {
 
       {/* Modal de pago - Confirmación de envío de link */}
       {showPaymentModal && paymentMatricula && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={closePaymentModal}>
-          <div className="bg-white rounded-lg max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-            <div className="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 rounded-t-lg">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={closePaymentModal}>
+          <div className="flex w-full max-w-md max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
               <h3 className="text-xl font-bold text-white">Enviar Link de Pago</h3>
             </div>
 
-            <div className="p-6 space-y-4">
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
               {/* Resultado del envío */}
               {sendResult && (
                 <div className={`p-4 rounded-lg ${sendResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>

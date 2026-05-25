@@ -230,26 +230,48 @@ export default function UsuariosAdmin() {
                     </span>
                   </td>
                   <td className="px-6 py-3">
-                    <button
-                      onClick={() => openPasswordModal(usuario)}
-                      className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm font-semibold transition-colors"
-                      title="Cambiar contraseña"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => openPasswordModal(usuario)}
+                        className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded text-sm font-semibold transition-colors"
+                        title="Cambiar contraseña"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-                        />
-                      </svg>
-                      Cambiar contraseña
-                    </button>
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                          />
+                        </svg>
+                        Cambiar contraseña
+                      </button>
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white px-3 py-1 rounded text-sm font-semibold transition-colors shadow-sm"
+                        title="Eliminar usuario"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3m-4 0h14"
+                          />
+                        </svg>
+                        Eliminar usuario
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

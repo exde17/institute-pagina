@@ -18,7 +18,8 @@ import Layout from '../layouts/Layout.astro';
         </div>
         <button
           id="btn-export-excel"
-          class="hidden inline-flex items-center gap-2 bg-green-600 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-green-700 transition-colors shadow-md"
+          hidden
+          class="inline-flex items-center gap-2 bg-green-600 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-green-700 transition-colors shadow-md"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -53,6 +54,9 @@ import Layout from '../layouts/Layout.astro';
       </table>
     </div>
 
+    <!-- Paginacion -->
+    <div id="pagination-container" hidden class="flex flex-wrap items-center justify-between gap-4 bg-white rounded-lg shadow-md border border-slate-200 px-6 py-3 mt-4"></div>
+
     <!-- Empty State -->
     <div id="empty-state" class="hidden text-center py-12">
       <svg class="w-24 h-24 text-slate-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -63,28 +67,28 @@ import Layout from '../layouts/Layout.astro';
     </div>
 
     <!-- Modal de éxito -->
-    <div id="success-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div id="success-modal" hidden class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
         <svg class="w-16 h-16 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
         </svg>
         <h3 class="text-xl font-bold text-slate-900 text-center mb-2">¡Éxito!</h3>
         <p id="success-message" class="text-slate-600 text-center"></p>
-        <button onclick="document.getElementById('success-modal').classList.add('hidden')" class="w-full mt-6 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+        <button onclick="document.getElementById('success-modal')?.setAttribute('hidden', '')" class="w-full mt-6 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
           Cerrar
         </button>
       </div>
     </div>
 
     <!-- Modal de error -->
-    <div id="error-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div id="error-modal" hidden class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div class="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
         <svg class="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
         </svg>
         <h3 class="text-xl font-bold text-slate-900 text-center mb-2">Error</h3>
         <p id="error-message" class="text-slate-600 text-center"></p>
-        <button onclick="document.getElementById('error-modal').classList.add('hidden')" class="w-full mt-6 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition-colors font-medium">
+        <button onclick="document.getElementById('error-modal')?.setAttribute('hidden', '')" class="w-full mt-6 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition-colors font-medium">
           Cerrar
         </button>
       </div>
@@ -103,6 +107,8 @@ import Layout from '../layouts/Layout.astro';
     }
 
     let inscripcionesData: Awaited<ReturnType<typeof getInscripciones>> = [];
+    let currentPage = 1;
+    let pageSize = 10;
 
     function checkAdminAccess() {
       const user = getUser();
@@ -142,6 +148,111 @@ import Layout from '../layouts/Layout.astro';
       return `<span class="${s.bg} ${s.text} px-3 py-1 rounded-full text-sm font-medium">${s.icon} ${status}</span>`;
     }
 
+    function getPageInfo(totalItems: number) {
+      const totalPages = pageSize === 0 ? 1 : Math.ceil(totalItems / pageSize);
+      const safePage = Math.min(currentPage, totalPages || 1);
+      const paginatedItems = pageSize === 0
+        ? inscripcionesData
+        : inscripcionesData.slice((safePage - 1) * pageSize, safePage * pageSize);
+
+      return { totalPages, safePage, paginatedItems };
+    }
+
+    function renderPagination(totalItems: number) {
+      const paginationContainer = document.getElementById('pagination-container');
+      if (!paginationContainer) return;
+
+      if (!totalItems) {
+        paginationContainer.setAttribute('hidden', '');
+        paginationContainer.innerHTML = '';
+        return;
+      }
+
+      const totalPages = pageSize === 0 ? 1 : Math.ceil(totalItems / pageSize);
+      const safePage = Math.min(currentPage, totalPages || 1);
+      paginationContainer.removeAttribute('hidden');
+
+      if (pageSize !== 0 && totalPages > 1) {
+        paginationContainer.innerHTML = `
+          <div class="flex items-center gap-2 text-sm text-slate-600">
+            <span>Mostrar</span>
+            <select id="page-size-select" class="border border-slate-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="5" ${pageSize === 5 ? 'selected' : ''}>5</option>
+              <option value="10" ${pageSize === 10 ? 'selected' : ''}>10</option>
+              <option value="20" ${pageSize === 20 ? 'selected' : ''}>20</option>
+              <option value="50" ${pageSize === 50 ? 'selected' : ''}>50</option>
+              <option value="0" ${pageSize === 0 ? 'selected' : ''}>Todo</option>
+            </select>
+            <span>de ${totalItems} inscripciones</span>
+          </div>
+
+          <div class="flex items-center gap-1 ml-auto">
+            <button id="page-first" class="px-2 py-1 text-sm rounded hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer">&laquo;</button>
+            <button id="page-prev" class="px-2 py-1 text-sm rounded hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer">&lsaquo;</button>
+            <span class="px-3 py-1 text-sm rounded bg-blue-600 text-white">${safePage}</span>
+            <button id="page-next" class="px-2 py-1 text-sm rounded hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer">&rsaquo;</button>
+            <button id="page-last" class="px-2 py-1 text-sm rounded hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer">&raquo;</button>
+          </div>
+        `;
+
+        const pageSizeSelect = document.getElementById('page-size-select') as HTMLSelectElement | null;
+        pageSizeSelect?.addEventListener('change', (event) => {
+          pageSize = Number((event.target as HTMLSelectElement).value);
+          currentPage = 1;
+          renderInscripciones();
+        });
+
+        const firstButton = document.getElementById('page-first');
+        const prevButton = document.getElementById('page-prev');
+        const nextButton = document.getElementById('page-next');
+        const lastButton = document.getElementById('page-last');
+
+        firstButton?.addEventListener('click', () => {
+          currentPage = 1;
+          renderInscripciones();
+        });
+        prevButton?.addEventListener('click', () => {
+          currentPage = Math.max(1, safePage - 1);
+          renderInscripciones();
+        });
+        nextButton?.addEventListener('click', () => {
+          currentPage = Math.min(totalPages, safePage + 1);
+          renderInscripciones();
+        });
+        lastButton?.addEventListener('click', () => {
+          currentPage = totalPages;
+          renderInscripciones();
+        });
+
+        firstButton instanceof HTMLButtonElement && (firstButton.disabled = safePage <= 1);
+        prevButton instanceof HTMLButtonElement && (prevButton.disabled = safePage <= 1);
+        nextButton instanceof HTMLButtonElement && (nextButton.disabled = safePage >= totalPages);
+        lastButton instanceof HTMLButtonElement && (lastButton.disabled = safePage >= totalPages);
+        return;
+      }
+
+      paginationContainer.innerHTML = `
+        <div class="flex items-center gap-2 text-sm text-slate-600">
+          <span>Mostrar</span>
+          <select id="page-size-select" class="border border-slate-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="5" ${pageSize === 5 ? 'selected' : ''}>5</option>
+            <option value="10" ${pageSize === 10 ? 'selected' : ''}>10</option>
+            <option value="20" ${pageSize === 20 ? 'selected' : ''}>20</option>
+            <option value="50" ${pageSize === 50 ? 'selected' : ''}>50</option>
+            <option value="0" ${pageSize === 0 ? 'selected' : ''}>Todo</option>
+          </select>
+          <span>de ${totalItems} inscripciones</span>
+        </div>
+      `;
+
+      const pageSizeSelect = document.getElementById('page-size-select') as HTMLSelectElement | null;
+      pageSizeSelect?.addEventListener('change', (event) => {
+        pageSize = Number((event.target as HTMLSelectElement).value);
+        currentPage = 1;
+        renderInscripciones();
+      });
+    }
+
     async function renderInscripciones() {
       if (!checkAdminAccess()) return;
 
@@ -149,6 +260,7 @@ import Layout from '../layouts/Layout.astro';
       const tableContainer = document.getElementById('table-container');
       const emptyState = document.getElementById('empty-state');
       const loadingState = document.getElementById('loading-state');
+      const paginationContainer = document.getElementById('pagination-container');
 
       try {
         const inscripciones = await getInscripciones();
@@ -158,14 +270,18 @@ import Layout from '../layouts/Layout.astro';
 
         if (!inscripciones || inscripciones.length === 0) {
           emptyState?.classList.remove('hidden');
+          paginationContainer?.setAttribute('hidden', '');
           return;
         }
 
         tableContainer?.classList.remove('hidden');
-        document.getElementById('btn-export-excel')?.classList.remove('hidden');
+        document.getElementById('btn-export-excel')?.removeAttribute('hidden');
+
+        const { totalPages, safePage, paginatedItems } = getPageInfo(inscripciones.length);
+        currentPage = safePage;
 
         if (tbody) {
-          tbody.innerHTML = inscripciones.map(insc => {
+          tbody.innerHTML = paginatedItems.map(insc => {
           const user = insc.user;
           const programa = insc.programa;
           const pago = insc.pagos?.[0];
@@ -192,12 +308,14 @@ import Layout from '../layouts/Layout.astro';
           `;
         }).join('');
         }
+
+        renderPagination(inscripciones.length);
       } catch (error) {
         console.error('Error al cargar inscripciones:', error);
         loadingState?.classList.add('hidden');
         const errorMsg = document.getElementById('error-message');
         if (errorMsg) errorMsg.textContent = (error as Error).message || 'Error al cargar inscripciones';
-        document.getElementById('error-modal')?.classList.remove('hidden');
+        document.getElementById('error-modal')?.removeAttribute('hidden');
       }
     }
 
@@ -207,14 +325,14 @@ import Layout from '../layouts/Layout.astro';
         if (result?.url) {
           const successMsg = document.getElementById('success-message');
           if (successMsg) successMsg.textContent = 'Link de pago generado. Redirigiendo...';
-          document.getElementById('success-modal')?.classList.remove('hidden');
+          document.getElementById('success-modal')?.removeAttribute('hidden');
           setTimeout(() => window.open(result.url, '_blank'), 1500);
         }
       } catch (error) {
         console.error('Error al generar link:', error);
         const errorMsg = document.getElementById('error-message');
         if (errorMsg) errorMsg.textContent = (error as Error).message || 'Error al generar link de pago';
-        document.getElementById('error-modal')?.classList.remove('hidden');
+        document.getElementById('error-modal')?.removeAttribute('hidden');
       }
     };
 
