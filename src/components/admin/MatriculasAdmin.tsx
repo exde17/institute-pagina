@@ -780,23 +780,23 @@ export default function MatriculasAdmin() {
 
       {/* Modal de documentos */}
       {selectedMatricula && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => { setSelectedMatricula(null); setDocUpdateMsg(null); }}>
-          <div className="flex w-full max-w-3xl max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-              <h3 className="text-xl font-bold text-slate-900">
-                Documentos de {selectedMatricula.estudiante.firstName} {selectedMatricula.estudiante.lastName}
-              </h3>
-              <button
-                onClick={() => { setSelectedMatricula(null); setDocUpdateMsg(null); }}
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+        <div className="fixed top-0 left-0 right-0 bottom-0 z-50 flex items-start justify-center overflow-hidden bg-black/60 pt-16 pb-4" onClick={() => { setSelectedMatricula(null); setDocUpdateMsg(null); }}>
+          <div className="flex w-full max-w-3xl max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl mx-4" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+            <h3 className="text-xl font-bold text-slate-900">
+              Documentos de {selectedMatricula?.estudiante.firstName} {selectedMatricula?.estudiante.lastName}
+            </h3>
+            <button
+              onClick={() => { setSelectedMatricula(null); setDocUpdateMsg(null); }}
+              className="p-2 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            <div className="flex-1 p-6 space-y-6 overflow-hidden">
               {/* Información del estudiante */}
               <div className="bg-slate-50 rounded-lg p-4">
                 <h4 className="font-bold text-slate-900 mb-3">Información del Estudiante</h4>
@@ -993,13 +993,13 @@ export default function MatriculasAdmin() {
 
       {/* Modal de beca */}
       {showBecaModal && becaMatricula && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={closeBecaModal}>
-          <div className="flex w-full max-w-md max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="bg-gradient-to-r from-amber-600 to-amber-700 px-6 py-4">
-              <h3 className="text-xl font-bold text-white">Gestionar Beca</h3>
-            </div>
+        <div className="fixed top-0 left-0 right-0 bottom-0 z-50 flex items-start justify-center overflow-hidden bg-black/60 pt-16 pb-4" onClick={closeBecaModal}>
+          <div className="flex w-full max-w-md max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl mx-4" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-gradient-to-r from-amber-600 to-amber-700 px-6 py-4">
+            <h3 className="text-xl font-bold text-white">Gestionar Beca</h3>
+          </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div className="flex-1 p-6 space-y-4 overflow-hidden">
               <div className="bg-slate-50 rounded-lg p-4">
                 <p className="text-sm text-slate-600">
                   <span className="font-semibold">Estudiante:</span> {becaMatricula.estudiante.firstName} {becaMatricula.estudiante.lastName}
@@ -1068,10 +1068,10 @@ export default function MatriculasAdmin() {
 
       {/* Modal de cuotas */}
       {showCuotasModal && cuotasMatricula && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={closeCuotasModal}>
-          <div className="flex w-full max-w-2xl max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
-              <h3 className="text-xl font-bold text-white">Cuotas de Pago</h3>
+        <div className="fixed top-0 left-0 right-0 bottom-0 z-50 flex items-start justify-center overflow-hidden bg-black/60 pt-16 pb-4" onClick={closeCuotasModal}>
+          <div className="flex w-full max-w-2xl max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl mx-4" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center justify-between bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
+            <h3 className="text-xl font-bold text-white">Cuotas de Pago</h3>
               <button
                 onClick={closeCuotasModal}
                 className="p-2 hover:bg-white/20 rounded-lg transition-colors cursor-pointer"
@@ -1082,7 +1082,7 @@ export default function MatriculasAdmin() {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            <div className="flex-1 p-6 space-y-4 overflow-hidden">
               <div className="bg-slate-50 rounded-lg p-4">
                 <p className="text-sm text-slate-600">
                   <span className="font-semibold">Estudiante:</span> {cuotasMatricula.estudiante.firstName} {cuotasMatricula.estudiante.lastName}
@@ -1128,7 +1128,7 @@ export default function MatriculasAdmin() {
                 ))}
               </div>
 
-              {cuotasMatricula.cuotas.length === 0 && (
+              {cuotasMatricula?.cuotas.length === 0 && (
                 <p className="text-center text-slate-600 py-4">No hay cuotas registradas.</p>
               )}
             </div>
@@ -1138,14 +1138,14 @@ export default function MatriculasAdmin() {
 
       {/* Modal de pago - Confirmación de envío de link */}
       {showPaymentModal && paymentMatricula && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={closePaymentModal}>
-          <div className="flex w-full max-w-md max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
-              <h3 className="text-xl font-bold text-white">Enviar Link de Pago</h3>
-            </div>
+        <div className="fixed top-0 left-0 right-0 bottom-0 z-50 flex items-start justify-center overflow-hidden bg-black/60 pt-16 pb-4" onClick={closePaymentModal}>
+          <div className="flex w-full max-w-md max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl mx-4" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+            <h3 className="text-xl font-bold text-white">Enviar Link de Pago</h3>
+          </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
-              {/* Resultado del envío */}
+          <div className="flex-1 p-6 space-y-4 overflow-hidden">
+            {/* Resultado del envío */}
               {sendResult && (
                 <div className={`p-4 rounded-lg ${sendResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
                   <div className="flex items-center gap-2">

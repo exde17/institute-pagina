@@ -28,7 +28,6 @@ export default function UsuariosAdmin() {
     newPassword: '',
     confirmPassword: '',
   });
-  const [passwordError, setPasswordError] = useState('');
 
   // Debounce para búsqueda
   useEffect(() => {
@@ -76,7 +75,6 @@ export default function UsuariosAdmin() {
   function openPasswordModal(usuario: Usuario) {
     setSelectedUsuario(usuario);
     setPasswordForm({ newPassword: '', confirmPassword: '' });
-    setPasswordError('');
     setShowPasswordModal(true);
   }
 
@@ -84,7 +82,6 @@ export default function UsuariosAdmin() {
     setShowPasswordModal(false);
     setSelectedUsuario(null);
     setPasswordForm({ newPassword: '', confirmPassword: '' });
-    setPasswordError('');
   }
 
   async function handleChangePassword(e: React.FormEvent) {
@@ -92,23 +89,37 @@ export default function UsuariosAdmin() {
 
     // Validaciones
     if (!passwordForm.newPassword || !passwordForm.confirmPassword) {
-      setPasswordError('Por favor completa todos los campos');
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Campos incompletos',
+        text: 'Por favor completa todos los campos',
+        confirmButtonColor: '#f59e0b',
+      });
       return;
     }
 
     if (passwordForm.newPassword.length < 8) {
-      setPasswordError('La contraseña debe tener al menos 8 caracteres');
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Contraseña inválida',
+        text: 'La contraseña debe tener al menos 8 caracteres',
+        confirmButtonColor: '#f59e0b',
+      });
       return;
     }
 
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setPasswordError('Las contraseñas no coinciden');
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Validación',
+        text: 'Las contraseñas no coinciden',
+        confirmButtonColor: '#f59e0b',
+      });
       return;
     }
 
     try {
       setChanging(true);
-      setPasswordError('');
 
       const token = getToken();
       if (!token) {
@@ -133,9 +144,12 @@ export default function UsuariosAdmin() {
       closePasswordModal();
       await loadUsuarios(); // Recargar usuario con misma paginación
     } catch (err) {
-      setPasswordError(
-        err instanceof Error ? err.message : 'Error al cambiar la contraseña'
-      );
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err instanceof Error ? err.message : 'Error al cambiar la contraseña',
+        confirmButtonColor: '#f59e0b',
+      });
       console.error('Error changing password:', err);
     } finally {
       setChanging(false);
@@ -394,12 +408,6 @@ export default function UsuariosAdmin() {
             <p className="text-slate-600 mb-4">
               Usuario: <strong>{selectedUsuario.firstName} {selectedUsuario.lastName}</strong>
             </p>
-
-            {passwordError && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded mb-4 text-sm">
-                {passwordError}
-              </div>
-            )}
 
             <form onSubmit={handleChangePassword} className="space-y-4">
               <div>

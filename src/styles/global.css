@@ -4,3 +4,17 @@
 .prosa { /* buen look para artículos/texto largo */
   max-width: 65ch;
 }
+
+/* Asegurar que los modales se abran correctamente */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  position: relative;
+}
+
+/* Contenedor de modales - asegurar que no haya transform que interfiera */
+div[class*="fixed"][class*="inset-0"][class*="flex"][class*="items-center"][class*="justify-center"] {
+  position: fixed !important;
+}
