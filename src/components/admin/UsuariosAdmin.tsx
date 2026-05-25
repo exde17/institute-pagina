@@ -29,6 +29,17 @@ export default function UsuariosAdmin() {
     confirmPassword: '',
   });
 
+  // Validation errors
+  const [validationErrors, setValidationErrors] = useState<{
+    empty?: string;
+    length?: string;
+    match?: string;
+  }>({});
+
+  // Password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   // Debounce para búsqueda
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -75,6 +86,7 @@ export default function UsuariosAdmin() {
   function openPasswordModal(usuario: Usuario) {
     setSelectedUsuario(usuario);
     setPasswordForm({ newPassword: '', confirmPassword: '' });
+    setValidationErrors({});
     setShowPasswordModal(true);
   }
 
@@ -82,39 +94,62 @@ export default function UsuariosAdmin() {
     setShowPasswordModal(false);
     setSelectedUsuario(null);
     setPasswordForm({ newPassword: '', confirmPassword: '' });
+    setValidationErrors({});
+    setShowPassword(false);
+    setShowConfirmPassword(false);
+  }
+
+  function validatePasswordForm(form: typeof passwordForm) {
+    const errors: typeof validationErrors = {};
+
+    // Validar campos vacíos
+    if (!form.newPassword || !form.confirmPassword) {
+      errors.empty = 'Por favor completa todos los campos';
+    }
+
+    // Validar longitud mínima
+    if (form.newPassword && form.newPassword.length < 8) {
+      errors.length = 'La contraseña debe tener al menos 8 caracteres';
+    }
+
+    // Validar coincidencia
+    if (form.newPassword && form.confirmPassword && form.newPassword !== form.confirmPassword) {
+      errors.match = 'Las contraseñas no coinciden';
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  }
+
+  function getPasswordRequirements(password: string) {
+    return {
+      hasMinLength: password.length >= 8,
+      hasUppercase: /[A-Z]/.test(password),
+      hasLowercase: /[a-z]/.test(password),
+      hasNumber: /\d/.test(password),
+    };
+  }
+
+  function areAllRequirementsMet(password: string): boolean {
+    const req = getPasswordRequirements(password);
+    return req.hasMinLength && req.hasUppercase && req.hasLowercase && req.hasNumber;
+  }
+
+  function handlePasswordInputChange(field: 'newPassword' | 'confirmPassword', value: string) {
+    const newForm = { ...passwordForm, [field]: value };
+    setPasswordForm(newForm);
+    validatePasswordForm(newForm);
   }
 
   async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault();
 
-    // Validaciones
-    if (!passwordForm.newPassword || !passwordForm.confirmPassword) {
-      await Swal.fire({
-        icon: 'warning',
-        title: 'Campos incompletos',
-        text: 'Por favor completa todos los campos',
-        confirmButtonColor: '#f59e0b',
-      });
-      return;
-    }
-
-    if (passwordForm.newPassword.length < 8) {
-      await Swal.fire({
-        icon: 'warning',
-        title: 'Contraseña inválida',
-        text: 'La contraseña debe tener al menos 8 caracteres',
-        confirmButtonColor: '#f59e0b',
-      });
+    // Validar una última vez antes de enviar
+    if (!areAllRequirementsMet(passwordForm.newPassword)) {
       return;
     }
 
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      await Swal.fire({
-        icon: 'warning',
-        title: 'Validación',
-        text: 'Las contraseñas no coinciden',
-        confirmButtonColor: '#f59e0b',
-      });
       return;
     }
 
@@ -135,13 +170,14 @@ export default function UsuariosAdmin() {
         token
       );
 
+      closePasswordModal();
+
       await Swal.fire({
         icon: 'success',
         title: '¡Éxito!',
         text: 'Contraseña cambiada exitosamente',
         confirmButtonColor: '#f59e0b',
       });
-      closePasswordModal();
       await loadUsuarios(); // Recargar usuario con misma paginación
     } catch (err) {
       await Swal.fire({
@@ -400,7 +436,7 @@ export default function UsuariosAdmin() {
 
       {/* Password Modal */}
       {showPasswordModal && selectedUsuario && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">
               Cambiar contraseña
@@ -414,38 +450,158 @@ export default function UsuariosAdmin() {
                 <label className="block font-semibold text-slate-700 mb-2">
                   Nueva contraseña
                 </label>
-                <input
-                  type="password"
-                  value={passwordForm.newPassword}
-                  onChange={(e) =>
-                    setPasswordForm({
-                      ...passwordForm,
-                      newPassword: e.target.value,
-                    })
-                  }
-                  placeholder="Mínimo 8 caracteres"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  disabled={changing}
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={passwordForm.newPassword}
+                    onChange={(e) =>
+                      handlePasswordInputChange('newPassword', e.target.value)
+                    }
+                    placeholder="Mínimo 8 caracteres"
+                    className={`w-full px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+                      passwordForm.newPassword && !areAllRequirementsMet(passwordForm.newPassword)
+                        ? 'border-red-300 focus:ring-red-500'
+                        : passwordForm.newPassword && areAllRequirementsMet(passwordForm.newPassword)
+                        ? 'border-green-300 focus:ring-green-500'
+                        : 'border-slate-300 focus:ring-amber-500'
+                    }`}
+                    disabled={changing}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors disabled:opacity-50"
+                    disabled={changing}
+                  >
+                    {showPassword ? (
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                        <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 1019.542 10 10.002 10.002 0 003.707 2.293zM15.378 12.089l-4.89-4.89a4 4 0 00-5.678 5.678l4.89 4.89a4 4 0 005.678-5.678z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+                
+                {/* Requisitos de contraseña */}
+                {passwordForm.newPassword && (
+                  <div className="mt-3 p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                    <p className="text-xs font-semibold text-slate-600 uppercase">Requisitos:</p>
+                    <div className="space-y-1.5">
+                      <div className={`flex items-center gap-2 text-xs ${getPasswordRequirements(passwordForm.newPassword).hasMinLength ? 'text-green-700' : 'text-red-700'}`}>
+                        {getPasswordRequirements(passwordForm.newPassword).hasMinLength ? (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                        ) : (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                        <span>Al menos 8 caracteres ({passwordForm.newPassword.length})</span>
+                      </div>
+                      
+                      <div className={`flex items-center gap-2 text-xs ${getPasswordRequirements(passwordForm.newPassword).hasUppercase ? 'text-green-700' : 'text-red-700'}`}>
+                        {getPasswordRequirements(passwordForm.newPassword).hasUppercase ? (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                        ) : (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                        <span>Una letra mayúscula</span>
+                      </div>
+                      
+                      <div className={`flex items-center gap-2 text-xs ${getPasswordRequirements(passwordForm.newPassword).hasLowercase ? 'text-green-700' : 'text-red-700'}`}>
+                        {getPasswordRequirements(passwordForm.newPassword).hasLowercase ? (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                        ) : (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                        <span>Una letra minúscula</span>
+                      </div>
+                      
+                      <div className={`flex items-center gap-2 text-xs ${getPasswordRequirements(passwordForm.newPassword).hasNumber ? 'text-green-700' : 'text-red-700'}`}>
+                        {getPasswordRequirements(passwordForm.newPassword).hasNumber ? (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                        ) : (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                        <span>Un número</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>
                 <label className="block font-semibold text-slate-700 mb-2">
                   Confirmar contraseña
                 </label>
-                <input
-                  type="password"
-                  value={passwordForm.confirmPassword}
-                  onChange={(e) =>
-                    setPasswordForm({
-                      ...passwordForm,
-                      confirmPassword: e.target.value,
-                    })
-                  }
-                  placeholder="Repite la contraseña"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  disabled={changing}
-                />
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={passwordForm.confirmPassword}
+                    onChange={(e) =>
+                      handlePasswordInputChange('confirmPassword', e.target.value)
+                    }
+                    placeholder="Repite la contraseña"
+                    className={`w-full px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+                      passwordForm.confirmPassword && passwordForm.newPassword !== passwordForm.confirmPassword
+                        ? 'border-red-300 focus:ring-red-500'
+                        : passwordForm.confirmPassword && passwordForm.newPassword === passwordForm.confirmPassword
+                        ? 'border-green-300 focus:ring-green-500'
+                        : 'border-slate-300 focus:ring-amber-500'
+                    }`}
+                    disabled={changing}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors disabled:opacity-50"
+                    disabled={changing}
+                  >
+                    {showConfirmPassword ? (
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                        <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 1019.542 10 10.002 10.002 0 003.707 2.293zM15.378 12.089l-4.89-4.89a4 4 0 00-5.678 5.678l4.89 4.89a4 4 0 005.678-5.678z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+                {passwordForm.confirmPassword && passwordForm.newPassword !== passwordForm.confirmPassword && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                    Las contraseñas no coinciden
+                  </p>
+                )}
+                {passwordForm.confirmPassword && passwordForm.newPassword === passwordForm.confirmPassword && (
+                  <p className="mt-1 text-sm text-green-600 flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    Las contraseñas coinciden
+                  </p>
+                )}
               </div>
 
               <div className="flex gap-2 pt-4">
@@ -459,8 +615,8 @@ export default function UsuariosAdmin() {
                 </button>
                 <button
                   type="submit"
-                  disabled={changing}
-                  className="flex-1 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  disabled={changing || !areAllRequirementsMet(passwordForm.newPassword) || passwordForm.newPassword !== passwordForm.confirmPassword}
+                  className="flex-1 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {changing ? (
                     <>
