@@ -901,6 +901,31 @@ export async function changeUserPassword(userId: string, newPassword: string, to
 }
 
 /**
+ * Actualiza el programa de una inscripción
+ */
+export async function actualizarProgramaInscripcion(
+  inscripcionId: string,
+  programaId: string,
+  token: string
+): Promise<{ message: string; programaAnterior: string; programaNuevo: string }> {
+  const res = await fetch(`${API_BASE}/api/inscripcion/${inscripcionId}/programa`, {
+    method: 'PATCH',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ programaId }),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData?.message || `Error ${res.status}: No se pudo actualizar el programa`);
+  }
+
+  return res.json();
+}
+
+/**
  * Activa o desactiva un usuario
  */
 export async function toggleUserStatus(userId: string, isActive: boolean, token: string): Promise<void> {

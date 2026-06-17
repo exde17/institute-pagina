@@ -9,10 +9,12 @@ import {
   generarLinkPagoMatricula,
   enviarEmailLinkPago,
   updateMatriculaDocuments,
+  actualizarProgramaInscripcion,
   type Matricula,
   type Entidad,
   type Cuota,
 } from '../../lib/matriculaApi';
+import { programasApi, type Programa } from '../../lib/programasApi';
 import { getToken } from '../../lib/auth';
 
 type FilterType = 'TODOS' | 'PAGADO' | 'BECADO' | 'PENDIENTE';
@@ -47,6 +49,14 @@ export default function MatriculasAdmin() {
   // Estado para resultado del envío
   const [sendResult, setSendResult] = useState<{ success: boolean; message: string } | null>(null);
 
+  // Estados para cambio de programa
+  const [showCambiarProgramaModal, setShowCambiarProgramaModal] = useState(false);
+  const [cambiarProgramaMatricula, setCambiarProgramaMatricula] = useState<Matricula | null>(null);
+  const [programas, setProgramas] = useState<Programa[]>([]);
+  const [selectedProgramaId, setSelectedProgramaId] = useState('');
+  const [savingPrograma, setSavingPrograma] = useState(false);
+  const [cambiarProgramaMsg, setCambiarProgramaMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
   // Filtro activo
   const [activeFilter, setActiveFilter] = useState<FilterType>('TODOS');
 
@@ -60,6 +70,7 @@ export default function MatriculasAdmin() {
   useEffect(() => {
     loadMatriculas();
     loadEntidades();
+    loadProgramas();
   }, []);
 
   async function loadMatriculas() {
@@ -92,6 +103,60 @@ export default function MatriculasAdmin() {
       setEntidades(data);
     } catch (err) {
       console.error('Error loading entidades:', err);
+    }
+  }
+
+  async function loadProgramas() {
+    try {
+      const data = await programasApi.obtenerTodos();
+      setProgramas(data);
+    } catch (err) {
+      console.error('Error loading programas:', err);
+    }
+  }
+
+  function openCambiarProgramaModal(matricula: Matricula) {
+    setCambiarProgramaMatricula(matricula);
+    setSelectedProgramaId(matricula.inscripcion?.programa?.id ?? '');
+    setCambiarProgramaMsg(null);
+    setShowCambiarProgramaModal(true);
+  }
+
+  function closeCambiarProgramaModal() {
+    setShowCambiarProgramaModal(false);
+    setCambiarProgramaMatricula(null);
+    setSelectedProgramaId('');
+    setCambiarProgramaMsg(null);
+  }
+
+  async function handleCambiarPrograma() {
+    if (!cambiarProgramaMatricula || !selectedProgramaId) return;
+    if (selectedProgramaId === cambiarProgramaMatricula.inscripcion?.programa?.id) {
+      setCambiarProgramaMsg({ type: 'error', text: 'Selecciona un programa diferente al actual.' });
+      return;
+    }
+
+    const token = getToken();
+    if (!token) return;
+
+    try {
+      setSavingPrograma(true);
+      setCambiarProgramaMsg(null);
+      const result = await actualizarProgramaInscripcion(
+        cambiarProgramaMatricula.inscripcion.id,
+        selectedProgramaId,
+        token
+      );
+      setCambiarProgramaMsg({ type: 'success', text: result.message });
+      await loadMatriculas();
+      setTimeout(closeCambiarProgramaModal, 1500);
+    } catch (err) {
+      setCambiarProgramaMsg({
+        type: 'error',
+        text: err instanceof Error ? err.message : 'Error al cambiar el programa',
+      });
+    } finally {
+      setSavingPrograma(false);
     }
   }
 
@@ -201,7 +266,7 @@ export default function MatriculasAdmin() {
       }
 
       const nombreCompleto = `${paymentMatricula.estudiante.firstName} ${paymentMatricula.estudiante.lastName}`;
-      const nombrePrograma = paymentMatricula.inscripcion.programa.nombre;
+      const nombrePrograma = paymentMatricula.inscripcion?.programa?.nombre ?? '';
 
       // 1. Primero generar el link de Wompi (con cuotaId para referencia en el SKU)
       const wompiResult = await generarLinkPagoMatricula(
@@ -265,7 +330,7 @@ export default function MatriculasAdmin() {
 
       const monto = Number(cuota.monto);
       const nombreCompleto = `${cuotasMatricula.estudiante.firstName} ${cuotasMatricula.estudiante.lastName}`;
-      const nombrePrograma = cuotasMatricula.inscripcion.programa.nombre;
+      const nombrePrograma = cuotasMatricula.inscripcion?.programa?.nombre ?? '';
 
       // 1. Primero generar el link de Wompi (con cuota.id para referencia en el SKU)
       const wompiResult = await generarLinkPagoMatricula(
@@ -442,9 +507,9 @@ export default function MatriculasAdmin() {
       'Municipio Nacimiento': m.estudiante.municipioNacimiento?.nombre || '',
       'Email': m.estudiante.email,
       'Telefono': m.estudiante.telephone || '',
-      'Programa': m.inscripcion.programa.nombre,
-      'Modalidad': m.inscripcion.programa.modalidad || '',
-      'Categoria': m.inscripcion.programa.categoria || '',
+      'Programa': m.inscripcion?.programa?.nombre ?? '',
+      'Modalidad': m.inscripcion?.programa?.modalidad ?? '',
+      'Categoria': m.inscripcion?.programa?.categoria ?? '',
       'Tipo Pago': m.tipoPago === 'CONTADO' ? 'Contado' : m.tipoPago === 'CUOTAS' ? 'Cuotas' : 'No definido',
       'Valor Total': Number(m.valorTotal) || 0,
       'Estado': m.estadoMatricula === 'PAGADO' ? 'Pagado' : m.estadoMatricula === 'PAGO_PARCIAL' ? 'Pago Parcial' : 'Pendiente',
@@ -638,8 +703,8 @@ export default function MatriculasAdmin() {
                   </div>
                 </td>
                 <td className="px-4 py-4">
-                  <p className="font-semibold text-slate-900 text-sm">{matricula.inscripcion.programa.nombre}</p>
-                  <p className="text-xs text-slate-600">{matricula.inscripcion.programa.modalidad}</p>
+                  <p className="font-semibold text-slate-900 text-sm">{matricula.inscripcion?.programa?.nombre ?? 'Sin programa'}</p>
+                  <p className="text-xs text-slate-600">{matricula.inscripcion?.programa?.modalidad ?? ''}</p>
                 </td>
                 <td className="px-4 py-4">
                   {getTipoPagoBadge(matricula.tipoPago)}
@@ -826,19 +891,28 @@ export default function MatriculasAdmin() {
 
               {/* Información del programa */}
               <div className="bg-blue-50 rounded-lg p-4">
-                <h4 className="font-bold text-slate-900 mb-3">Programa Inscrito</h4>
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="font-bold text-slate-900">Programa Inscrito</h4>
+                  <button
+                    type="button"
+                    onClick={() => openCambiarProgramaModal(selectedMatricula)}
+                    className="px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Cambiar programa
+                  </button>
+                </div>
                 <div className="flex items-center gap-4">
-                  {selectedMatricula.inscripcion.programa.imagen && (
+                  {selectedMatricula.inscripcion?.programa?.imagen && (
                     <img
-                      src={selectedMatricula.inscripcion.programa.imagen}
-                      alt={selectedMatricula.inscripcion.programa.nombre}
+                      src={selectedMatricula.inscripcion?.programa?.imagen}
+                      alt={selectedMatricula.inscripcion?.programa?.nombre}
                       className="w-20 h-20 object-cover rounded-lg"
                     />
                   )}
                   <div>
-                    <p className="font-bold text-lg text-slate-900">{selectedMatricula.inscripcion.programa.nombre}</p>
+                    <p className="font-bold text-lg text-slate-900">{selectedMatricula.inscripcion?.programa?.nombre ?? 'Sin programa'}</p>
                     <p className="text-sm text-slate-700">
-                      {selectedMatricula.inscripcion.programa.modalidad} - {selectedMatricula.inscripcion.programa.duracion} semestres
+                      {selectedMatricula.inscripcion?.programa?.modalidad ?? ''}{selectedMatricula.inscripcion?.programa?.duracion ? ` - ${selectedMatricula.inscripcion?.programa?.duracion} semestres` : ''}
                     </p>
                   </div>
                 </div>
@@ -1005,7 +1079,7 @@ export default function MatriculasAdmin() {
                   <span className="font-semibold">Estudiante:</span> {becaMatricula.estudiante.firstName} {becaMatricula.estudiante.lastName}
                 </p>
                 <p className="text-sm text-slate-600">
-                  <span className="font-semibold">Programa:</span> {becaMatricula.inscripcion.programa.nombre}
+                  <span className="font-semibold">Programa:</span> {becaMatricula.inscripcion?.programa?.nombre ?? 'Sin programa'}
                 </p>
                 <p className="text-sm text-slate-600">
                   <span className="font-semibold">Estado actual:</span> {becaMatricula.esBecado ? 'Becado' : 'No becado'}
@@ -1172,7 +1246,7 @@ export default function MatriculasAdmin() {
                       <span className="font-semibold">Estudiante:</span> {paymentMatricula.estudiante.firstName} {paymentMatricula.estudiante.lastName}
                     </p>
                     <p className="text-sm text-slate-600">
-                      <span className="font-semibold">Programa:</span> {paymentMatricula.inscripcion.programa.nombre}
+                      <span className="font-semibold">Programa:</span> {paymentMatricula.inscripcion?.programa?.nombre ?? 'Sin programa'}
                     </p>
                     <p className="text-sm text-slate-600">
                       <span className="font-semibold">Tipo de pago:</span> {paymentMatricula.tipoPago === 'CONTADO' ? 'Contado' : 'Cuotas'}
@@ -1267,6 +1341,95 @@ export default function MatriculasAdmin() {
                   </div>
                 </>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal cambiar programa */}
+      {showCambiarProgramaModal && cambiarProgramaMatricula && (
+        <div
+          className="fixed top-0 left-0 right-0 bottom-0 z-50 flex items-start justify-center overflow-hidden bg-black/60 pt-16 pb-4"
+          onClick={closeCambiarProgramaModal}
+        >
+          <div
+            className="flex w-full max-w-md max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+              <h3 className="text-xl font-bold text-white">Cambiar Programa</h3>
+            </div>
+
+            <div className="flex-1 p-6 space-y-4 overflow-y-auto">
+              <div className="bg-slate-50 rounded-lg p-4">
+                <p className="text-sm text-slate-600">
+                  <span className="font-semibold">Estudiante:</span>{' '}
+                  {cambiarProgramaMatricula.estudiante.firstName} {cambiarProgramaMatricula.estudiante.lastName}
+                </p>
+                <p className="text-sm text-slate-600 mt-1">
+                  <span className="font-semibold">Programa actual:</span>{' '}
+                  {cambiarProgramaMatricula.inscripcion?.programa?.nombre ?? 'Sin programa'}
+                </p>
+              </div>
+
+              <div>
+                <label htmlFor="nuevo-programa" className="block text-sm font-semibold text-slate-900 mb-2">
+                  Nuevo Programa
+                </label>
+                <select
+                  id="nuevo-programa"
+                  value={selectedProgramaId}
+                  onChange={(e) => setSelectedProgramaId(e.target.value)}
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Selecciona un programa</option>
+                  {programas.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {cambiarProgramaMsg && (
+                <div
+                  className={`p-3 rounded-lg text-sm ${
+                    cambiarProgramaMsg.type === 'success'
+                      ? 'bg-green-50 text-green-800 border border-green-200'
+                      : 'bg-red-50 text-red-800 border border-red-200'
+                  }`}
+                >
+                  {cambiarProgramaMsg.text}
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3 px-6 py-4 border-t border-slate-200">
+              <button
+                type="button"
+                onClick={closeCambiarProgramaModal}
+                className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleCambiarPrograma}
+                disabled={savingPrograma || !selectedProgramaId}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {savingPrograma ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Guardando...
+                  </>
+                ) : (
+                  'Confirmar cambio'
+                )}
+              </button>
             </div>
           </div>
         </div>
