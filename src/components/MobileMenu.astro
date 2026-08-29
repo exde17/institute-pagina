@@ -36,11 +36,16 @@
         Contacto
       </a>
       
-      <!-- Enlace de Matrícula para usuarios no admin -->
+      <!-- Enlace de Matrícula para usuarios no admin ni docente -->
       <a href="/matricula" id="user-matricula-mobile-link" class="hidden menu-link py-4 px-4 text-lg font-semibold text-white hover:text-green-300 border-b border-slate-700 transition-colors">
         Matrículas
       </a>
-      
+
+      <!-- Enlace de Estudiantes para docentes -->
+      <a href="/docente-estudiantes" id="docente-mobile-link" class="hidden menu-link py-4 px-4 text-lg font-semibold text-white hover:text-amber-300 border-b border-slate-700 transition-colors">
+        Estudiantes
+      </a>
+
       <!-- Dropdown de Administración en móvil -->
       <div id="admin-menu-section" class="hidden border-b border-slate-700">
         <button id="admin-mobile-dropdown-btn" class="menu-link w-full flex items-center justify-between py-4 px-4 text-lg font-semibold text-white hover:text-amber-300 transition-colors">
@@ -158,8 +163,9 @@
     const token = localStorage.getItem('auth_token');
     const user = userData ? JSON.parse(userData) : null;
     const isAdmin = user && Array.isArray(user.role) && user.role.includes('admin');
+    const isDocente = user && Array.isArray(user.role) && user.role.includes('docente');
     const mobileAuthSection = document.getElementById('mobile-auth-section');
-    
+
     // Actualizar sección de administración
     const adminMenuSection = document.getElementById('admin-menu-section');
     if (adminMenuSection) {
@@ -169,11 +175,21 @@
         adminMenuSection.classList.add('hidden');
       }
     }
-    
-    // Mostrar enlace de matrícula solo para usuarios no admin
+
+    // Mostrar enlace de estudiantes solo para docentes (los admin ya lo tienen en su dropdown)
+    const docenteMobileLink = document.getElementById('docente-mobile-link');
+    if (docenteMobileLink) {
+      if (isDocente && !isAdmin) {
+        docenteMobileLink.classList.remove('hidden');
+      } else {
+        docenteMobileLink.classList.add('hidden');
+      }
+    }
+
+    // Mostrar enlace de matrícula solo para usuarios no admin ni docente
     const userMatriculaMobileLink = document.getElementById('user-matricula-mobile-link');
     if (userMatriculaMobileLink) {
-      if (user && token && !isAdmin) {
+      if (user && token && !isAdmin && !isDocente) {
         userMatriculaMobileLink.classList.remove('hidden');
       } else {
         userMatriculaMobileLink.classList.add('hidden');

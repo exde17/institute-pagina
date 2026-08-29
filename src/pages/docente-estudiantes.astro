@@ -1,0 +1,92 @@
+---
+import Layout from '../layouts/Layout.astro';
+import EstudiantesPassword from '../components/docente/EstudiantesPassword';
+---
+
+<Layout title="Estudiantes — FCM INSTITUTE" description="Cambio de contraseña de estudiantes para docentes">
+  <div id="docente-guard" class="hidden">
+    <div class="min-h-screen flex items-center justify-center bg-slate-100">
+      <div class="bg-white rounded-xl shadow-lg p-8 max-w-md w-full mx-4">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-slate-900 mb-2">Acceso Restringido</h2>
+          <p class="text-slate-600 mb-6">
+            Esta página es solo para docentes y administradores. Por favor, inicia sesión con una cuenta autorizada.
+          </p>
+          <div class="space-y-3">
+            <a
+              href="/auth/login"
+              class="block w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-center"
+            >
+              Iniciar Sesión
+            </a>
+            <a
+              href="/"
+              class="block w-full px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-semibold text-center"
+            >
+              Volver al Inicio
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="docente-content" class="hidden">
+    <div class="mx-auto max-w-7xl px-4 py-12">
+      <div class="mb-8">
+        <div class="flex items-center gap-3 mb-3">
+          <svg class="w-8 h-8 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10a3 3 0 11-6 0 3 3 0 016 0zM6 20a9 9 0 0118 0v2H6v-2z"/>
+          </svg>
+          <h1 class="text-4xl font-bold text-slate-900">Estudiantes</h1>
+        </div>
+        <p class="text-slate-600 mb-3">Busca un estudiante y cambia su contraseña.</p>
+        <div class="inline-block bg-amber-100 text-amber-800 px-4 py-2 rounded-full text-sm font-semibold">
+          Solo accesible para docentes y administradores
+        </div>
+      </div>
+
+      <EstudiantesPassword client:load />
+    </div>
+  </div>
+</Layout>
+
+<script>
+  function checkAuth() {
+    const token = localStorage.getItem('auth_token');
+    const userData = localStorage.getItem('auth_user');
+
+    const guard = document.getElementById('docente-guard');
+    const content = document.getElementById('docente-content');
+
+    if (!guard || !content) return;
+
+    if (!token || !userData) {
+      guard.classList.remove('hidden');
+      return;
+    }
+
+    try {
+      const user = JSON.parse(userData);
+      const roles = Array.isArray(user?.role) ? user.role : [];
+      const isAllowed = roles.includes('docente') || roles.includes('admin') || roles.includes('super-user');
+
+      if (isAllowed) {
+        content.classList.remove('hidden');
+      } else {
+        guard.classList.remove('hidden');
+      }
+    } catch (error) {
+      console.error('Error al verificar autenticación:', error);
+      guard.classList.remove('hidden');
+    }
+  }
+
+  checkAuth();
+  window.addEventListener('storage', checkAuth);
+</script>
